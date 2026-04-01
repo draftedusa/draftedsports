@@ -1,0 +1,26 @@
+import { Tag } from "@/types";
+
+export const tags: Tag[] = [
+  { id: "tag-nfl", name: "NFL", slug: "nfl" },
+  { id: "tag-nba", name: "NBA", slug: "nba" },
+  { id: "tag-mlb", name: "MLB", slug: "mlb" },
+  { id: "tag-nhl", name: "NHL", slug: "nhl" },
+  { id: "tag-breaking", name: "Breaking News", slug: "breaking-news" },
+  { id: "tag-trade", name: "Trade Rumors", slug: "trade-rumors" },
+  { id: "tag-injury", name: "Injury Update", slug: "injury-update" },
+  { id: "tag-highlights", name: "Highlights", slug: "highlights" },
+  { id: "tag-analysis", name: "Analysis", slug: "analysis" },
+  { id: "tag-rankings", name: "Power Rankings", slug: "power-rankings" },
+  { id: "tag-draft", name: "Draft", slug: "draft" },
+  { id: "tag-playoffs", name: "Playoffs", slug: "playoffs" },
+  { id: "tag-fantasy", name: "Fantasy Sports", slug: "fantasy-sports" },
+  { id: "tag-mvp", name: "MVP Race", slug: "mvp-race" },
+  { id: "tag-records", name: "Records", slug: "records" },
+  { id: "tag-rookies", name: "Rookies", slug: "rookies" },
+  { id: "tag-coaches", name: "Coaching Changes", slug: "coaching-changes" },
+  { id: "tag-preview", name: "Game Preview", slug: "game-preview" },
+  { id: "tag-recap", name: "Game Recap", slug: "game-recap" },
+  { id: "tag-stats", name: "Stats & Numbers", slug: "stats-and-numbers" },
+  { id: "tag-history", name: "History", slug: "history" },
+  { id: "tag-international", name: "International", slug: "international" },
+];
