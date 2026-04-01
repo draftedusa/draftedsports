@@ -1,65 +1,136 @@
-import Image from "next/image";
+import Link from "next/link";
+import { games } from "@/data/games";
+import { teams } from "@/data/teams";
+import { articles } from "@/data/articles";
+import { leagues } from "@/data/leagues";
+import GameCard from "@/components/cards/GameCard";
+import ArticleCard from "@/components/cards/ArticleCard";
+import { liveGames, topArticles, formatCount } from "@/lib/utils";
 
-export default function Home() {
+export default function HomePage() {
+  const live = liveGames(games);
+  const upcoming = games.filter((g) => g.status === "upcoming").slice(0, 4);
+  const recent = games.filter((g) => g.status === "final").slice(0, 4);
+  const featured = articles[0];
+  const trending = topArticles(articles, 8);
+  const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-10">
+      {/* Hero + Featured Article */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <ArticleCard article={featured} variant="featured" />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <div className="space-y-3">
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Trending Now</h2>
+          {trending.slice(1, 6).map((art) => (
+            <ArticleCard key={art.id} article={art} variant="compact" />
+          ))}
+        </div>
+      </section>
+
+      {/* Live Now */}
+      {live.length > 0 && (
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <h2 className="text-lg font-bold text-white">Live Now</h2>
+            <span className="text-sm text-gray-500">{live.length} games in progress</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {live.map((g) => (
+              <GameCard
+                key={g.id}
+                game={g}
+                homeTeam={teamMap[g.homeTeamId]}
+                awayTeam={teamMap[g.awayTeamId]}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* League strips */}
+      {leagues.map((league) => {
+        const leagueGames = games.filter((g) => g.leagueId === league.id).slice(0, 3);
+        const leagueArticles = articles.filter((a) => a.tagIds.includes(`tag-${league.id}`)).slice(0, 3);
+        if (!leagueGames.length && !leagueArticles.length) return null;
+        return (
+          <section key={league.id}>
+            <div className="flex items-center justify-between mb-4 border-b border-gray-800 pb-2">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <span>{league.logo}</span> {league.name}
+              </h2>
+              <Link href={`/league/${league.slug}`} className="text-sm text-red-400 hover:text-red-300 font-semibold">
+                See All →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Games column */}
+              <div className="space-y-3">
+                {leagueGames.map((g) => (
+                  <GameCard
+                    key={g.id}
+                    game={g}
+                    homeTeam={teamMap[g.homeTeamId]}
+                    awayTeam={teamMap[g.awayTeamId]}
+                    compact
+                  />
+                ))}
+              </div>
+              {/* Articles */}
+              <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {leagueArticles.map((a) => (
+                  <ArticleCard key={a.id} article={a} />
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
+
+      {/* Upcoming Games */}
+      <section>
+        <h2 className="text-lg font-bold text-white mb-4">Upcoming Games</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {upcoming.map((g) => (
+            <GameCard
+              key={g.id}
+              game={g}
+              homeTeam={teamMap[g.homeTeamId]}
+              awayTeam={teamMap[g.awayTeamId]}
+              compact
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          ))}
         </div>
-      </main>
+      </section>
+
+      {/* Recent Results */}
+      <section>
+        <h2 className="text-lg font-bold text-white mb-4">Recent Results</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {recent.map((g) => (
+            <GameCard
+              key={g.id}
+              game={g}
+              homeTeam={teamMap[g.homeTeamId]}
+              awayTeam={teamMap[g.awayTeamId]}
+              compact
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Top Articles grid */}
+      <section>
+        <h2 className="text-lg font-bold text-white mb-4">Top Stories</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {trending.slice(0, 8).map((a) => (
+            <ArticleCard key={a.id} article={a} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
