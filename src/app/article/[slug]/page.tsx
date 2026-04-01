@@ -82,16 +82,16 @@ export default function ArticlePage({ params }: Props) {
         {/* Main article */}
         <div className="lg:col-span-2 space-y-6">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-600">
-            <Link href="/" className="hover:text-gray-400">Home</Link>
+          <div className="flex items-center gap-1.5 text-xs text-surface-muted">
+            <Link href="/" className="hover:text-surface-muted">Home</Link>
             <span>/</span>
             {articleTags[0] && (
               <>
-                <Link href={`/tag/${articleTags[0].slug}`} className="hover:text-gray-400">{articleTags[0].name}</Link>
+                <Link href={`/tag/${articleTags[0].slug}`} className="hover:text-surface-muted">{articleTags[0].name}</Link>
                 <span>/</span>
               </>
             )}
-            <span className="text-gray-500 truncate">{article.title.slice(0, 40)}…</span>
+            <span className="text-surface-muted truncate">{article.title.slice(0, 40)}…</span>
           </div>
 
           {/* Header */}
@@ -103,17 +103,17 @@ export default function ArticlePage({ params }: Props) {
                 </Link>
               ))}
             </div>
-            <h1 className="text-3xl font-black text-white leading-tight mb-4">{article.title}</h1>
+            <h1 className="text-3xl font-black text-surface-text leading-tight mb-4">{article.title}</h1>
 
             {/* Byline + meta */}
-            <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-gray-800">
-              <div className="flex items-center gap-3 text-sm text-gray-400">
-                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white">
+            <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-surface-300">
+              <div className="flex items-center gap-3 text-sm text-surface-muted">
+                <div className="w-8 h-8 rounded-full bg-surface-300 flex items-center justify-center text-sm font-bold text-white">
                   {article.byline[0]}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-200 text-sm">{article.byline}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="font-semibold text-surface-text text-sm">{article.byline}</p>
+                  <p className="text-xs text-surface-muted">
                     {new Date(article.publishDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                     {" · "}{article.readTime} min read{" · "}{formatCount(article.views)} views
                   </p>
@@ -123,19 +123,19 @@ export default function ArticlePage({ params }: Props) {
               {/* Action row */}
               <div className="flex items-center gap-2">
                 <button onClick={() => setArticleReactions((r) => ({ ...r, fire: r.fire + 1 }))}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors">
+                  className="flex items-center gap-1 px-3 py-1.5 bg-surface-300 hover:bg-surface-300 rounded text-sm transition-colors">
                   🔥 {articleReactions.fire > 0 ? articleReactions.fire : ""}
                 </button>
                 <button onClick={() => setArticleReactions((r) => ({ ...r, wow: r.wow + 1 }))}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors">
+                  className="flex items-center gap-1 px-3 py-1.5 bg-surface-300 hover:bg-surface-300 rounded text-sm transition-colors">
                   😮 {articleReactions.wow > 0 ? articleReactions.wow : ""}
                 </button>
                 <button onClick={() => setSaved(!saved)}
-                  className={`px-3 py-1.5 rounded text-sm font-semibold transition-colors ${saved ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"}`}>
+                  className={`px-3 py-1.5 rounded text-sm font-semibold transition-colors ${saved ? "bg-blue-600 text-white" : "bg-surface-300 text-surface-muted hover:text-surface-text hover:bg-surface-300"}`}>
                   {saved ? "✓ Saved" : "🔖 Save"}
                 </button>
                 <button onClick={handleCopyLink}
-                  className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded text-sm transition-colors">
+                  className="px-3 py-1.5 bg-surface-300 hover:bg-surface-300 text-surface-muted hover:text-surface-text rounded text-sm transition-colors">
                   {copyMsg || "🔗 Share"}
                 </button>
               </div>
@@ -146,7 +146,7 @@ export default function ArticlePage({ params }: Props) {
               <div className="flex flex-wrap gap-2 mt-3">
                 {articleTeams.map((team) => (
                   <Link key={team.id} href={`/team/${team.slug}`}>
-                    <span className="flex items-center gap-1.5 px-2 py-1 bg-gray-800 rounded text-xs text-gray-300 hover:text-white hover:bg-gray-700 transition-colors">
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-surface-300 rounded text-xs text-surface-text hover:text-surface-text hover:bg-surface-300 transition-colors">
                       {team.logo} {team.name}
                     </span>
                   </Link>
@@ -163,22 +163,22 @@ export default function ArticlePage({ params }: Props) {
           {/* Body */}
           <div className="space-y-4">
             {article.body.split("\n\n").map((para, i) => (
-              <p key={i} className="text-gray-200 leading-relaxed text-base">{para}</p>
+              <p key={i} className="text-surface-text leading-relaxed text-base">{para}</p>
             ))}
           </div>
 
           {/* Social share row */}
-          <div className="flex items-center gap-2 py-4 border-t border-b border-gray-800">
-            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide mr-2">Share:</span>
+          <div className="flex items-center gap-2 py-4 border-t border-b border-surface-300">
+            <span className="text-xs text-surface-muted font-semibold uppercase tracking-wide mr-2">Share:</span>
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}`}
               target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-xs font-semibold transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-300 hover:bg-surface-300 text-surface-text hover:text-surface-text rounded text-xs font-semibold transition-colors"
             >
               𝕏 Post
             </a>
             <button onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-xs font-semibold transition-colors">
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-300 hover:bg-surface-300 text-surface-text hover:text-surface-text rounded text-xs font-semibold transition-colors">
               🔗 {copyMsg || "Copy Link"}
             </button>
           </div>
@@ -186,14 +186,14 @@ export default function ArticlePage({ params }: Props) {
           {/* Poll */}
           {articlePoll && (
             <Panel title="Reader Poll" accent="border-blue-600">
-              <p className="text-sm font-semibold text-white mb-3">{articlePoll.question}</p>
+              <p className="text-sm font-semibold text-surface-text mb-3">{articlePoll.question}</p>
               <div className="space-y-2">
                 {articlePoll.options.map((opt) => {
                   const pct = Math.round((opt.votes / articlePoll.votes) * 100);
                   const isVoted = votedOption === opt.id;
                   return (
                     <button key={opt.id} onClick={() => setVotedOption(opt.id)} className="w-full text-left">
-                      <div className={`relative rounded overflow-hidden border transition-colors ${isVoted ? "border-blue-500" : "border-gray-700 hover:border-gray-500"}`}>
+                      <div className={`relative rounded overflow-hidden border transition-colors ${isVoted ? "border-blue-500" : "border-surface-300 hover:border-gray-500"}`}>
                         <div className="absolute inset-y-0 left-0 bg-blue-900/40" style={{ width: `${pct}%` }} />
                         <div className="relative flex items-center justify-between px-3 py-2">
                           <span className="text-sm text-white">{opt.text}</span>
@@ -204,14 +204,14 @@ export default function ArticlePage({ params }: Props) {
                   );
                 })}
               </div>
-              <p className="text-xs text-gray-500 mt-2">{formatCount(articlePoll.votes)} votes</p>
+              <p className="text-xs text-surface-muted mt-2">{formatCount(articlePoll.votes)} votes</p>
             </Panel>
           )}
 
           {/* Newsletter CTA */}
           <div className="bg-gradient-to-r from-red-950/50 to-gray-900 border border-red-900/40 rounded-xl p-6">
-            <h3 className="text-lg font-black text-white mb-1">Never miss a story.</h3>
-            <p className="text-sm text-gray-400 mb-4">Get the best of UNDRAFTED delivered to your inbox. No spam, unsubscribe any time.</p>
+            <h3 className="text-lg font-black text-surface-text mb-1">Never miss a story.</h3>
+            <p className="text-sm text-surface-muted mb-4">Get the best of UNDRAFTED delivered to your inbox. No spam, unsubscribe any time.</p>
             {newsletterDone ? (
               <p className="text-green-400 font-semibold text-sm">✅ You're in! Check your inbox.</p>
             ) : (
@@ -222,9 +222,9 @@ export default function ArticlePage({ params }: Props) {
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-red-600"
+                  className="flex-1 bg-surface-300 border border-surface-300 rounded-lg px-4 py-2.5 text-surface-text placeholder-gray-600 text-sm focus:outline-none focus:border-red-600"
                 />
-                <button type="submit" className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-sm rounded-lg transition-colors whitespace-nowrap">
+                <button type="submit" className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-surface-text font-bold text-sm rounded-lg transition-colors whitespace-nowrap">
                   Subscribe
                 </button>
               </form>
@@ -242,27 +242,27 @@ export default function ArticlePage({ params }: Props) {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Share your thoughts…"
-                className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
+                className="flex-1 bg-surface-300 border border-surface-300 rounded px-3 py-2 text-sm text-surface-text placeholder-gray-500 focus:outline-none focus:border-gray-500"
               />
-              <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded transition-colors">
+              <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-500 text-surface-text text-sm font-semibold rounded transition-colors">
                 Post
               </button>
             </form>
             <div className="space-y-4">
               {allComments.map((cmt) => (
-                <div key={cmt.id} className="border-b border-gray-800 pb-4 last:border-0">
+                <div key={cmt.id} className="border-b border-surface-300 pb-4 last:border-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-semibold text-gray-300">@user</span>
-                    <span className="text-xs text-gray-600">{timeAgo(cmt.createdAt)}</span>
+                    <span className="text-xs font-semibold text-surface-text">@user</span>
+                    <span className="text-xs text-surface-muted">{timeAgo(cmt.createdAt)}</span>
                   </div>
-                  <p className="text-sm text-gray-200">{cmt.body}</p>
+                  <p className="text-sm text-surface-text">{cmt.body}</p>
                   <div className="flex items-center gap-3 mt-2">
                     {(["fire", "wow", "facts", "lol"] as const).map((emoji) => {
                       const icons = { fire: "🔥", wow: "😮", facts: "💯", lol: "😂" };
                       const base = cmt.reactions[emoji] + (reactionCounts[cmt.id]?.[emoji] ?? 0);
                       return (
                         <button key={emoji} onClick={() => handleReaction(cmt.id, emoji)}
-                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-white transition-colors">
+                          className="flex items-center gap-1 text-xs text-surface-muted hover:text-surface-text transition-colors">
                           {icons[emoji]} {formatCount(base)}
                         </button>
                       );
@@ -288,11 +288,11 @@ export default function ArticlePage({ params }: Props) {
 
           {/* Tag cloud */}
           {articleTags.length > 0 && (
-            <Panel title="Topics" accent="border-gray-700">
+            <Panel title="Topics" accent="border-surface-300">
               <div className="flex flex-wrap gap-2">
                 {articleTags.map((tag) => (
                   <Link key={tag.id} href={`/tag/${tag.slug}`}>
-                    <span className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-full text-xs font-medium transition-colors">
+                    <span className="px-3 py-1 bg-surface-300 hover:bg-surface-300 text-surface-text hover:text-surface-text rounded-full text-xs font-medium transition-colors">
                       {tag.name}
                     </span>
                   </Link>

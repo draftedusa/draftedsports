@@ -6,6 +6,7 @@ import { leagues } from "@/data/leagues";
 import { transactions } from "@/data/transactions";
 import GameCard from "@/components/cards/GameCard";
 import ArticleCard from "@/components/cards/ArticleCard";
+import ArticleHero from "@/components/editorial/ArticleHero";
 import NewsletterForm from "@/components/ui/NewsletterForm";
 import { liveGames, topArticles, formatCount } from "@/lib/utils";
 
@@ -13,30 +14,32 @@ export default function HomePage() {
   const live = liveGames(games);
   const upcoming = games.filter((g) => g.status === "upcoming").slice(0, 4);
   const recent = games.filter((g) => g.status === "final").slice(0, 4);
-  const sorted = topArticles(articles, 10);
+  const sorted = topArticles(articles, 20);
   const featured = sorted[0];
-  const trending = sorted.slice(1, 6);
-  const editorPicks = sorted.slice(1, 5); // curated feel
+  const trending = sorted.slice(1, 7);
+  const editorPicks = sorted.slice(7, 11);
   const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
   const breakingTx = transactions.filter((t) => t.isBreaking).slice(0, 4);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-12">
+    <div className="space-y-10">
 
-      {/* ── Hero + Trending sidebar ───────────────────────────── */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <ArticleCard article={featured} variant="featured" />
-        </div>
-        <div className="space-y-1">
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Trending Now</h2>
+      {/* ── 1. HERO — ArticleHero component ──────────────────── */}
+      <section>
+        <ArticleHero article={featured} />
+      </section>
+
+      {/* ── 2. TRENDING — 2-column article grid ──────────────── */}
+      <section>
+        <SectionHeader title="Trending Now" badge={`${trending.length} stories`} href="/search" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {trending.map((art) => (
-            <ArticleCard key={art.id} article={art} variant="compact" />
+            <ArticleCard key={art.id} article={art} isTrending={art.isTrending} />
           ))}
         </div>
       </section>
 
-      {/* ── Live Now ──────────────────────────────────────────── */}
+      {/* ── 3. LIVE SCORES — visual break after trending ─────── */}
       {live.length > 0 && (
         <section>
           <SectionHeader title="Live Now" badge={`${live.length} games`} href="/scores" live />
@@ -48,7 +51,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Breaking Transactions ──────────────────────────────── */}
+      {/* ── 4. BREAKING TRANSACTIONS ─────────────────────────── */}
       {breakingTx.length > 0 && (
         <section>
           <SectionHeader title="Breaking News" href="/transactions" />
@@ -63,7 +66,7 @@ export default function HomePage() {
                     </span>
                     <div>
                       <p className="text-sm font-bold text-surface-text leading-snug">{tx.headline}</p>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         {txTeams.map((t) => (
                           <span key={t.id} className="text-xs text-surface-muted">{t.logo} {t.name}</span>
                         ))}
@@ -78,7 +81,7 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── League strips ─────────────────────────────────────── */}
+      {/* ── 5. LEAGUE STRIPS ─────────────────────────────────── */}
       {leagues.map((league) => {
         const leagueGames = games.filter((g) => g.leagueId === league.id).slice(0, 3);
         const leagueArticles = articles.filter((a) => a.tagIds.includes(`tag-${league.id}`)).slice(0, 3);
@@ -102,7 +105,7 @@ export default function HomePage() {
         );
       })}
 
-      {/* ── Editor's Picks ────────────────────────────────────── */}
+      {/* ── 6. EDITOR'S PICKS ────────────────────────────────── */}
       <section>
         <SectionHeader title="Editor's Picks" href="/search" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -112,7 +115,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Upcoming Games + Recent Results ───────────────────── */}
+      {/* ── 7. UPCOMING + RECENT ─────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <section>
           <SectionHeader title="Upcoming Games" href="/scores" />
@@ -132,19 +135,29 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* ── Newsletter CTA ────────────────────────────────────── */}
+      {/* ── 8. NEWSLETTER CTA ────────────────────────────────── */}
       <section className="bg-gradient-to-r from-brand/10 to-brand-light/5 border border-brand/20 rounded-xl p-8 text-center">
-        <h2 className="text-2xl font-black tracking-tighter text-surface-text mb-2">Get UNDRAFTED in your inbox.</h2>
+        <h2 className="text-2xl font-black tracking-tighter text-surface-text mb-2">
+          Get UNDRAFTED in your inbox.
+        </h2>
         <p className="text-surface-muted mb-6 max-w-md mx-auto text-sm">
           Breaking news, game recaps, and the takes you can&apos;t miss — delivered every morning.
         </p>
         <NewsletterForm />
       </section>
+
     </div>
   );
 }
 
-function SectionHeader({ title, badge, href, live }: { title: string; badge?: string; href?: string; live?: boolean }) {
+function SectionHeader({
+  title, badge, href, live,
+}: {
+  title: string;
+  badge?: string;
+  href?: string;
+  live?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between mb-4 border-b border-surface-300 pb-2">
       <h2 className="text-lg font-bold text-surface-text flex items-center gap-2">

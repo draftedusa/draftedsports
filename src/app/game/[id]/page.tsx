@@ -81,15 +81,15 @@ export default function GamePage({ params }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
       {/* Scoreboard */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <div className="bg-surface-200 border border-surface-300 rounded-xl p-6">
         <div className="flex items-center gap-3 mb-6">
           <GameStatusBadge status={game.status} />
           {game.status === "live" && (
-            <span className="text-gray-400 text-sm font-medium">{game.quarter} · {game.timeRemaining}</span>
+            <span className="text-surface-muted text-sm font-medium">{game.quarter} · {game.timeRemaining}</span>
           )}
-          {game.status === "final" && <span className="text-gray-500 text-sm">{game.date}</span>}
-          {game.status === "upcoming" && <span className="text-gray-400 text-sm">{game.date}</span>}
-          <span className="ml-auto text-xs text-gray-600 uppercase">{game.leagueId}</span>
+          {game.status === "final" && <span className="text-surface-muted text-sm">{game.date}</span>}
+          {game.status === "upcoming" && <span className="text-surface-muted text-sm">{game.date}</span>}
+          <span className="ml-auto text-xs text-surface-muted uppercase">{game.leagueId}</span>
         </div>
 
         {/* Main score display */}
@@ -97,56 +97,56 @@ export default function GamePage({ params }: Props) {
           <div className="text-center">
             <Link href={`/team/${awayTeam.slug}`}>
               <span className="text-6xl block mb-2">{awayTeam.logo}</span>
-              <p className="text-lg font-bold text-white hover:text-red-400 transition-colors">{awayTeam.name}</p>
-              <p className="text-sm text-gray-500">{awayTeam.record}</p>
+              <p className="text-lg font-bold text-surface-text hover:text-brand transition-colors">{awayTeam.name}</p>
+              <p className="text-sm text-surface-muted">{awayTeam.record}</p>
             </Link>
           </div>
           <div className="text-center">
             {game.status !== "upcoming" ? (
               <div className="flex items-center justify-center gap-4">
-                <span className={`text-5xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-white" : "text-gray-600"}`}>
+                <span className={`text-5xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-surface-text" : "text-surface-muted"}`}>
                   {game.awayScore}
                 </span>
                 <span className="text-2xl text-gray-700">—</span>
-                <span className={`text-5xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-white" : "text-gray-600"}`}>
+                <span className={`text-5xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-surface-text" : "text-surface-muted"}`}>
                   {game.homeScore}
                 </span>
               </div>
             ) : (
-              <p className="text-gray-400 text-xl font-semibold">vs</p>
+              <p className="text-surface-muted text-xl font-semibold">vs</p>
             )}
           </div>
           <div className="text-center">
             <Link href={`/team/${homeTeam.slug}`}>
               <span className="text-6xl block mb-2">{homeTeam.logo}</span>
-              <p className="text-lg font-bold text-white hover:text-red-400 transition-colors">{homeTeam.name}</p>
-              <p className="text-sm text-gray-500">{homeTeam.record}</p>
+              <p className="text-lg font-bold text-surface-text hover:text-brand transition-colors">{homeTeam.name}</p>
+              <p className="text-sm text-surface-muted">{homeTeam.record}</p>
             </Link>
           </div>
         </div>
 
         {/* Quarter-by-quarter box score */}
         {qtrScores && (
-          <div className="border-t border-gray-800 pt-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Box Score</p>
+          <div className="border-t border-surface-300 pt-4">
+            <p className="text-xs text-surface-muted uppercase tracking-wide mb-2">Box Score</p>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-center">
                 <thead>
-                  <tr className="text-xs text-gray-500">
+                  <tr className="text-xs text-surface-muted">
                     <th className="text-left pb-1 pr-4">Team</th>
                     {qtrScores.map((q) => <th key={q.label} className="pb-1 w-10">{q.label}</th>)}
                     <th className="pb-1 w-12 font-bold">T</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-t border-gray-800">
-                    <td className="text-left py-2 pr-4 font-semibold text-gray-300">{awayTeam.name}</td>
-                    {qtrScores.map((q) => <td key={q.label} className="py-2 text-gray-400">{q.away}</td>)}
+                  <tr className="border-t border-surface-300">
+                    <td className="text-left py-2 pr-4 font-semibold text-surface-text">{awayTeam.name}</td>
+                    {qtrScores.map((q) => <td key={q.label} className="py-2 text-surface-muted">{q.away}</td>)}
                     <td className="py-2 font-black text-white">{game.awayScore}</td>
                   </tr>
-                  <tr className="border-t border-gray-800">
-                    <td className="text-left py-2 pr-4 font-semibold text-gray-300">{homeTeam.name}</td>
-                    {qtrScores.map((q) => <td key={q.label} className="py-2 text-gray-400">{q.home}</td>)}
+                  <tr className="border-t border-surface-300">
+                    <td className="text-left py-2 pr-4 font-semibold text-surface-text">{homeTeam.name}</td>
+                    {qtrScores.map((q) => <td key={q.label} className="py-2 text-surface-muted">{q.home}</td>)}
                     <td className="py-2 font-black text-white">{game.homeScore}</td>
                   </tr>
                 </tbody>
@@ -157,13 +157,13 @@ export default function GamePage({ params }: Props) {
 
         {/* Betting odds */}
         {gameOdds && (
-          <div className="border-t border-gray-800 pt-4 mt-2">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Odds — {gameOdds.provider}</p>
+          <div className="border-t border-surface-300 pt-4 mt-2">
+            <p className="text-xs text-surface-muted uppercase tracking-wide mb-2">Odds — {gameOdds.provider}</p>
             <div className="flex flex-wrap gap-4 text-sm">
-              <div><span className="text-gray-500 text-xs">Spread </span><span className="text-white font-semibold">{gameOdds.spread}</span></div>
-              <div><span className="text-gray-500 text-xs">O/U </span><span className="text-white font-semibold">{gameOdds.overUnder}</span></div>
-              <div><span className="text-gray-500 text-xs">ML Home </span><span className="text-white font-semibold">{gameOdds.moneylineHome}</span></div>
-              <div><span className="text-gray-500 text-xs">ML Away </span><span className="text-white font-semibold">{gameOdds.moneylineAway}</span></div>
+              <div><span className="text-surface-muted text-xs">Spread </span><span className="text-white font-semibold">{gameOdds.spread}</span></div>
+              <div><span className="text-surface-muted text-xs">O/U </span><span className="text-white font-semibold">{gameOdds.overUnder}</span></div>
+              <div><span className="text-surface-muted text-xs">ML Home </span><span className="text-white font-semibold">{gameOdds.moneylineHome}</span></div>
+              <div><span className="text-surface-muted text-xs">ML Away </span><span className="text-white font-semibold">{gameOdds.moneylineAway}</span></div>
             </div>
           </div>
         )}
@@ -177,14 +177,14 @@ export default function GamePage({ params }: Props) {
               <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 {[...game.events].reverse().map((evt) => (
                   <div key={evt.id} className="flex gap-3 items-start">
-                    <span className="text-xs text-gray-500 tabular-nums shrink-0 pt-0.5 w-20">{evt.time}</span>
+                    <span className="text-xs text-surface-muted tabular-nums shrink-0 pt-0.5 w-20">{evt.time}</span>
                     <div className="flex-1">
-                      <p className={`text-sm ${evt.isHighlight ? "text-white font-semibold" : "text-gray-300"}`}>
+                      <p className={`text-sm ${evt.isHighlight ? "text-white font-semibold" : "text-surface-text"}`}>
                         {evt.isHighlight && <span className="text-orange-400 mr-1">🔥</span>}
                         {evt.description}
                       </p>
                     </div>
-                    <span className="text-xs text-gray-600 uppercase shrink-0">{evt.type}</span>
+                    <span className="text-xs text-surface-muted uppercase shrink-0">{evt.type}</span>
                   </div>
                 ))}
               </div>
@@ -194,14 +194,14 @@ export default function GamePage({ params }: Props) {
           {/* Poll */}
           {gamePoll && (
             <Panel title="Fan Poll" accent="border-blue-600">
-              <p className="text-sm font-semibold text-white mb-3">{gamePoll.question}</p>
+              <p className="text-sm font-semibold text-surface-text mb-3">{gamePoll.question}</p>
               <div className="space-y-2">
                 {gamePoll.options.map((opt) => {
                   const pct = Math.round((opt.votes / gamePoll.votes) * 100);
                   const isVoted = votedOption === opt.id;
                   return (
                     <button key={opt.id} onClick={() => setVotedOption(opt.id)} className="w-full text-left">
-                      <div className={`relative rounded overflow-hidden border transition-colors ${isVoted ? "border-blue-500" : "border-gray-700 hover:border-gray-500"}`}>
+                      <div className={`relative rounded overflow-hidden border transition-colors ${isVoted ? "border-blue-500" : "border-surface-300 hover:border-gray-500"}`}>
                         <div className="absolute inset-y-0 left-0 bg-blue-900/40" style={{ width: `${pct}%` }} />
                         <div className="relative flex items-center justify-between px-3 py-2">
                           <span className="text-sm text-white">{opt.text}</span>
@@ -212,7 +212,7 @@ export default function GamePage({ params }: Props) {
                   );
                 })}
               </div>
-              <p className="text-xs text-gray-500 mt-2">{formatCount(gamePoll.votes)} votes</p>
+              <p className="text-xs text-surface-muted mt-2">{formatCount(gamePoll.votes)} votes</p>
             </Panel>
           )}
 
@@ -220,7 +220,7 @@ export default function GamePage({ params }: Props) {
           {gameThread && (
             <Panel
               title={gameThread.title}
-              titleRight={<span className="text-gray-500">{formatCount(gameThread.commentCount + localComments.length)} comments</span>}
+              titleRight={<span className="text-surface-muted">{formatCount(gameThread.commentCount + localComments.length)} comments</span>}
               accent="border-yellow-600"
             >
               <form onSubmit={handleComment} className="flex gap-2 mb-4">
@@ -228,29 +228,29 @@ export default function GamePage({ params }: Props) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Join the discussion…"
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
+                  className="flex-1 bg-surface-300 border border-surface-300 rounded px-3 py-2 text-sm text-surface-text placeholder-gray-500 focus:outline-none focus:border-gray-500"
                 />
-                <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded transition-colors">
+                <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-500 text-surface-text text-sm font-semibold rounded transition-colors">
                   Post
                 </button>
               </form>
               <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
                 {allComments.map((cmt) => (
-                  <div key={cmt.id} className="border-b border-gray-800 pb-4 last:border-0">
+                  <div key={cmt.id} className="border-b border-surface-300 pb-4 last:border-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-gray-300">@user</span>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs font-semibold text-surface-text">@user</span>
+                      <span className="text-xs text-surface-muted">
                         {new Date(cmt.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-200">{cmt.body}</p>
+                    <p className="text-sm text-surface-text">{cmt.body}</p>
                     <div className="flex items-center gap-3 mt-2">
                       {(["fire", "wow", "facts", "lol"] as const).map((emoji) => {
                         const icons = { fire: "🔥", wow: "😮", facts: "💯", lol: "😂" };
                         const base = cmt.reactions[emoji] + (reactionCounts[cmt.id]?.[emoji] ?? 0);
                         return (
                           <button key={emoji} onClick={() => handleReaction(cmt.id, emoji)}
-                            className="flex items-center gap-1 text-xs text-gray-500 hover:text-white transition-colors">
+                            className="flex items-center gap-1 text-xs text-surface-muted hover:text-surface-text transition-colors">
                             {icons[emoji]} {formatCount(base)}
                           </button>
                         );
@@ -270,10 +270,10 @@ export default function GamePage({ params }: Props) {
               <div className="space-y-3">
                 {relatedArticles.map((art) => (
                   <Link key={art.id} href={`/article/${art.slug}`} className="block group">
-                    <p className="text-sm font-semibold text-white group-hover:text-red-400 transition-colors leading-snug">
+                    <p className="text-sm font-semibold text-surface-text group-hover:text-brand transition-colors leading-snug">
                       {art.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{art.byline} · {formatCount(art.views)} views</p>
+                    <p className="text-xs text-surface-muted mt-0.5">{art.byline} · {formatCount(art.views)} views</p>
                   </Link>
                 ))}
               </div>
@@ -285,10 +285,10 @@ export default function GamePage({ params }: Props) {
             <Panel title="Injury & News" accent="border-red-700">
               <div className="space-y-3">
                 {gameTransactions.slice(0, 4).map((tx) => (
-                  <div key={tx.id} className="border-b border-gray-800 pb-3 last:border-0">
-                    <p className="text-xs font-bold text-red-400 capitalize">{tx.type}</p>
-                    <p className="text-sm text-gray-200 mt-0.5 leading-snug">{tx.headline}</p>
-                    <p className="text-xs text-gray-600 mt-0.5">{tx.date}</p>
+                  <div key={tx.id} className="border-b border-surface-300 pb-3 last:border-0">
+                    <p className="text-xs font-bold text-brand capitalize">{tx.type}</p>
+                    <p className="text-sm text-surface-text mt-0.5 leading-snug">{tx.headline}</p>
+                    <p className="text-xs text-surface-muted mt-0.5">{tx.date}</p>
                   </div>
                 ))}
               </div>

@@ -23,8 +23,8 @@ export default async function ProfilePage({ params }: Props) {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       {/* Profile Header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 flex items-center gap-6">
-        <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center text-4xl border-2 border-gray-700">
+      <div className="bg-surface-200 border border-surface-300 rounded-xl p-8 flex items-center gap-6">
+        <div className="w-20 h-20 rounded-full bg-surface-300 flex items-center justify-center text-4xl border-2 border-surface-300">
           {user.avatar}
         </div>
         <div>
@@ -36,7 +36,7 @@ export default async function ProfilePage({ params }: Props) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-400">
+          <div className="flex items-center gap-4 text-sm text-surface-muted">
             <span>{savedArticles.length} saved articles</span>
             <span>·</span>
             <span>{favoriteTeams.length} favorite teams</span>
@@ -51,7 +51,7 @@ export default async function ProfilePage({ params }: Props) {
           {/* Saved Articles */}
           {savedArticles.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Saved Articles</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Saved Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {savedArticles.map((a) => (
                   <ArticleCard key={a.id} article={a} />
@@ -63,12 +63,12 @@ export default async function ProfilePage({ params }: Props) {
           {/* Recent Comments */}
           {userComments.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Recent Comments</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Recent Comments</h2>
               <div className="space-y-3">
                 {userComments.map((cmt) => (
-                  <div key={cmt.id} className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-                    <p className="text-sm text-gray-200 mb-2">{cmt.body}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <div key={cmt.id} className="bg-surface-200 border border-surface-300 rounded-lg p-4">
+                    <p className="text-sm text-surface-text mb-2">{cmt.body}</p>
+                    <div className="flex items-center gap-3 text-xs text-surface-muted">
                       <span>
                         {new Date(cmt.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
@@ -90,18 +90,18 @@ export default async function ProfilePage({ params }: Props) {
               <div className="space-y-3">
                 {favoriteTeams.map((team) => (
                   <Link key={team.id} href={`/team/${team.slug}`}>
-                    <div className="flex items-center gap-3 p-2 rounded hover:bg-gray-800 transition-colors">
+                    <div className="flex items-center gap-3 p-2 rounded hover:bg-surface-300 transition-colors">
                       <span className="text-2xl">{team.logo}</span>
                       <div>
                         <p className="text-sm font-semibold text-white">{team.name}</p>
-                        <p className="text-xs text-gray-500">{team.record}</p>
+                        <p className="text-xs text-surface-muted">{team.record}</p>
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No favorite teams yet.</p>
+              <p className="text-sm text-surface-muted">No favorite teams yet.</p>
             )}
           </Panel>
         </div>

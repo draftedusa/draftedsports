@@ -43,21 +43,21 @@ export default async function PlayerPage({ params }: Props) {
       >
         {/* Jersey number avatar */}
         <div
-          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-white border-4 shrink-0"
+          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-surface-text border-4 shrink-0"
           style={{ borderColor: team.primaryColor, background: team.primaryColor + "33" }}
         >
           {player.number}
         </div>
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Link href={`/team/${team.slug}`} className="text-xs text-gray-400 hover:text-gray-200 font-semibold">
+            <Link href={`/team/${team.slug}`} className="text-xs text-surface-muted hover:text-surface-text font-semibold">
               {team.logo} {team.name}
             </Link>
             <span className="text-gray-700">·</span>
-            <span className="text-xs text-gray-500 font-mono">{player.position}</span>
+            <span className="text-xs text-surface-muted font-mono">{player.position}</span>
           </div>
           <h1 className="text-4xl font-black text-white">{player.name}</h1>
-          <p className="text-gray-400 mt-1">#{player.number} · {player.position}</p>
+          <p className="text-surface-muted mt-1">#{player.number} · {player.position}</p>
         </div>
       </div>
 
@@ -65,9 +65,9 @@ export default async function PlayerPage({ params }: Props) {
       <Panel title="Season Stats" accent="border-red-600">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {Object.entries(player.stats).map(([key, val]) => (
-            <div key={key} className="text-center bg-gray-800 rounded-lg p-4">
+            <div key={key} className="text-center bg-surface-300 rounded-lg p-4">
               <p className="text-2xl font-black text-white">{val}</p>
-              <p className="text-xs text-gray-500 mt-1 uppercase tracking-wide">
+              <p className="text-xs text-surface-muted mt-1 uppercase tracking-wide">
                 {STAT_LABELS[key] ?? key}
               </p>
             </div>
@@ -91,13 +91,13 @@ export default async function PlayerPage({ params }: Props) {
                   const won = teamScore > oppScore;
                   return (
                     <Link key={g.id} href={`/game/${g.id}`}>
-                      <div className="flex items-center justify-between p-3 rounded bg-gray-800 hover:bg-gray-700 transition-colors">
+                      <div className="flex items-center justify-between p-3 rounded bg-surface-300 hover:bg-surface-300 transition-colors">
                         <div className="flex items-center gap-2">
-                          <span className={`text-xs font-bold w-6 ${won ? "text-green-400" : "text-red-400"}`}>{won ? "W" : "L"}</span>
+                          <span className={`text-xs font-bold w-6 ${won ? "text-green-400" : "text-brand"}`}>{won ? "W" : "L"}</span>
                           <span className="text-sm text-white">{isHome ? "vs" : "@"} {opponent.name}</span>
                         </div>
-                        <span className="text-sm font-bold text-white tabular-nums">{teamScore}–{oppScore}</span>
-                        <span className="text-xs text-gray-500">{g.date}</span>
+                        <span className="text-sm font-bold text-surface-text tabular-nums">{teamScore}–{oppScore}</span>
+                        <span className="text-xs text-surface-muted">{g.date}</span>
                       </div>
                     </Link>
                   );
@@ -109,7 +109,7 @@ export default async function PlayerPage({ params }: Props) {
           {/* Related articles */}
           {playerArticles.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Related Articles</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Related Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {playerArticles.map((a) => (
                   <ArticleCard key={a.id} article={a} />
@@ -123,7 +123,7 @@ export default async function PlayerPage({ params }: Props) {
         <div className="space-y-4">
           <Panel title="Player Info" accent="border-gray-600">
             <div className="space-y-2 text-sm">
-              <InfoRow label="Team" value={<Link href={`/team/${team.slug}`} className="text-red-400 hover:text-red-300">{team.name}</Link>} />
+              <InfoRow label="Team" value={<Link href={`/team/${team.slug}`} className="text-brand hover:text-brand/80">{team.name}</Link>} />
               <InfoRow label="Position" value={player.position} />
               <InfoRow label="Jersey" value={`#${player.number}`} />
               <InfoRow label="League" value={team.leagueId.toUpperCase()} />
@@ -136,8 +136,8 @@ export default async function PlayerPage({ params }: Props) {
                 {playerTx.map((tx) => (
                   <div key={tx.id}>
                     <p className="text-xs font-bold text-yellow-400 capitalize">{tx.type}</p>
-                    <p className="text-sm text-gray-200 mt-0.5">{tx.headline}</p>
-                    <p className="text-xs text-gray-600 mt-0.5">{tx.date}</p>
+                    <p className="text-sm text-surface-text mt-0.5">{tx.headline}</p>
+                    <p className="text-xs text-surface-muted mt-0.5">{tx.date}</p>
                   </div>
                 ))}
               </div>
@@ -151,8 +151,8 @@ export default async function PlayerPage({ params }: Props) {
 
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between border-b border-gray-800 pb-2 last:border-0">
-      <span className="text-gray-500">{label}</span>
+    <div className="flex items-center justify-between border-b border-surface-300 pb-2 last:border-0">
+      <span className="text-surface-muted">{label}</span>
       <span className="text-white font-medium">{value}</span>
     </div>
   );

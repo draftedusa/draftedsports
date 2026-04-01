@@ -29,7 +29,7 @@ export default function ArticleCard({ article, variant = "default", isTrending }
               <span className="text-xs text-surface-muted">· {article.readTime} min read</span>
             </div>
             <h2 className="text-lg font-black tracking-tighter leading-tight text-white mb-2">{article.title}</h2>
-            <div className="flex items-center gap-3 text-xs text-gray-300">
+            <div className="flex items-center gap-3 text-xs text-white/80">
               <span>{article.byline}</span>
               <span>·</span>
               <span>{formatCount(article.views)} views</span>

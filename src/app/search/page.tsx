@@ -63,18 +63,18 @@ export default function SearchPage() {
 
       {/* Search input */}
       <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">🔍</span>
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-muted text-lg">🔍</span>
         <input
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search articles, teams, players…"
-          className="w-full bg-gray-900 border border-gray-700 rounded-xl px-12 py-4 text-white text-lg placeholder-gray-600 focus:outline-none focus:border-gray-500"
+          className="w-full bg-surface-200 border border-surface-300 rounded-xl px-12 py-4 text-surface-text text-lg placeholder-gray-600 focus:outline-none focus:border-gray-500"
         />
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xl"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-muted hover:text-surface-text text-xl"
           >
             ×
           </button>
@@ -88,7 +88,7 @@ export default function SearchPage() {
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
-              className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${filter === f.value ? "bg-red-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"}`}
+              className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors ${filter === f.value ? "bg-red-600 text-white" : "bg-surface-300 text-surface-muted hover:bg-surface-300 hover:text-surface-text"}`}
             >
               {f.label} {f.count > 0 && <span className="ml-1 opacity-70">({f.count})</span>}
             </button>
@@ -98,29 +98,29 @@ export default function SearchPage() {
 
       {/* Results */}
       {q.length < 2 ? (
-        <div className="text-center py-20 text-gray-600">
+        <div className="text-center py-20 text-surface-muted">
           <p className="text-5xl mb-4">🔍</p>
           <p className="text-lg">Type at least 2 characters to search</p>
         </div>
       ) : totalResults === 0 ? (
-        <div className="text-center py-20 text-gray-600">
+        <div className="text-center py-20 text-surface-muted">
           <p className="text-5xl mb-4">😕</p>
-          <p className="text-lg">No results for "<span className="text-gray-400">{query}</span>"</p>
+          <p className="text-lg">No results for "<span className="text-surface-muted">{query}</span>"</p>
         </div>
       ) : (
         <div className="space-y-8">
           {/* Teams */}
           {(filter === "all" || filter === "teams") && matchedTeams.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Teams</h2>
+              <h2 className="text-xs font-bold text-surface-muted uppercase tracking-widest mb-3">Teams</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {matchedTeams.map((team) => (
                   <Link key={team.id} href={`/team/${team.slug}`}>
-                    <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
+                    <div className="flex items-center gap-3 p-3 bg-surface-200 border border-surface-300 rounded-lg hover:border-brand/40 transition-colors">
                       <span className="text-2xl">{team.logo}</span>
                       <div>
                         <p className="text-sm font-bold text-white">{team.name}</p>
-                        <p className="text-xs text-gray-500">{team.leagueId.toUpperCase()} · {team.record}</p>
+                        <p className="text-xs text-surface-muted">{team.leagueId.toUpperCase()} · {team.record}</p>
                       </div>
                     </div>
                   </Link>
@@ -132,19 +132,19 @@ export default function SearchPage() {
           {/* Players */}
           {(filter === "all" || filter === "players") && matchedPlayers.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Players</h2>
+              <h2 className="text-xs font-bold text-surface-muted uppercase tracking-widest mb-3">Players</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {matchedPlayers.map((player) => {
                   const team = teamMap[player.teamId];
                   return (
                     <Link key={player.id} href={`/player/${player.id}`}>
-                      <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
-                        <span className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white">
+                      <div className="flex items-center gap-3 p-3 bg-surface-200 border border-surface-300 rounded-lg hover:border-brand/40 transition-colors">
+                        <span className="w-9 h-9 rounded-full bg-surface-300 flex items-center justify-center text-sm font-bold text-white">
                           {player.number}
                         </span>
                         <div>
                           <p className="text-sm font-bold text-white">{player.name}</p>
-                          <p className="text-xs text-gray-500">{player.position} · {team?.name}</p>
+                          <p className="text-xs text-surface-muted">{player.position} · {team?.name}</p>
                         </div>
                       </div>
                     </Link>
@@ -157,19 +157,19 @@ export default function SearchPage() {
           {/* Games */}
           {(filter === "all" || filter === "games") && matchedGames.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Games</h2>
+              <h2 className="text-xs font-bold text-surface-muted uppercase tracking-widest mb-3">Games</h2>
               <div className="space-y-2">
                 {matchedGames.map((g) => {
                   const home = teamMap[g.homeTeamId];
                   const away = teamMap[g.awayTeamId];
                   return (
                     <Link key={g.id} href={`/game/${g.id}`}>
-                      <div className="flex items-center gap-3 p-3 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
-                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-400 uppercase">{g.status}</span>
-                        <p className="text-sm text-white font-medium">
+                      <div className="flex items-center gap-3 p-3 bg-surface-200 border border-surface-300 rounded-lg hover:border-brand/40 transition-colors">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-surface-300 text-surface-muted uppercase">{g.status}</span>
+                        <p className="text-sm text-surface-text font-medium">
                           {away.name} {g.status !== "upcoming" ? `${g.awayScore} – ${g.homeScore}` : "vs"} {home.name}
                         </p>
-                        <span className="text-xs text-gray-600 ml-auto">{g.leagueId.toUpperCase()}</span>
+                        <span className="text-xs text-surface-muted ml-auto">{g.leagueId.toUpperCase()}</span>
                       </div>
                     </Link>
                   );
@@ -181,13 +181,13 @@ export default function SearchPage() {
           {/* Articles */}
           {(filter === "all" || filter === "articles") && matchedArticles.length > 0 && (
             <section>
-              <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Articles</h2>
+              <h2 className="text-xs font-bold text-surface-muted uppercase tracking-widest mb-3">Articles</h2>
               <div className="space-y-2">
                 {matchedArticles.map((art) => (
                   <Link key={art.id} href={`/article/${art.slug}`}>
-                    <div className="p-4 bg-gray-900 border border-gray-800 rounded-lg hover:border-gray-600 transition-colors">
-                      <p className="text-sm font-bold text-white mb-1 leading-snug">{art.title}</p>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <div className="p-4 bg-surface-200 border border-surface-300 rounded-lg hover:border-brand/40 transition-colors">
+                      <p className="text-sm font-bold text-surface-text mb-1 leading-snug">{art.title}</p>
+                      <div className="flex items-center gap-3 text-xs text-surface-muted">
                         <span>{art.byline}</span>
                         <span>·</span>
                         <span>{formatCount(art.views)} views</span>

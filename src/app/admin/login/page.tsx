@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-surface-100 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -44,34 +44,34 @@ export default function AdminLoginPage() {
           <p className="text-sm text-yellow-400 font-bold mt-1 uppercase tracking-widest">Admin CMS</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-8 space-y-5">
-          <h1 className="text-lg font-bold text-white text-center">Sign In</h1>
+        <form onSubmit={handleSubmit} className="bg-surface-200 border border-surface-300 rounded-xl p-8 space-y-5">
+          <h1 className="text-lg font-bold text-surface-text text-center">Sign In</h1>
 
           <div>
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 block">Username</label>
+            <label className="text-xs font-semibold text-surface-muted uppercase tracking-wide mb-1.5 block">Username</label>
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="SportsCentralAdmin"
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-600 transition-colors"
+              className="w-full bg-surface-300 border border-surface-300 rounded-lg px-4 py-3 text-surface-text placeholder-surface-muted focus:outline-none focus:border-yellow-600 transition-colors"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 block">Password</label>
+            <label className="text-xs font-semibold text-surface-muted uppercase tracking-wide mb-1.5 block">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-600 transition-colors"
+              className="w-full bg-surface-300 border border-surface-300 rounded-lg px-4 py-3 text-surface-text placeholder-surface-muted focus:outline-none focus:border-yellow-600 transition-colors"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-950/30 border border-red-900 rounded px-3 py-2">{error}</p>
+            <p className="text-sm text-brand bg-red-950/30 border border-red-900 rounded px-3 py-2">{error}</p>
           )}
 
           <button
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
             {loading ? "Signing in…" : "Sign In"}
           </button>
 
-          <p className="text-xs text-gray-600 text-center">
+          <p className="text-xs text-surface-muted text-center">
             Demo credentials shown on failed login
           </p>
         </form>

@@ -28,11 +28,11 @@ export default async function LeaguePage({ params }: Props) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       {/* League Header */}
-      <div className="flex items-center gap-4 border-b border-gray-800 pb-6">
+      <div className="flex items-center gap-4 border-b border-surface-300 pb-6">
         <span className="text-5xl">{league.logo}</span>
         <div>
           <h1 className="text-3xl font-black text-white">{league.name}</h1>
-          <p className="text-gray-400">{league.sport}</p>
+          <p className="text-surface-muted">{league.sport}</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export default async function LeaguePage({ params }: Props) {
           {/* Live games */}
           {liveGames.length > 0 && (
             <section>
-              <h2 className="flex items-center gap-2 text-base font-bold text-white mb-3">
+              <h2 className="flex items-center gap-2 text-base font-bold text-surface-text mb-3">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> Live Now
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -56,7 +56,7 @@ export default async function LeaguePage({ params }: Props) {
           {/* Recent Results */}
           {recentGames.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Recent Results</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Recent Results</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {recentGames.map((g) => (
                   <GameCard key={g.id} game={g} homeTeam={teamMap[g.homeTeamId]} awayTeam={teamMap[g.awayTeamId]} compact />
@@ -68,7 +68,7 @@ export default async function LeaguePage({ params }: Props) {
           {/* Upcoming */}
           {upcomingGames.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Upcoming Games</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Upcoming Games</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {upcomingGames.map((g) => (
                   <GameCard key={g.id} game={g} homeTeam={teamMap[g.homeTeamId]} awayTeam={teamMap[g.awayTeamId]} compact />
@@ -79,7 +79,7 @@ export default async function LeaguePage({ params }: Props) {
 
           {/* Articles */}
           <section>
-            <h2 className="text-base font-bold text-white mb-3">{league.name} News</h2>
+            <h2 className="text-base font-bold text-surface-text mb-3">{league.name} News</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {leagueArticles.map((a) => (
                 <ArticleCard key={a.id} article={a} />
@@ -93,23 +93,23 @@ export default async function LeaguePage({ params }: Props) {
           <Panel title="Standings" accent="border-red-600">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs text-gray-500 uppercase">
+                <tr className="text-xs text-surface-muted uppercase">
                   <th className="text-left pb-2">#</th>
                   <th className="text-left pb-2">Team</th>
                   <th className="text-right pb-2">Record</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-surface-300">
                 {leagueTeams.map((team) => (
-                  <tr key={team.id} className="hover:bg-gray-800/50 transition-colors">
-                    <td className="py-2 text-gray-500 text-xs">{team.standing}</td>
+                  <tr key={team.id} className="hover:bg-surface-300 transition-colors">
+                    <td className="py-2 text-surface-muted text-xs">{team.standing}</td>
                     <td className="py-2">
-                      <Link href={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-red-400 transition-colors">
+                      <Link href={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-brand transition-colors">
                         <span>{team.logo}</span>
                         <span className="text-white font-medium text-sm">{team.name}</span>
                       </Link>
                     </td>
-                    <td className="py-2 text-right text-gray-400 tabular-nums">{team.record}</td>
+                    <td className="py-2 text-right text-surface-muted tabular-nums">{team.record}</td>
                   </tr>
                 ))}
               </tbody>

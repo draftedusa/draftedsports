@@ -141,7 +141,7 @@ export default function LiveControlPage() {
         {/* ── 2. Left: Event Timeline ──────────────────────────── */}
         <div className="space-y-4">
           <Panel title="Live Event Timeline" accent="border-red-600"
-            titleRight={<span className="text-gray-500">{game.events.length} events</span>}>
+            titleRight={<span className="text-surface-muted">{game.events.length} events</span>}>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
               {[...game.events].reverse().map((evt) => {
                 const dismissed = dismissedEvents.has(evt.id);
@@ -229,7 +229,7 @@ export default function LiveControlPage() {
                       push: "Queue push alert",
                     };
                     return (
-                      <li key={key} className={`flex items-center gap-2 text-xs ${enabled ? "text-gray-200" : "text-gray-600 line-through"}`}>
+                      <li key={key} className={`flex items-center gap-2 text-xs ${enabled ? "text-surface-text" : "text-surface-muted line-through"}`}>
                         <span>{enabled ? "✅" : "❌"}</span> {labels[key]}
                       </li>
                     );
@@ -238,19 +238,19 @@ export default function LiveControlPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={executeMoment}
-                    className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded transition-colors"
+                    className="px-4 py-2 bg-green-600 hover:bg-green-500 text-surface-text text-sm font-bold rounded transition-colors"
                   >
                     Execute
                   </button>
                   <button
                     onClick={() => setEditActionsOpen(true)}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold rounded transition-colors"
+                    className="px-4 py-2 bg-surface-300 hover:bg-surface-200 text-surface-text text-sm font-semibold rounded transition-colors"
                   >
                     Edit Actions
                   </button>
                   <button
                     onClick={() => setMomentPreview(null)}
-                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-400 text-sm rounded transition-colors"
+                    className="px-4 py-2 bg-surface-300 hover:bg-surface-300 text-surface-muted text-sm rounded transition-colors"
                   >
                     Cancel
                   </button>
@@ -262,7 +262,7 @@ export default function LiveControlPage() {
             {editActionsOpen && (
               <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
                 <div className="bg-surface-200 border border-surface-300 rounded-xl p-6 w-80 space-y-4">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wide">Edit Auto Actions</h3>
+                  <h3 className="text-sm font-bold text-surface-text uppercase tracking-wide">Edit Auto Actions</h3>
                   {Object.entries(enabledActions).map(([key, val]) => {
                     const labels: Record<string, string> = {
                       highlight: "Create highlight post",
@@ -279,7 +279,7 @@ export default function LiveControlPage() {
                           onChange={(e) => setEnabledActions((prev) => ({ ...prev, [key]: e.target.checked }))}
                           className="w-4 h-4 accent-yellow-500"
                         />
-                        <span className="text-sm text-gray-200">{labels[key]}</span>
+                        <span className="text-sm text-surface-text">{labels[key]}</span>
                       </label>
                     );
                   })}
@@ -296,7 +296,7 @@ export default function LiveControlPage() {
             {/* Executed moments log */}
             {executedMoments.length > 0 && (
               <div className="mt-3 space-y-1">
-                <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Executed</p>
+                <p className="text-xs text-surface-muted uppercase tracking-wide font-semibold mb-1">Executed</p>
                 {executedMoments.map((m, i) => (
                   <p key={i} className="text-xs text-green-400">✅ {m}</p>
                 ))}
@@ -342,7 +342,7 @@ export default function LiveControlPage() {
                       setSubmittedPolls((prev) => [...prev, `${pollQuestion} → ${dest}`]);
                       addToast(`📊 Poll attached to ${dest}`);
                     }}
-                    className="px-3 py-1.5 bg-blue-800 hover:bg-blue-700 text-white text-xs font-semibold rounded transition-colors"
+                    className="px-3 py-1.5 bg-blue-800 hover:bg-blue-700 text-surface-text text-xs font-semibold rounded transition-colors"
                   >
                     {label}
                   </button>
@@ -365,7 +365,7 @@ export default function LiveControlPage() {
           <Panel
             title="Highlight Queue"
             accent="border-orange-600"
-            titleRight={<span className="text-gray-500">{pendingHighlights.length - discardedHighlights.size} pending</span>}
+            titleRight={<span className="text-surface-muted">{pendingHighlights.length - discardedHighlights.size} pending</span>}
           >
             <div className="space-y-3">
               {pendingHighlights.map((hl) => {
@@ -491,7 +491,7 @@ export default function LiveControlPage() {
                     addToast(`🔔 Alert sent: "${alertHeadline}"`);
                     console.log("MOCK ALERT SENT:", { headline: alertHeadline, dests, priority: alertPriority });
                   }}
-                  className="self-end px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded transition-colors"
+                  className="self-end px-4 py-2 bg-red-600 hover:bg-red-500 text-surface-text text-sm font-bold rounded transition-colors"
                 >
                   Send Now
                 </button>
@@ -499,7 +499,7 @@ export default function LiveControlPage() {
               {sentAlerts.length > 0 && (
                 <div className="mt-1 max-h-24 overflow-y-auto space-y-0.5">
                   {sentAlerts.map((a, i) => (
-                    <p key={i} className="text-xs text-red-400 truncate">✅ {a}</p>
+                    <p key={i} className="text-xs text-brand truncate">✅ {a}</p>
                   ))}
                 </div>
               )}
@@ -517,7 +517,7 @@ function StatusDot({ label, active }: { label: string; active: boolean }) {
   return (
     <div className="flex items-center gap-1">
       <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-green-400" : "bg-red-500"}`} />
-      <span className={`text-xs ${active ? "text-gray-400" : "text-red-400"}`}>{label}</span>
+      <span className={`text-xs ${active ? "text-surface-muted" : "text-brand"}`}>{label}</span>
     </div>
   );
 }
@@ -527,7 +527,7 @@ function ToggleBtn({ children, active, danger, onClick }: { children: React.Reac
   const style = danger
     ? active
       ? "bg-red-700 border-red-500 text-white"
-      : "bg-transparent border-red-800 text-red-400 hover:border-red-600"
+      : "bg-transparent border-red-800 text-brand hover:border-red-600"
     : active
     ? "bg-surface-300 border-surface-300 text-surface-text"
     : "bg-transparent border-surface-300 text-surface-muted hover:border-surface-text";
@@ -540,7 +540,7 @@ function EventBtn({ children, danger, onClick }: { children: React.ReactNode; da
       onClick={onClick}
       className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
         danger
-          ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-800"
+          ? "bg-red-500/10 text-brand hover:bg-red-500/20 border border-red-800"
           : "bg-surface-200 text-surface-muted hover:bg-surface-300 border border-surface-300"
       }`}
     >
@@ -553,7 +553,7 @@ function SmBtn({ children, green, danger, onClick }: { children: React.ReactNode
   const style = green
     ? "bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-700"
     : danger
-    ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-800"
+    ? "bg-red-500/10 text-brand hover:bg-red-500/20 border border-red-800"
     : "bg-surface-200 text-surface-muted hover:bg-surface-300 border border-surface-300";
   return (
     <button onClick={onClick} className={`px-2 py-1 text-xs font-medium rounded transition-colors ${style}`}>
@@ -566,7 +566,7 @@ function SystemState({ label, value, ok }: { label: string; value: string; ok: b
   return (
     <div className="bg-surface-200 rounded p-2">
       <p className="text-xs text-surface-muted">{label}</p>
-      <p className={`text-xs font-bold mt-0.5 ${ok ? "text-green-400" : "text-red-400"}`}>{value}</p>
+      <p className={`text-xs font-bold mt-0.5 ${ok ? "text-green-400" : "text-brand"}`}>{value}</p>
     </div>
   );
 }

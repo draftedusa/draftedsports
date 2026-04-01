@@ -16,9 +16,9 @@ export default function ScoresPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       {/* Page header */}
-      <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+      <div className="flex items-center justify-between border-b border-surface-300 pb-4">
         <h1 className="text-2xl font-black text-white">Scores & Results</h1>
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-surface-muted">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
           April 1, 2026
         </div>
@@ -29,7 +29,7 @@ export default function ScoresPage() {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <h2 className="text-base font-bold text-white uppercase tracking-wide">Live Now</h2>
+            <h2 className="text-base font-bold text-surface-text uppercase tracking-wide">Live Now</h2>
           </div>
           <div className="space-y-2">
             {liveGames.map((g) => (
@@ -45,7 +45,7 @@ export default function ScoresPage() {
         if (!leagueFinal.length) return null;
         return (
           <section key={league.id}>
-            <h2 className="flex items-center gap-2 text-base font-bold text-gray-300 uppercase tracking-wide mb-3 border-b border-gray-800 pb-2">
+            <h2 className="flex items-center gap-2 text-base font-bold text-surface-text uppercase tracking-wide mb-3 border-b border-surface-300 pb-2">
               {league.logo} {league.name} — Final
             </h2>
             <div className="space-y-2">
@@ -59,7 +59,7 @@ export default function ScoresPage() {
 
       {/* UPCOMING */}
       <section>
-        <h2 className="text-base font-bold text-gray-300 uppercase tracking-wide mb-3 border-b border-gray-800 pb-2">
+        <h2 className="text-base font-bold text-surface-text uppercase tracking-wide mb-3 border-b border-surface-300 pb-2">
           Upcoming
         </h2>
         <div className="space-y-2">
@@ -83,17 +83,17 @@ function ScoreRow({ gameId }: { gameId: string }) {
 
   return (
     <Link href={`/game/${game.id}`}>
-      <div className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-lg border transition-colors cursor-pointer ${isLive ? "bg-red-950/20 border-red-900/50 hover:border-red-700" : "bg-gray-900 border-gray-800 hover:border-gray-600"}`}>
+      <div className={`grid grid-cols-12 items-center gap-3 px-4 py-3 rounded-lg border transition-colors cursor-pointer ${isLive ? "bg-red-950/20 border-red-900/50 hover:border-red-700" : "bg-surface-200 border-surface-300 hover:border-brand/40"}`}>
         {/* Status */}
         <div className="col-span-2 sm:col-span-1">
           <GameStatusBadge status={game.status} />
           {isLive && (
-            <p className="text-xs text-gray-400 mt-0.5 whitespace-nowrap">
+            <p className="text-xs text-surface-muted mt-0.5 whitespace-nowrap">
               {game.quarter} · {game.timeRemaining}
             </p>
           )}
           {isUpcoming && (
-            <p className="text-xs text-gray-500 mt-0.5 whitespace-nowrap">{game.date}</p>
+            <p className="text-xs text-surface-muted mt-0.5 whitespace-nowrap">{game.date}</p>
           )}
         </div>
 
@@ -101,10 +101,10 @@ function ScoreRow({ gameId }: { gameId: string }) {
         <div className="col-span-4 sm:col-span-4 flex items-center gap-2">
           <span className="text-xl">{away.logo}</span>
           <div>
-            <p className={`text-sm font-bold ${!isUpcoming && game.awayScore > game.homeScore ? "text-white" : "text-gray-400"}`}>
+            <p className={`text-sm font-bold ${!isUpcoming && game.awayScore > game.homeScore ? "text-surface-text" : "text-surface-muted"}`}>
               {away.name}
             </p>
-            <p className="text-xs text-gray-600">{away.record}</p>
+            <p className="text-xs text-surface-muted">{away.record}</p>
           </div>
         </div>
 
@@ -112,26 +112,26 @@ function ScoreRow({ gameId }: { gameId: string }) {
         <div className="col-span-2 text-center">
           {!isUpcoming ? (
             <div className="flex items-center justify-center gap-2">
-              <span className={`text-xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-white" : "text-gray-600"}`}>
+              <span className={`text-xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-surface-text" : "text-surface-muted"}`}>
                 {game.awayScore}
               </span>
               <span className="text-gray-700">–</span>
-              <span className={`text-xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-white" : "text-gray-600"}`}>
+              <span className={`text-xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-surface-text" : "text-surface-muted"}`}>
                 {game.homeScore}
               </span>
             </div>
           ) : (
-            <span className="text-gray-500 text-sm">vs</span>
+            <span className="text-surface-muted text-sm">vs</span>
           )}
         </div>
 
         {/* Home team */}
         <div className="col-span-4 sm:col-span-3 flex items-center justify-end gap-2">
           <div className="text-right">
-            <p className={`text-sm font-bold ${!isUpcoming && game.homeScore > game.awayScore ? "text-white" : "text-gray-400"}`}>
+            <p className={`text-sm font-bold ${!isUpcoming && game.homeScore > game.awayScore ? "text-surface-text" : "text-surface-muted"}`}>
               {home.name}
             </p>
-            <p className="text-xs text-gray-600">{home.record}</p>
+            <p className="text-xs text-surface-muted">{home.record}</p>
           </div>
           <span className="text-xl">{home.logo}</span>
         </div>
@@ -139,8 +139,8 @@ function ScoreRow({ gameId }: { gameId: string }) {
         {/* Odds (desktop) */}
         {gameOdds && (
           <div className="hidden sm:col-span-2 sm:flex flex-col items-end gap-0.5">
-            <p className="text-xs text-gray-500">{gameOdds.spread}</p>
-            <p className="text-xs text-gray-600">O/U {gameOdds.overUnder}</p>
+            <p className="text-xs text-surface-muted">{gameOdds.spread}</p>
+            <p className="text-xs text-surface-muted">O/U {gameOdds.overUnder}</p>
             <p className="text-xs text-gray-700">{gameOdds.provider}</p>
           </div>
         )}

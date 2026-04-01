@@ -47,20 +47,20 @@ export default function TeamPage({ params }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-1">
               {league && (
-                <Link href={`/league/${league.slug}`} className="text-xs text-gray-400 hover:text-gray-300 font-semibold uppercase tracking-wide">
+                <Link href={`/league/${league.slug}`} className="text-xs text-surface-muted hover:text-surface-text font-semibold uppercase tracking-wide">
                   {league.name}
                 </Link>
               )}
-              <span className="text-gray-600">·</span>
-              <span className="text-xs text-gray-500">#{team.standing} in League</span>
+              <span className="text-surface-muted">·</span>
+              <span className="text-xs text-surface-muted">#{team.standing} in League</span>
             </div>
             <h1 className="text-4xl font-black text-white">{team.name}</h1>
-            <p className="text-xl text-gray-300 mt-1">{team.record}</p>
+            <p className="text-xl text-surface-text mt-1">{team.record}</p>
           </div>
         </div>
         <button
           onClick={() => setFollowing(!following)}
-          className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-colors ${following ? "bg-red-600 text-white hover:bg-red-500" : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white border border-gray-700"}`}
+          className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-colors ${following ? "bg-red-600 text-surface-text hover:bg-red-500" : "bg-surface-300 text-surface-text hover:bg-surface-300 hover:text-surface-text border border-surface-300"}`}
         >
           {following ? "✓ Following" : "+ Follow"}
         </button>
@@ -71,20 +71,20 @@ export default function TeamPage({ params }: Props) {
           {/* Injury Report */}
           {injuryNews.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <h2 className="text-base font-bold text-surface-text mb-3 flex items-center gap-2">
                 🩹 Injury Report
               </h2>
               <div className="space-y-2">
                 {injuryNews.map((tx) => (
                   <div key={tx.id} className="flex items-start gap-3 p-3 bg-red-950/20 border border-red-900/40 rounded-lg">
-                    <span className="text-red-400 text-lg shrink-0">🩹</span>
+                    <span className="text-brand text-lg shrink-0">🩹</span>
                     <div>
                       <p className="text-sm font-bold text-white">{tx.playerName}</p>
-                      <p className="text-sm text-gray-300">{tx.headline}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{tx.date}</p>
+                      <p className="text-sm text-surface-text">{tx.headline}</p>
+                      <p className="text-xs text-surface-muted mt-0.5">{tx.date}</p>
                     </div>
                     {tx.isBreaking && (
-                      <span className="ml-auto text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded shrink-0">Breaking</span>
+                      <span className="ml-auto text-xs font-bold text-surface-text bg-red-600 px-2 py-0.5 rounded shrink-0">Breaking</span>
                     )}
                   </div>
                 ))}
@@ -95,7 +95,7 @@ export default function TeamPage({ params }: Props) {
           {/* Recent Games */}
           {recentGames.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Recent Games</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Recent Games</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {recentGames.map((g) => (
                   <GameCard key={g.id} game={g} homeTeam={teamMap[g.homeTeamId]} awayTeam={teamMap[g.awayTeamId]} compact />
@@ -107,7 +107,7 @@ export default function TeamPage({ params }: Props) {
           {/* Upcoming */}
           {upcomingGames.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Upcoming</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Upcoming</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {upcomingGames.map((g) => (
                   <GameCard key={g.id} game={g} homeTeam={teamMap[g.homeTeamId]} awayTeam={teamMap[g.awayTeamId]} compact />
@@ -119,16 +119,16 @@ export default function TeamPage({ params }: Props) {
           {/* News & Transactions */}
           {otherNews.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">Team News</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">Team News</h2>
               <div className="space-y-3">
                 {otherNews.map((tx) => (
-                  <div key={tx.id} className="p-3 bg-gray-900 border border-gray-800 rounded-lg">
+                  <div key={tx.id} className="p-3 bg-surface-200 border border-surface-300 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-gray-500 uppercase">{tx.type}</span>
-                      <span className="text-xs text-gray-600">{tx.date}</span>
+                      <span className="text-xs font-bold text-surface-muted uppercase">{tx.type}</span>
+                      <span className="text-xs text-surface-muted">{tx.date}</span>
                     </div>
                     <p className="text-sm font-semibold text-white">{tx.headline}</p>
-                    <p className="text-sm text-gray-400 mt-0.5">{tx.detail}</p>
+                    <p className="text-sm text-surface-muted mt-0.5">{tx.detail}</p>
                   </div>
                 ))}
               </div>
@@ -138,7 +138,7 @@ export default function TeamPage({ params }: Props) {
           {/* Articles */}
           {teamArticles.length > 0 && (
             <section>
-              <h2 className="text-base font-bold text-white mb-3">{team.name} News</h2>
+              <h2 className="text-base font-bold text-surface-text mb-3">{team.name} News</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {teamArticles.map((a) => (
                   <ArticleCard key={a.id} article={a} />
@@ -157,22 +157,22 @@ export default function TeamPage({ params }: Props) {
                 const [topKey, topVal] = statEntries[0] ?? [];
                 return (
                   <Link key={player.id} href={`/player/${player.id}`}>
-                    <div className="flex items-center justify-between p-2 rounded hover:bg-gray-800 transition-colors">
+                    <div className="flex items-center justify-between p-2 rounded hover:bg-surface-300 transition-colors">
                       <div className="flex items-center gap-3">
                         <span
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-surface-text shrink-0"
                           style={{ backgroundColor: team.primaryColor }}
                         >
                           {player.number}
                         </span>
                         <div>
-                          <p className="text-sm font-semibold text-white hover:text-red-400 transition-colors">{player.name}</p>
-                          <p className="text-xs text-gray-500">{player.position}</p>
+                          <p className="text-sm font-semibold text-surface-text hover:text-brand transition-colors">{player.name}</p>
+                          <p className="text-xs text-surface-muted">{player.position}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-white">{topVal}</p>
-                        <p className="text-xs text-gray-500 uppercase">{topKey}</p>
+                        <p className="text-xs text-surface-muted uppercase">{topKey}</p>
                       </div>
                     </div>
                   </Link>

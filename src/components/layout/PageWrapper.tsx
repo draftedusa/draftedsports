@@ -16,7 +16,7 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
   return (
     <div className="flex max-w-[1400px] mx-auto w-full px-4 gap-6 flex-1">
       <LeftRail />
-      <main className="flex-1 min-w-0 py-6">{children}</main>
+      <main className="flex-1 min-w-0 py-6 min-h-screen">{children}</main>
       <RightRail />
     </div>
   );
