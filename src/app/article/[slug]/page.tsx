@@ -30,20 +30,20 @@ export default function ArticlePage({ params }: Props) {
   const articlePoll = polls.find((p) => p.articleId === article.id);
 
   const [reactionCounts, setReactionCounts] = useState<Record<string, Record<string, number>>>({});
-  const [localReactions, setLocalReactions] = useState({ fire: 0, wow: 0 });
+  const [articleReactions, setArticleReactions] = useState({ fire: 0, wow: 0 });
   const [newComment, setNewComment] = useState("");
   const [localComments, setLocalComments] = useState<typeof threadComments>([]);
   const [votedOption, setVotedOption] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [copyMsg, setCopyMsg] = useState("");
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterDone, setNewsletterDone] = useState(false);
 
   function handleReaction(commentId: string, emoji: string) {
     setReactionCounts((prev) => ({
       ...prev,
       [commentId]: { ...prev[commentId], [emoji]: (prev[commentId]?.[emoji] ?? 0) + 1 },
     }));
-  }
-
-  function handleArticleReaction(emoji: "fire" | "wow") {
-    setLocalReactions((prev) => ({ ...prev, [emoji]: prev[emoji] + 1 }));
   }
 
   function handleComment(e: React.FormEvent) {
@@ -63,6 +63,17 @@ export default function ArticlePage({ params }: Props) {
     setNewComment("");
   }
 
+  function handleCopyLink() {
+    navigator.clipboard?.writeText(window.location.href).catch(() => {});
+    setCopyMsg("Copied!");
+    setTimeout(() => setCopyMsg(""), 2000);
+  }
+
+  function handleNewsletter(e: React.FormEvent) {
+    e.preventDefault();
+    setNewsletterDone(true);
+  }
+
   const allComments = [...localComments, ...threadComments];
 
   return (
@@ -70,41 +81,67 @@ export default function ArticlePage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main article */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-600">
+            <Link href="/" className="hover:text-gray-400">Home</Link>
+            <span>/</span>
+            {articleTags[0] && (
+              <>
+                <Link href={`/tag/${articleTags[0].slug}`} className="hover:text-gray-400">{articleTags[0].name}</Link>
+                <span>/</span>
+              </>
+            )}
+            <span className="text-gray-500 truncate">{article.title.slice(0, 40)}…</span>
+          </div>
+
           {/* Header */}
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {articleTags.map((tag) => (
-                <Badge key={tag.id} variant="default">{tag.name}</Badge>
+                <Link key={tag.id} href={`/tag/${tag.slug}`}>
+                  <Badge variant="default">{tag.name}</Badge>
+                </Link>
               ))}
             </div>
             <h1 className="text-3xl font-black text-white leading-tight mb-4">{article.title}</h1>
-            <div className="flex items-center justify-between flex-wrap gap-3">
+
+            {/* Byline + meta */}
+            <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-gray-800">
               <div className="flex items-center gap-3 text-sm text-gray-400">
-                <span className="font-semibold text-gray-200">{article.byline}</span>
-                <span>·</span>
-                <span>{new Date(article.publishDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
-                <span>·</span>
-                <span>{article.readTime} min read</span>
-                <span>·</span>
-                <span>{formatCount(article.views)} views</span>
+                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white">
+                  {article.byline[0]}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-200 text-sm">{article.byline}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(article.publishDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                    {" · "}{article.readTime} min read{" · "}{formatCount(article.views)} views
+                  </p>
+                </div>
               </div>
+
+              {/* Action row */}
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleArticleReaction("fire")}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors"
-                >
-                  🔥 {localReactions.fire > 0 ? localReactions.fire : "Fire"}
+                <button onClick={() => setArticleReactions((r) => ({ ...r, fire: r.fire + 1 }))}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors">
+                  🔥 {articleReactions.fire > 0 ? articleReactions.fire : ""}
                 </button>
-                <button
-                  onClick={() => handleArticleReaction("wow")}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors"
-                >
-                  😮 {localReactions.wow > 0 ? localReactions.wow : "Wow"}
+                <button onClick={() => setArticleReactions((r) => ({ ...r, wow: r.wow + 1 }))}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors">
+                  😮 {articleReactions.wow > 0 ? articleReactions.wow : ""}
+                </button>
+                <button onClick={() => setSaved(!saved)}
+                  className={`px-3 py-1.5 rounded text-sm font-semibold transition-colors ${saved ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"}`}>
+                  {saved ? "✓ Saved" : "🔖 Save"}
+                </button>
+                <button onClick={handleCopyLink}
+                  className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded text-sm transition-colors">
+                  {copyMsg || "🔗 Share"}
                 </button>
               </div>
             </div>
 
-            {/* Team badges */}
+            {/* Team chips */}
             {articleTeams.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {articleTeams.map((team) => (
@@ -118,16 +155,32 @@ export default function ArticlePage({ params }: Props) {
             )}
           </div>
 
-          {/* Placeholder hero image */}
+          {/* Hero placeholder */}
           <div className="w-full h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl flex items-center justify-center text-6xl">
             🏟️
           </div>
 
-          {/* Article body */}
-          <div className="prose prose-invert max-w-none">
+          {/* Body */}
+          <div className="space-y-4">
             {article.body.split("\n\n").map((para, i) => (
-              <p key={i} className="text-gray-200 leading-relaxed mb-4 text-base">{para}</p>
+              <p key={i} className="text-gray-200 leading-relaxed text-base">{para}</p>
             ))}
+          </div>
+
+          {/* Social share row */}
+          <div className="flex items-center gap-2 py-4 border-t border-b border-gray-800">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide mr-2">Share:</span>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-xs font-semibold transition-colors"
+            >
+              𝕏 Post
+            </a>
+            <button onClick={handleCopyLink}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded text-xs font-semibold transition-colors">
+              🔗 {copyMsg || "Copy Link"}
+            </button>
           </div>
 
           {/* Poll */}
@@ -155,6 +208,29 @@ export default function ArticlePage({ params }: Props) {
             </Panel>
           )}
 
+          {/* Newsletter CTA */}
+          <div className="bg-gradient-to-r from-red-950/50 to-gray-900 border border-red-900/40 rounded-xl p-6">
+            <h3 className="text-lg font-black text-white mb-1">Never miss a story.</h3>
+            <p className="text-sm text-gray-400 mb-4">Get the best of UNDRAFTED delivered to your inbox. No spam, unsubscribe any time.</p>
+            {newsletterDone ? (
+              <p className="text-green-400 font-semibold text-sm">✅ You're in! Check your inbox.</p>
+            ) : (
+              <form onSubmit={handleNewsletter} className="flex gap-2">
+                <input
+                  type="email"
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-red-600"
+                />
+                <button type="submit" className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-sm rounded-lg transition-colors whitespace-nowrap">
+                  Subscribe
+                </button>
+              </form>
+            )}
+          </div>
+
           {/* Comments */}
           <Panel
             title="Comments"
@@ -168,10 +244,7 @@ export default function ArticlePage({ params }: Props) {
                 placeholder="Share your thoughts…"
                 className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gray-500"
               />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded transition-colors"
-              >
+              <button type="submit" className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded transition-colors">
                 Post
               </button>
             </form>
@@ -188,11 +261,8 @@ export default function ArticlePage({ params }: Props) {
                       const icons = { fire: "🔥", wow: "😮", facts: "💯", lol: "😂" };
                       const base = cmt.reactions[emoji] + (reactionCounts[cmt.id]?.[emoji] ?? 0);
                       return (
-                        <button
-                          key={emoji}
-                          onClick={() => handleReaction(cmt.id, emoji)}
-                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-white transition-colors"
-                        >
+                        <button key={emoji} onClick={() => handleReaction(cmt.id, emoji)}
+                          className="flex items-center gap-1 text-xs text-gray-500 hover:text-white transition-colors">
                           {icons[emoji]} {formatCount(base)}
                         </button>
                       );
@@ -211,6 +281,21 @@ export default function ArticlePage({ params }: Props) {
               <div className="space-y-4">
                 {related.map((a) => (
                   <ArticleCard key={a.id} article={a} variant="compact" />
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          {/* Tag cloud */}
+          {articleTags.length > 0 && (
+            <Panel title="Topics" accent="border-gray-700">
+              <div className="flex flex-wrap gap-2">
+                {articleTags.map((tag) => (
+                  <Link key={tag.id} href={`/tag/${tag.slug}`}>
+                    <span className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-full text-xs font-medium transition-colors">
+                      {tag.name}
+                    </span>
+                  </Link>
                 ))}
               </div>
             </Panel>

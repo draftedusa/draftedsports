@@ -1,27 +1,49 @@
 @import "tailwindcss";
 
+/* ── Runtime CSS variables ─────────────────────────────── */
 :root {
-  --background: #030712;
-  --foreground: #f9fafb;
+  --brand:        #8b5cf6;
+  --brand-light:  #d946ef;
+  --surface-100:  #ffffff;
+  --surface-200:  #f3f4f6;
+  --surface-300:  #e5e7eb;
+  --surface-text: #111827;
+  --surface-muted:#6b7280;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+.dark {
+  --surface-100:  #0f0f14;
+  --surface-200:  #18181f;
+  --surface-300:  #27272f;
+  --surface-text: #f9fafb;
+  --surface-muted:#9ca3af;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+/* ── Tailwind v4 theme tokens ──────────────────────────── */
+@theme {
+  --color-brand:        var(--brand);
+  --color-brand-light:  var(--brand-light);
+  --color-surface-100:  var(--surface-100);
+  --color-surface-200:  var(--surface-200);
+  --color-surface-300:  var(--surface-300);
+  --color-surface-text: var(--surface-text);
+  --color-surface-muted:var(--surface-muted);
 }
 
-/* Smooth scrolling */
+@custom-variant dark (&:is(.dark *));
+
+/* ── Base ──────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
 
-/* Line clamp utility */
+body {
+  background: var(--surface-100);
+  color: var(--surface-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ── Utilities ─────────────────────────────────────────── */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -33,4 +55,19 @@ html {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Ticker animation ──────────────────────────────────── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-ticker {
+  animation: ticker 40s linear infinite;
+}
+.animate-ticker:hover {
+  animation-play-state: paused;
 }

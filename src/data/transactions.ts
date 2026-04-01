@@ -1,0 +1,148 @@
+export type TransactionType = "trade" | "signing" | "waiver" | "extension" | "release" | "injury";
+
+export interface Transaction {
+  id: string;
+  type: TransactionType;
+  headline: string;
+  detail: string;
+  teamIds: string[];
+  playerName: string;
+  date: string;
+  isBreaking: boolean;
+  leagueId: string;
+}
+
+export const transactions: Transaction[] = [
+  {
+    id: "tx-001",
+    type: "injury",
+    headline: "Travis Kelce (ankle) listed as day-to-day",
+    detail: "Chiefs TE Travis Kelce suffered a right ankle sprain in the 3rd quarter vs. the Eagles. He is day-to-day and his status for next week is uncertain.",
+    teamIds: ["nfl-chiefs"],
+    playerName: "Travis Kelce",
+    date: "2026-04-01",
+    isBreaking: true,
+    leagueId: "nfl",
+  },
+  {
+    id: "tx-002",
+    type: "signing",
+    headline: "Lakers sign G-League standout Marcus Cole to 10-day contract",
+    detail: "The Los Angeles Lakers have signed guard Marcus Cole to a 10-day hardship contract to help with depth while Anthony Davis nurses a bruised knee.",
+    teamIds: ["nba-lakers"],
+    playerName: "Marcus Cole",
+    date: "2026-04-01",
+    isBreaking: false,
+    leagueId: "nba",
+  },
+  {
+    id: "tx-003",
+    type: "extension",
+    headline: "Alperen Sengun agrees to 5-year max extension with Rockets",
+    detail: "The Houston Rockets and center Alperen Sengun have agreed in principle on a five-year maximum contract extension worth $260M, sources tell UNDRAFTED. The deal cements Sengun as the franchise cornerstone through 2031.",
+    teamIds: ["nba-rockets"],
+    playerName: "Alperen Sengun",
+    date: "2026-03-31",
+    isBreaking: true,
+    leagueId: "nba",
+  },
+  {
+    id: "tx-004",
+    type: "trade",
+    headline: "Dodgers acquire reliever Jake Morales from Padres for two prospects",
+    detail: "The Los Angeles Dodgers have acquired right-handed reliever Jake Morales from the San Diego Padres in exchange for Double-A prospects Tyler Vance and Carlos Ruiz.",
+    teamIds: ["mlb-dodgers"],
+    playerName: "Jake Morales",
+    date: "2026-03-30",
+    isBreaking: false,
+    leagueId: "mlb",
+  },
+  {
+    id: "tx-005",
+    type: "release",
+    headline: "Cowboys release veteran WR Terrence Boyd",
+    detail: "Dallas Cowboys have released veteran wide receiver Terrence Boyd with a post-June 1 designation to save $8.2M in cap space ahead of the offseason.",
+    teamIds: ["nfl-cowboys"],
+    playerName: "Terrence Boyd",
+    date: "2026-03-29",
+    isBreaking: false,
+    leagueId: "nfl",
+  },
+  {
+    id: "tx-006",
+    type: "signing",
+    headline: "Bruins re-sign David Pastrnak to 8-year, $112M extension",
+    detail: "The Boston Bruins have locked up their franchise star David Pastrnak through 2034 with an eight-year deal worth $112M, removing any doubt about his future in Boston.",
+    teamIds: ["nhl-bruins"],
+    playerName: "David Pastrnak",
+    date: "2026-03-28",
+    isBreaking: true,
+    leagueId: "nhl",
+  },
+  {
+    id: "tx-007",
+    type: "trade",
+    headline: "Thunder acquire backup PG Darnell Shaw from Memphis",
+    detail: "Oklahoma City Thunder have acquired point guard Darnell Shaw from the Memphis Grizzlies in exchange for a 2027 second-round pick.",
+    teamIds: ["nba-thunder"],
+    playerName: "Darnell Shaw",
+    date: "2026-03-27",
+    isBreaking: false,
+    leagueId: "nba",
+  },
+  {
+    id: "tx-008",
+    type: "injury",
+    headline: "Anthony Davis (knee) questionable for next two games",
+    detail: "Los Angeles Lakers center Anthony Davis is listed as questionable for the next two games with a bruised right knee. He is undergoing further evaluation.",
+    teamIds: ["nba-lakers"],
+    playerName: "Anthony Davis",
+    date: "2026-04-01",
+    isBreaking: true,
+    leagueId: "nba",
+  },
+  {
+    id: "tx-009",
+    type: "extension",
+    headline: "Mahomes extension clause triggers — locked in through 2031",
+    detail: "A performance incentive clause in Patrick Mahomes' contract has triggered following Kansas City's third consecutive conference championship appearance, extending his deal through the 2031 season.",
+    teamIds: ["nfl-chiefs"],
+    playerName: "Patrick Mahomes",
+    date: "2026-03-26",
+    isBreaking: false,
+    leagueId: "nfl",
+  },
+  {
+    id: "tx-010",
+    type: "signing",
+    headline: "Yankees sign veteran SP Carlos Vega to one-year deal",
+    detail: "New York Yankees have bolstered their rotation by signing veteran starter Carlos Vega to a one-year, $14M contract.",
+    teamIds: ["mlb-yankees"],
+    playerName: "Carlos Vega",
+    date: "2026-03-25",
+    isBreaking: false,
+    leagueId: "mlb",
+  },
+  {
+    id: "tx-011",
+    type: "waiver",
+    headline: "Ravens claim LB Marcus Taylor off waivers from Titans",
+    detail: "Baltimore Ravens have claimed linebacker Marcus Taylor off waivers from the Tennessee Titans. Taylor, 27, recorded 80 tackles last season.",
+    teamIds: ["nfl-ravens"],
+    playerName: "Marcus Taylor",
+    date: "2026-03-24",
+    isBreaking: false,
+    leagueId: "nfl",
+  },
+  {
+    id: "tx-012",
+    type: "injury",
+    headline: "Cale Makar (upper body) day-to-day for Avalanche",
+    detail: "Colorado Avalanche defenseman Cale Makar is listed as day-to-day with an upper-body injury suffered in Thursday's game against Boston.",
+    teamIds: ["nhl-avalanche"],
+    playerName: "Cale Makar",
+    date: "2026-04-01",
+    isBreaking: false,
+    leagueId: "nhl",
+  },
+];

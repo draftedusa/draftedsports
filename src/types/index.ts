@@ -60,6 +60,9 @@ export interface Article {
   byline: string;
   publishDate: string;
   body: string;
+  excerpt?: string;
+  category?: string;
+  isTrending?: boolean;
   teamIds: string[];
   gameId?: string;
   tagIds: string[];

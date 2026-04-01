@@ -89,23 +89,23 @@ export default function LiveControlPage() {
   }
 
   return (
-    <div className="bg-gray-950 min-h-screen pb-16 relative">
+    <div className="bg-surface-100 min-h-screen pb-16 relative">
       {/* Toast container */}
       <div className="fixed top-16 right-4 z-50 space-y-2 pointer-events-none">
         {toasts.map((t) => (
-          <div key={t.id} className="bg-gray-800 border border-gray-700 text-white text-sm px-4 py-2 rounded-lg shadow-lg">
+          <div key={t.id} className="bg-surface-200 border border-surface-300 text-surface-text text-sm px-4 py-2 rounded-lg shadow-lg">
             {t.text}
           </div>
         ))}
       </div>
 
       {/* ── 1. Game Header Strip ─────────────────────────────────── */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 sticky top-0 z-40">
+      <div className="bg-surface-200 border-b border-surface-300 px-4 py-3 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-4">
           {/* Score */}
           <div className="flex items-center gap-2">
             <Badge variant="live">Live</Badge>
-            <span className="text-white font-bold text-sm">
+            <span className="text-surface-text font-bold text-sm">
               {awayTeam.name} vs {homeTeam.name} — {game.awayScore}–{game.homeScore} | {game.quarter} {game.timeRemaining}
             </span>
           </div>
@@ -148,12 +148,12 @@ export default function LiveControlPage() {
                 const triggered = triggeredEvents.has(evt.id);
                 if (dismissed) return null;
                 return (
-                  <div key={evt.id} className={`border rounded-lg p-3 transition-colors ${triggered ? "border-green-800 bg-green-950/30" : "border-gray-800 bg-gray-900"}`}>
+                  <div key={evt.id} className={`border rounded-lg p-3 transition-colors ${triggered ? "border-green-600 bg-green-500/10" : "border-surface-300 bg-surface-200"}`}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div>
-                        <span className="text-xs text-gray-500 font-mono">[{evt.time}]</span>
+                        <span className="text-xs text-surface-muted font-mono">[{evt.time}]</span>
                         {evt.isHighlight && <span className="ml-1 text-xs text-orange-400">🔥 Highlight</span>}
-                        <p className={`text-sm mt-0.5 ${evt.isHighlight ? "text-white font-semibold" : "text-gray-300"}`}>
+                        <p className={`text-sm mt-0.5 ${evt.isHighlight ? "text-surface-text font-semibold" : "text-surface-muted"}`}>
                           {evt.description}
                         </p>
                       </div>
@@ -204,7 +204,7 @@ export default function LiveControlPage() {
                 value={momentInput}
                 onChange={(e) => setMomentInput(e.target.value)}
                 placeholder="e.g. Sengun poster dunk"
-                className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-600"
+                className="flex-1 bg-surface-200 border border-surface-300 rounded px-3 py-2 text-sm text-surface-text placeholder-surface-muted focus:outline-none focus:border-yellow-600"
               />
               <button
                 type="submit"
@@ -215,10 +215,10 @@ export default function LiveControlPage() {
             </form>
 
             {momentPreview && (
-              <div className="bg-gray-800 rounded-lg p-4 mb-3 border border-yellow-800">
+              <div className="bg-surface-200 rounded-lg p-4 mb-3 border border-yellow-600/40">
                 <p className="text-sm font-bold text-yellow-400 mb-1">Moment: "{momentPreview.text}"</p>
-                <p className="text-xs text-gray-400 mb-3">Confidence: <span className="text-green-400 font-bold">{momentPreview.confidence}%</span></p>
-                <p className="text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wide">Auto Actions:</p>
+                <p className="text-xs text-surface-muted mb-3">Confidence: <span className="text-green-400 font-bold">{momentPreview.confidence}%</span></p>
+                <p className="text-xs font-semibold text-surface-muted mb-2 uppercase tracking-wide">Auto Actions:</p>
                 <ul className="space-y-1 mb-4">
                   {Object.entries(enabledActions).map(([key, enabled]) => {
                     const labels: Record<string, string> = {
@@ -261,7 +261,7 @@ export default function LiveControlPage() {
             {/* Edit Actions Modal */}
             {editActionsOpen && (
               <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-                <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-80 space-y-4">
+                <div className="bg-surface-200 border border-surface-300 rounded-xl p-6 w-80 space-y-4">
                   <h3 className="text-sm font-bold text-white uppercase tracking-wide">Edit Auto Actions</h3>
                   {Object.entries(enabledActions).map(([key, val]) => {
                     const labels: Record<string, string> = {
@@ -308,15 +308,15 @@ export default function LiveControlPage() {
           <Panel title="Poll Injection System" accent="border-blue-600">
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-400 mb-1 block">Question</label>
+                <label className="text-xs text-surface-muted mb-1 block">Question</label>
                 <input
                   value={pollQuestion}
                   onChange={(e) => setPollQuestion(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-600"
+                  className="w-full bg-surface-200 border border-surface-300 rounded px-3 py-2 text-sm text-surface-text focus:outline-none focus:border-blue-600"
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-400 mb-1 block">Options</label>
+                <label className="text-xs text-surface-muted mb-1 block">Options</label>
                 {pollOptions.map((opt, i) => (
                   <input
                     key={i}
@@ -326,7 +326,7 @@ export default function LiveControlPage() {
                       copy[i] = e.target.value;
                       setPollOptions(copy);
                     }}
-                    className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm text-white mb-1 focus:outline-none focus:border-blue-600"
+                    className="w-full bg-surface-200 border border-surface-300 rounded px-3 py-1.5 text-sm text-surface-text mb-1 focus:outline-none focus:border-blue-600"
                   />
                 ))}
               </div>
@@ -372,12 +372,12 @@ export default function LiveControlPage() {
                 if (discardedHighlights.has(hl.id)) return null;
                 const inserted = insertedHighlights.has(hl.id);
                 return (
-                  <div key={hl.id} className={`border rounded-lg p-3 ${inserted ? "border-green-800 opacity-60" : "border-gray-700"}`}>
+                  <div key={hl.id} className={`border rounded-lg p-3 ${inserted ? "border-green-700 opacity-60" : "border-surface-300"}`}>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-14 h-10 bg-gray-800 rounded flex items-center justify-center text-xl shrink-0">🎬</div>
+                      <div className="w-14 h-10 bg-surface-200 rounded flex items-center justify-center text-xl shrink-0">🎬</div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{hl.title}</p>
-                        <p className="text-xs text-gray-500">{hl.source} · {hl.timestamp}</p>
+                        <p className="text-sm font-semibold text-surface-text truncate">{hl.title}</p>
+                        <p className="text-xs text-surface-muted">{hl.source} · {hl.timestamp}</p>
                       </div>
                     </div>
                     <div className="flex gap-1.5">
@@ -405,15 +405,15 @@ export default function LiveControlPage() {
           <Panel title="Thread & Community" accent="border-purple-600">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-300">Status</span>
+                <span className="text-xs text-surface-muted">Status</span>
                 <span className="text-xs font-bold text-green-400">Active</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-300">Slow Mode</span>
+                <span className="text-xs text-surface-muted">Slow Mode</span>
                 <select
                   value={slowMode}
                   onChange={(e) => { setSlowMode(e.target.value); addToast(`⏱ Slow mode: ${e.target.value}s`); }}
-                  className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1"
+                  className="bg-surface-200 border border-surface-300 text-surface-text text-xs rounded px-2 py-1"
                 >
                   <option value="0">Off</option>
                   <option value="5">5s</option>
@@ -434,7 +434,7 @@ export default function LiveControlPage() {
                   <button
                     key={label}
                     onClick={action}
-                    className="px-2 py-2 bg-gray-800 hover:bg-gray-700 text-white text-xs font-medium rounded transition-colors text-center"
+                    className="px-2 py-2 bg-surface-200 hover:bg-surface-300 text-surface-text text-xs font-medium rounded transition-colors text-center"
                   >
                     {label}
                   </button>
@@ -447,15 +447,15 @@ export default function LiveControlPage() {
           <Panel title="Alert & Push System" accent="border-red-600">
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-400 mb-1 block">Headline</label>
+                <label className="text-xs text-surface-muted mb-1 block">Headline</label>
                 <input
                   value={alertHeadline}
                   onChange={(e) => setAlertHeadline(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-red-600"
+                  className="w-full bg-surface-200 border border-surface-300 rounded px-3 py-2 text-sm text-surface-text focus:outline-none focus:border-red-600"
                 />
               </div>
               <div>
-                <p className="text-xs text-gray-400 mb-1">Destinations</p>
+                <p className="text-xs text-surface-muted mb-1">Destinations</p>
                 <div className="flex gap-3">
                   {(Object.keys(alertDests) as Array<keyof typeof alertDests>).map((dest) => (
                     <label key={dest} className="flex items-center gap-1.5 cursor-pointer">
@@ -465,18 +465,18 @@ export default function LiveControlPage() {
                         onChange={(e) => setAlertDests((prev) => ({ ...prev, [dest]: e.target.checked }))}
                         className="accent-red-500"
                       />
-                      <span className="text-xs text-gray-300 capitalize">{dest}</span>
+                      <span className="text-xs text-surface-muted capitalize">{dest}</span>
                     </label>
                   ))}
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-1">
-                  <label className="text-xs text-gray-400 mb-1 block">Priority</label>
+                  <label className="text-xs text-surface-muted mb-1 block">Priority</label>
                   <select
                     value={alertPriority}
                     onChange={(e) => setAlertPriority(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 text-white text-sm rounded px-2 py-1.5"
+                    className="w-full bg-surface-200 border border-surface-300 text-surface-text text-sm rounded px-2 py-1.5"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -529,8 +529,8 @@ function ToggleBtn({ children, active, danger, onClick }: { children: React.Reac
       ? "bg-red-700 border-red-500 text-white"
       : "bg-transparent border-red-800 text-red-400 hover:border-red-600"
     : active
-    ? "bg-gray-700 border-gray-500 text-white"
-    : "bg-transparent border-gray-700 text-gray-400 hover:border-gray-500";
+    ? "bg-surface-300 border-surface-300 text-surface-text"
+    : "bg-transparent border-surface-300 text-surface-muted hover:border-surface-text";
   return <button className={`${base} ${style}`} onClick={onClick}>{children}</button>;
 }
 
@@ -540,8 +540,8 @@ function EventBtn({ children, danger, onClick }: { children: React.ReactNode; da
       onClick={onClick}
       className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
         danger
-          ? "bg-red-950 text-red-400 hover:bg-red-900 border border-red-900"
-          : "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700"
+          ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-800"
+          : "bg-surface-200 text-surface-muted hover:bg-surface-300 border border-surface-300"
       }`}
     >
       {children}
@@ -551,10 +551,10 @@ function EventBtn({ children, danger, onClick }: { children: React.ReactNode; da
 
 function SmBtn({ children, green, danger, onClick }: { children: React.ReactNode; green?: boolean; danger?: boolean; onClick: () => void }) {
   const style = green
-    ? "bg-green-900 text-green-400 hover:bg-green-800 border border-green-800"
+    ? "bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-700"
     : danger
-    ? "bg-red-950 text-red-400 hover:bg-red-900 border border-red-900"
-    : "bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700";
+    ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-800"
+    : "bg-surface-200 text-surface-muted hover:bg-surface-300 border border-surface-300";
   return (
     <button onClick={onClick} className={`px-2 py-1 text-xs font-medium rounded transition-colors ${style}`}>
       {children}
@@ -564,8 +564,8 @@ function SmBtn({ children, green, danger, onClick }: { children: React.ReactNode
 
 function SystemState({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (
-    <div className="bg-gray-800 rounded p-2">
-      <p className="text-xs text-gray-500">{label}</p>
+    <div className="bg-surface-200 rounded p-2">
+      <p className="text-xs text-surface-muted">{label}</p>
       <p className={`text-xs font-bold mt-0.5 ${ok ? "text-green-400" : "text-red-400"}`}>{value}</p>
     </div>
   );

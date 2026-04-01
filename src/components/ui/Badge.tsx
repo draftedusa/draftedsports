@@ -9,11 +9,11 @@ interface BadgeProps {
 export default function Badge({ children, variant = "default", className = "" }: BadgeProps) {
   const base = "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide";
   const variants: Record<string, string> = {
-    live: "bg-red-600 text-white animate-pulse",
-    final: "bg-gray-700 text-gray-300",
-    upcoming: "bg-blue-900 text-blue-300",
+    live: "bg-brand text-white animate-pulse",
+    final: "bg-surface-300 text-surface-muted",
+    upcoming: "bg-blue-500/20 text-blue-400",
     hot: "bg-orange-600 text-white",
-    default: "bg-gray-800 text-gray-300",
+    default: "bg-surface-300 text-surface-muted",
   };
   return (
     <span className={`${base} ${variants[variant]} ${className}`}>
