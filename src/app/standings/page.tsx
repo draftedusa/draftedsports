@@ -54,7 +54,7 @@ export default function StandingsPage() {
                         <td className="px-4 py-3">
                           <Link href={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-brand transition-colors">
                             <span className="text-lg">{team.logo}</span>
-                            <span className="font-semibold text-white">{team.name}</span>
+                            <span className="font-semibold text-surface-text">{team.name}</span>
                           </Link>
                         </td>
                         <td className="px-3 py-3 text-center font-bold text-surface-text tabular-nums">{team.record}</td>

@@ -17,7 +17,7 @@ export default function ScoresPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       {/* Page header */}
       <div className="flex items-center justify-between border-b border-surface-300 pb-4">
-        <h1 className="text-2xl font-black text-white">Scores & Results</h1>
+        <h1 className="text-2xl font-black text-surface-text">Scores & Results</h1>
         <div className="flex items-center gap-2 text-xs text-surface-muted">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
           April 1, 2026

@@ -59,7 +59,7 @@ export default function SearchPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-black text-white">Search</h1>
+      <h1 className="text-2xl font-black text-surface-text">Search</h1>
 
       {/* Search input */}
       <div className="relative">
@@ -119,7 +119,7 @@ export default function SearchPage() {
                     <div className="flex items-center gap-3 p-3 bg-surface-200 border border-surface-300 rounded-lg hover:border-brand/40 transition-colors">
                       <span className="text-2xl">{team.logo}</span>
                       <div>
-                        <p className="text-sm font-bold text-white">{team.name}</p>
+                        <p className="text-sm font-bold text-surface-text">{team.name}</p>
                         <p className="text-xs text-surface-muted">{team.leagueId.toUpperCase()} · {team.record}</p>
                       </div>
                     </div>
@@ -143,7 +143,7 @@ export default function SearchPage() {
                           {player.number}
                         </span>
                         <div>
-                          <p className="text-sm font-bold text-white">{player.name}</p>
+                          <p className="text-sm font-bold text-surface-text">{player.name}</p>
                           <p className="text-xs text-surface-muted">{player.position} · {team?.name}</p>
                         </div>
                       </div>

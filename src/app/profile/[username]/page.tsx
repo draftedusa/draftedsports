@@ -29,7 +29,7 @@ export default async function ProfilePage({ params }: Props) {
         </div>
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-2xl font-black text-white">@{user.username}</h1>
+            <h1 className="text-2xl font-black text-surface-text">@{user.username}</h1>
             {user.role === "admin" && (
               <span className="px-2 py-0.5 bg-yellow-900 text-yellow-400 text-xs font-bold rounded uppercase">
                 Admin

@@ -54,7 +54,7 @@ export default function TeamPage({ params }: Props) {
               <span className="text-surface-muted">·</span>
               <span className="text-xs text-surface-muted">#{team.standing} in League</span>
             </div>
-            <h1 className="text-4xl font-black text-white">{team.name}</h1>
+            <h1 className="text-4xl font-black text-surface-text">{team.name}</h1>
             <p className="text-xl text-surface-text mt-1">{team.record}</p>
           </div>
         </div>

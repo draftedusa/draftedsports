@@ -2,45 +2,66 @@
 
 /* ── Runtime CSS variables ─────────────────────────────── */
 :root {
-  --brand:        #8b5cf6;
-  --brand-light:  #d946ef;
-  --surface-100:  #ffffff;
-  --surface-200:  #f3f4f6;
-  --surface-300:  #e5e7eb;
-  --surface-text: #111827;
-  --surface-muted:#6b7280;
+  --brand:         #8b5cf6;
+  --brand-light:   #d946ef;
+  --surface-100:   #ffffff;
+  --surface-200:   #f3f4f6;
+  --surface-300:   #e5e7eb;
+  --surface-text:  #111827;
+  --surface-muted: #6b7280;
+  --card-border:   #e5e7eb;
+  --shadow-header: 0 4px 24px 0 rgba(0,0,0,0.08);
 }
 
 .dark {
-  --surface-100:  #0f0f14;
-  --surface-200:  #18181f;
-  --surface-300:  #27272f;
-  --surface-text: #f9fafb;
-  --surface-muted:#9ca3af;
+  --surface-100:   #0f0f14;
+  --surface-200:   #18181f;
+  --surface-300:   #27272f;
+  --surface-text:  #f9fafb;
+  --surface-muted: #9ca3af;
+  --card-border:   #27272f;
+  --shadow-header: 0 4px 24px 0 rgba(0,0,0,0.5);
 }
 
 /* ── Tailwind v4 theme tokens ──────────────────────────── */
 @theme {
-  --color-brand:        var(--brand);
-  --color-brand-light:  var(--brand-light);
-  --color-surface-100:  var(--surface-100);
-  --color-surface-200:  var(--surface-200);
-  --color-surface-300:  var(--surface-300);
-  --color-surface-text: var(--surface-text);
-  --color-surface-muted:var(--surface-muted);
+  --color-brand:         var(--brand);
+  --color-brand-light:   var(--brand-light);
+  --color-surface-100:   var(--surface-100);
+  --color-surface-200:   var(--surface-200);
+  --color-surface-300:   var(--surface-300);
+  --color-surface-text:  var(--surface-text);
+  --color-surface-muted: var(--surface-muted);
 }
 
 @custom-variant dark (&:is(.dark *));
 
 /* ── Base ──────────────────────────────────────────────── */
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--surface-100);
   color: var(--surface-text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+/* ── Cards — light mode border enforcement ─────────────── */
+.card {
+  border: 1px solid var(--card-border);
+  background: var(--surface-200);
+  border-radius: 0.75rem;
+}
+
+/* ── Typography utilities ──────────────────────────────── */
+.hero-headline {
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-weight: 900;
+}
+.body-copy {
+  line-height: 1.75;
+  font-size: 1.0625rem;
 }
 
 /* ── Utilities ─────────────────────────────────────────── */
@@ -60,6 +81,19 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* ── Header scroll elevation ───────────────────────────── */
+.header-scrolled {
+  box-shadow: var(--shadow-header);
+  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--surface-100) 92%, transparent);
+}
+
+/* ── Blur backdrop (paywall/modal) ─────────────────────── */
+.backdrop-blur-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* ── Ticker animation ──────────────────────────────────── */
 @keyframes ticker {
   0%   { transform: translateX(0); }
@@ -70,4 +104,21 @@ body {
 }
 .animate-ticker:hover {
   animation-play-state: paused;
+}
+
+/* ── Skeleton shimmer ──────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-200) 25%,
+    var(--surface-300) 50%,
+    var(--surface-200) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 0.375rem;
 }

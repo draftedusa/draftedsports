@@ -4,12 +4,14 @@ import { usePathname } from "next/navigation";
 import LeftRail from "./LeftRail";
 import RightRail from "./RightRail";
 
+// Routes that get 100% width (no sidebar rails)
+const FULL_WIDTH_PATHS = ["/auth", "/feed", "/profile", "/admin", "/login"];
+
 export default function PageWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
-  const isAuth  = pathname === "/login";
+  const isFullWidth = FULL_WIDTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p));
 
-  if (isAdmin || isAuth) {
+  if (isFullWidth) {
     return <main className="flex-1">{children}</main>;
   }
 

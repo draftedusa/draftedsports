@@ -12,6 +12,8 @@ import Panel from "@/components/ui/Panel";
 import ArticleCard from "@/components/cards/ArticleCard";
 import Badge from "@/components/ui/Badge";
 import { formatCount, timeAgo } from "@/lib/utils";
+import { useArticleGate } from "@/lib/hooks/useArticleGate";
+import PaywallModal from "@/components/monetization/PaywallModal";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -28,6 +30,8 @@ export default function ArticlePage({ params }: Props) {
   const articleThread = threads.find((t) => t.articleId === article.id);
   const threadComments = articleThread ? comments.filter((c) => c.threadId === articleThread.id) : [];
   const articlePoll = polls.find((p) => p.articleId === article.id);
+
+  const { showPaywall, dismissPaywall } = useArticleGate(slug);
 
   const [reactionCounts, setReactionCounts] = useState<Record<string, Record<string, number>>>({});
   const [articleReactions, setArticleReactions] = useState({ fire: 0, wow: 0 });
@@ -77,6 +81,8 @@ export default function ArticlePage({ params }: Props) {
   const allComments = [...localComments, ...threadComments];
 
   return (
+    <>
+      {showPaywall && <PaywallModal onClose={dismissPaywall} />}
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main article */}
@@ -303,5 +309,6 @@ export default function ArticlePage({ params }: Props) {
         </div>
       </div>
     </div>
+    </>
   );
 }

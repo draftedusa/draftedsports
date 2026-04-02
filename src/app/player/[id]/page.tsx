@@ -56,7 +56,7 @@ export default async function PlayerPage({ params }: Props) {
             <span className="text-gray-700">·</span>
             <span className="text-xs text-surface-muted font-mono">{player.position}</span>
           </div>
-          <h1 className="text-4xl font-black text-white">{player.name}</h1>
+          <h1 className="text-4xl font-black text-surface-text">{player.name}</h1>
           <p className="text-surface-muted mt-1">#{player.number} · {player.position}</p>
         </div>
       </div>

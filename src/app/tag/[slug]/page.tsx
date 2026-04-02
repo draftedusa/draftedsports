@@ -18,7 +18,7 @@ export default async function TagPage({ params }: Props) {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
       <div className="border-b border-surface-300 pb-4">
         <p className="text-xs text-surface-muted uppercase tracking-widest mb-1">Topic</p>
-        <h1 className="text-3xl font-black text-white">{tag.name}</h1>
+        <h1 className="text-3xl font-black text-surface-text">{tag.name}</h1>
         <p className="text-sm text-surface-muted mt-1">{tagArticles.length} articles</p>
       </div>
 
