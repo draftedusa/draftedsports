@@ -107,7 +107,7 @@ export default function GamePage({ params }: Props) {
                 <span className={`text-5xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-surface-text" : "text-surface-muted"}`}>
                   {game.awayScore}
                 </span>
-                <span className="text-2xl text-gray-700">—</span>
+                <span className="text-2xl text-surface-muted">—</span>
                 <span className={`text-5xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-surface-text" : "text-surface-muted"}`}>
                   {game.homeScore}
                 </span>

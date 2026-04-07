@@ -63,11 +63,11 @@ export default function Footer() {
           <h4 className="text-surface-text font-bold mb-4 text-xs uppercase tracking-widest">Legal</h4>
           <ul className="space-y-1.5">
             {[
-              { href: "/privacy",      label: "Privacy Policy" },
-              { href: "/terms",        label: "Terms of Use" },
-              { href: "/disclaimers",  label: "Content Disclaimers" },
-              { href: "/cookies",      label: "Cookie Settings" },
-              { href: "/accessibility",label: "Accessibility" },
+              { href: "/privacy-policy", label: "Privacy Policy" },
+              { href: "/terms",          label: "Terms of Use" },
+              { href: "/disclaimer",     label: "Content Disclaimers" },
+              { href: "/privacy-policy", label: "Cookie Settings" },
+              { href: "/accessibility",  label: "Accessibility" },
             ].map(({ href, label }) => (
               <li key={href}>
                 <Link href={href} className="hover:text-brand transition-colors text-xs">{label}</Link>
@@ -128,8 +128,8 @@ export default function Footer() {
           © {year} UNDRAFTED. All data is fictional. Not affiliated with any sports organization.
         </p>
         <div className="flex items-center gap-4 text-xs text-surface-muted">
-          <Link href="/privacy" className="hover:text-brand transition-colors">Privacy</Link>
-          <Link href="/terms"   className="hover:text-brand transition-colors">Terms</Link>
+          <Link href="/privacy-policy" className="hover:text-brand transition-colors">Privacy</Link>
+          <Link href="/terms"          className="hover:text-brand transition-colors">Terms</Link>
           <Link href="/contact" className="hover:text-brand transition-colors">Contact</Link>
         </div>
       </div>

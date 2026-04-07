@@ -115,7 +115,7 @@ function ScoreRow({ gameId }: { gameId: string }) {
               <span className={`text-xl font-black tabular-nums ${game.awayScore > game.homeScore ? "text-surface-text" : "text-surface-muted"}`}>
                 {game.awayScore}
               </span>
-              <span className="text-gray-700">–</span>
+              <span className="text-surface-muted">–</span>
               <span className={`text-xl font-black tabular-nums ${game.homeScore > game.awayScore ? "text-surface-text" : "text-surface-muted"}`}>
                 {game.homeScore}
               </span>
@@ -141,7 +141,7 @@ function ScoreRow({ gameId }: { gameId: string }) {
           <div className="hidden sm:col-span-2 sm:flex flex-col items-end gap-0.5">
             <p className="text-xs text-surface-muted">{gameOdds.spread}</p>
             <p className="text-xs text-surface-muted">O/U {gameOdds.overUnder}</p>
-            <p className="text-xs text-gray-700">{gameOdds.provider}</p>
+            <p className="text-xs text-surface-muted">{gameOdds.provider}</p>
           </div>
         )}
       </div>

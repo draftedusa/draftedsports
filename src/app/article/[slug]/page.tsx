@@ -31,7 +31,7 @@ export default function ArticlePage({ params }: Props) {
   const threadComments = articleThread ? comments.filter((c) => c.threadId === articleThread.id) : [];
   const articlePoll = polls.find((p) => p.articleId === article.id);
 
-  const { showPaywall, dismissPaywall } = useArticleGate(slug);
+  const { showPaywall, dismissPaywall, articlesViewed } = useArticleGate(slug);
 
   const [reactionCounts, setReactionCounts] = useState<Record<string, Record<string, number>>>({});
   const [articleReactions, setArticleReactions] = useState({ fire: 0, wow: 0 });
@@ -82,7 +82,7 @@ export default function ArticlePage({ params }: Props) {
 
   return (
     <>
-      {showPaywall && <PaywallModal onClose={dismissPaywall} />}
+      {showPaywall && <PaywallModal onClose={dismissPaywall} articlesViewed={articlesViewed} />}
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main article */}

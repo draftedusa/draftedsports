@@ -5,22 +5,27 @@ import Link from "next/link";
 
 interface PaywallModalProps {
   onClose: () => void;
+  articlesViewed?: number;
 }
 
-export default function PaywallModal({ onClose }: PaywallModalProps) {
-  // Close on ESC
+export default function PaywallModal({ onClose, articlesViewed = 0 }: PaywallModalProps) {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    // Lock scroll
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
   }, [onClose]);
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-      style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", backgroundColor: "rgba(0,0,0,0.4)" }}
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 backdrop-blur-sm"
+      style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
       onClick={onClose}
     >
       <div
@@ -38,27 +43,27 @@ export default function PaywallModal({ onClose }: PaywallModalProps) {
           </svg>
         </button>
 
-        {/* Logo / badge */}
+        {/* Logo badge */}
         <div className="flex items-center gap-2 mb-5">
           <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
-          <span className="text-xs font-black tracking-widest uppercase text-brand">UNDRAFTED</span>
+          <span className="text-xs font-black tracking-widest uppercase text-brand">UNDRAFTED+</span>
         </div>
 
         {/* Headline */}
         <h2 className="text-2xl font-black tracking-tighter text-surface-text mb-2">
-          You&apos;ve reached your free article limit
+          You&apos;ve read {articlesViewed} free articles
         </h2>
         <p className="text-sm text-surface-muted leading-relaxed mb-6">
-          Get unlimited access to in-depth analysis, live coverage, and breaking news. No ads. No limits. Cancel any time.
+          Unlock unlimited access to in-depth analysis, live coverage, creator franchises, and breaking news. No ads. Cancel anytime.
         </p>
 
         {/* Benefits */}
         <ul className="space-y-2 mb-6">
           {[
             "Unlimited articles across all sports",
+            "Creator franchise deep dives & film rooms",
             "Live game coverage & breaking news alerts",
-            "Exclusive film room & draft analysis",
-            "Ad-free reading experience",
+            "Ad-free, distraction-free experience",
           ].map((benefit) => (
             <li key={benefit} className="flex items-center gap-2 text-sm text-surface-text">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-brand shrink-0">
@@ -69,18 +74,20 @@ export default function PaywallModal({ onClose }: PaywallModalProps) {
           ))}
         </ul>
 
-        {/* CTA */}
-        <Link
-          href="/auth/login"
-          className="block w-full text-center px-6 py-3 bg-brand hover:bg-brand/90 text-white font-bold rounded-xl text-sm transition-colors mb-3"
-        >
-          Start Free Trial
-        </Link>
+        {/* Primary CTA */}
         <Link
           href="/auth/onboarding"
+          className="block w-full text-center px-6 py-3 bg-brand hover:bg-brand/90 text-white font-bold rounded-xl text-sm transition-colors mb-3"
+        >
+          Unlock UNDRAFTED+
+        </Link>
+
+        {/* Secondary CTA */}
+        <Link
+          href="/auth/login"
           className="block w-full text-center px-6 py-3 bg-surface-200 hover:bg-surface-300 border border-surface-300 text-surface-text font-bold rounded-xl text-sm transition-colors mb-4"
         >
-          Create Free Account
+          Already a member? Sign In
         </Link>
 
         {/* No thanks */}

@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { Article } from "@/types";
 import { formatCount, truncate } from "@/lib/utils";
+import CreatorTag from "@/components/ui/CreatorTag";
+import Kicker from "@/components/ui/Kicker";
 
 interface ArticleCardProps {
   article: Article;
-  variant?: "default" | "featured" | "compact";
+  variant?: "default" | "featured" | "compact" | "premium";
   isTrending?: boolean;
 }
 
 export default function ArticleCard({ article, variant = "default", isTrending }: ArticleCardProps) {
   const trending = isTrending ?? article.isTrending;
+  const isPremium = variant === "premium" || article.category === "analysis";
 
   if (variant === "featured") {
     return (
@@ -24,16 +27,9 @@ export default function ArticleCard({ article, variant = "default", isTrending }
             </div>
           )}
           <div className="relative p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xs font-bold text-brand uppercase tracking-wide">Featured</span>
-              <span className="text-xs text-surface-muted">· {article.readTime} min read</span>
-            </div>
+            <Kicker label={article.category ?? "Featured"} variant="brand" className="mb-2" />
             <h2 className="text-lg font-black tracking-tighter leading-tight text-white mb-2">{article.title}</h2>
-            <div className="flex items-center gap-3 text-xs text-white/80">
-              <span>{article.byline}</span>
-              <span>·</span>
-              <span>{formatCount(article.views)} views</span>
-            </div>
+            <CreatorTag byline={article.byline} className="text-white/80" />
           </div>
         </div>
       </Link>
@@ -54,29 +50,39 @@ export default function ArticleCard({ article, variant = "default", isTrending }
               )}
               <p className="text-sm font-semibold text-surface-text leading-snug line-clamp-2">{article.title}</p>
             </div>
-            <p className="text-xs text-surface-muted mt-1">{article.byline} · {formatCount(article.views)} views</p>
+            <CreatorTag byline={article.byline} className="mt-1" />
           </div>
         </div>
       </Link>
     );
   }
 
-  // default
+  // Default + Premium cards
   return (
     <Link href={`/article/${article.slug}`}>
-      <div className="bg-surface-200 border border-surface-300 rounded-xl overflow-hidden hover:border-brand/40 transition-colors cursor-pointer group">
+      <div className={`bg-surface-200 border rounded-xl overflow-hidden hover:border-brand/40 transition-colors cursor-pointer group ${
+        isPremium ? "border-brand/20" : "border-surface-300"
+      }`}>
         <div className="h-36 bg-gradient-to-br from-brand/10 to-brand-light/5 flex items-center justify-center text-4xl relative">
-          🏟️
+          {isPremium ? "✨" : "🏟️"}
           {trending && (
             <span className="absolute top-2 left-2 w-2 h-2 rounded-full bg-brand animate-pulse" />
           )}
+          {isPremium && (
+            <span className="absolute top-2 right-2 bg-brand/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+              Premium
+            </span>
+          )}
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-surface-text text-sm leading-snug mb-2 group-hover:text-brand transition-colors">{article.title}</h3>
+          {isPremium && <Kicker label="Exclusive Analysis" variant="brand" className="mb-1.5" />}
+          <h3 className={`font-bold text-surface-text text-sm leading-snug mb-2 group-hover:text-brand transition-colors ${
+            isPremium ? "font-serif" : ""
+          }`}>{article.title}</h3>
           <p className="text-xs text-surface-muted mb-3 line-clamp-2">{truncate(article.body, 110)}</p>
-          <div className="flex items-center justify-between text-xs text-surface-muted">
-            <span>{article.byline}</span>
-            <span>{formatCount(article.views)} views · {article.readTime} min</span>
+          <div className="flex items-center justify-between">
+            <CreatorTag byline={article.byline} showAvatar />
+            <span className="text-[10px] text-surface-muted">{formatCount(article.views)} · {article.readTime}m</span>
           </div>
         </div>
       </div>

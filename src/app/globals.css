@@ -111,6 +111,14 @@ body {
   0%   { background-position: -400px 0; }
   100% { background-position: 400px 0; }
 }
+/* ── Mobile bottom nav safe area ──────────────────────── */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+@media (max-width: 639px) {
+  body { padding-bottom: 3.5rem; }
+}
+
 .skeleton {
   background: linear-gradient(
     90deg,

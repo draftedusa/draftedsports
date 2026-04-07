@@ -12,46 +12,52 @@ import SearchModal from "./SearchModal";
 
 const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
 
-function buildTickerItems(): string[] {
+function buildTickerItems() {
   const live = games.filter((g) => g.status === "live").map((g) => {
     const home = teamMap[g.homeTeamId];
     const away = teamMap[g.awayTeamId];
-    return `🔴 ${away.name} ${g.awayScore} — ${home.name} ${g.homeScore} · ${g.quarter} ${g.timeRemaining}`;
+    return { type: "live" as const, away, home, game: g };
   });
   const breaking = transactions
     .filter((t) => t.isBreaking)
     .slice(0, 3)
-    .map((t) => `⚡ ${t.headline}`);
-  return [...live, ...breaking];
+    .map((t) => ({ type: "breaking" as const, headline: t.headline }));
+  return { live, breaking };
 }
 
-const BOTTOM_NAV = [
-  { href: "/",             label: "Home" },
-  { href: "/scores",       label: "Scores" },
-  { href: "/standings",    label: "Standings" },
-  { href: "/transactions", label: "Transactions" },
-  { href: "/watch",        label: "Watch" },
-  { href: "/feed",         label: "Fan Pulse" },
+const PRIMARY_NAV = [
+  { href: "/",           label: "Home" },
+  { href: "/scores",     label: "Scores" },
+  { href: "/watch",      label: "Watch" },
+  { href: "/search",     label: "Analysis" },
+  { href: "/feed",       label: "Feed" },
+  { href: "/standings",  label: "Premium", premium: true },
+];
+
+const MOBILE_NAV = [
+  { href: "/",       label: "Home",   icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+  { href: "/scores", label: "Scores", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
+  { href: "/watch",  label: "Watch",  icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+  { href: "/feed",   label: "Feed",   icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+  { href: "/profile",label: "Profile",icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" },
 ];
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [dropOpen, setDropOpen]     = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
-  const dropRef                      = useRef<HTMLDivElement>(null);
-  const { data: session }           = useSession();
-  const tickerItems                  = buildTickerItems();
+  const [scrolled, setScrolled] = useState(false);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const { data: session } = useSession();
+  const ticker = buildTickerItems();
   const isAdmin = (session?.user as Record<string, unknown> | undefined)?.role === "admin";
 
-  // Scroll elevation
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const fn = (e: MouseEvent) => {
       if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false);
@@ -60,7 +66,6 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", fn);
   }, []);
 
-  // Cmd/Ctrl+K opens search
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -88,8 +93,23 @@ export default function Header() {
           </span>
           <div className="flex-1 overflow-hidden">
             <div className="flex gap-12 whitespace-nowrap animate-ticker text-xs text-white font-medium">
-              {[...tickerItems, ...tickerItems].map((item, i) => (
-                <span key={i} className="shrink-0">{item}</span>
+              {/* Desktop: full detail */}
+              {[...ticker.live, ...ticker.live].map((item, i) => (
+                <span key={`l${i}`} className="shrink-0 hidden sm:inline">
+                  🔴 {item.away.name} {item.game.awayScore} — {item.home.name} {item.game.homeScore} · {item.game.quarter} {item.game.timeRemaining}
+                </span>
+              ))}
+              {[...ticker.breaking, ...ticker.breaking].map((item, i) => (
+                <span key={`b${i}`} className="shrink-0 hidden sm:inline">⚡ {item.headline}</span>
+              ))}
+              {/* Mobile: compact — logos + score + time only */}
+              {[...ticker.live, ...ticker.live].map((item, i) => (
+                <span key={`ml${i}`} className="shrink-0 sm:hidden">
+                  {item.away.logo} {item.game.awayScore}–{item.game.homeScore} {item.home.logo} · {item.game.quarter}
+                </span>
+              ))}
+              {[...ticker.breaking, ...ticker.breaking].map((item, i) => (
+                <span key={`mb${i}`} className="shrink-0 sm:hidden">⚡ Breaking</span>
               ))}
             </div>
           </div>
@@ -97,8 +117,6 @@ export default function Header() {
 
         {/* ── Top Tier: Logo | League Icons | Search+Gear+Auth ─── */}
         <div className="max-w-[1400px] mx-auto px-4 flex items-center h-14 gap-4">
-
-          {/* Far-left: Logo */}
           <Link href="/" className="shrink-0">
             <span className="text-2xl font-black italic tracking-tighter text-surface-text">
               UN<span className="text-brand">DRAFTED</span>
@@ -127,7 +145,7 @@ export default function Header() {
 
           {/* Far-right: Search + Settings + Theme + Auth */}
           <div className="flex items-center gap-1 ml-auto shrink-0">
-            {/* Search — opens modal, NOT a page nav */}
+            {/* Search — opens modal ONLY */}
             <button
               onClick={() => setSearchOpen(true)}
               className="flex w-8 h-8 items-center justify-center rounded-lg text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors"
@@ -178,7 +196,6 @@ export default function Header() {
                       className="flex items-center gap-2 px-3 py-2 text-xs text-surface-text hover:bg-surface-200 transition-colors">
                       👤 My Profile
                     </Link>
-                    {/* Admin-only: stealth dock — ONLY visible to admins */}
                     {isAdmin && (
                       <>
                         <div className="border-t border-surface-300 my-0.5" />
@@ -211,7 +228,7 @@ export default function Header() {
               </Link>
             )}
 
-            {/* Hamburger */}
+            {/* Hamburger — mobile */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 text-surface-muted hover:text-surface-text"
@@ -224,15 +241,24 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ── Bottom Tier — Static site nav ───────────────────── */}
+        {/* ── Bottom Tier — Primary nav (desktop) ─────────────── */}
         <div className="hidden lg:block border-t border-surface-300 bg-surface-200/60">
           <div className="max-w-[1400px] mx-auto px-4 h-9 flex items-center gap-0.5">
-            {BOTTOM_NAV.map(({ href, label }) => (
+            {PRIMARY_NAV.map(({ href, label, premium }) => (
               <Link
                 key={href}
                 href={href}
-                className="px-4 h-full flex items-center text-xs font-semibold text-surface-muted hover:text-brand transition-colors"
+                className={`px-4 h-full flex items-center text-xs font-semibold transition-colors ${
+                  premium
+                    ? "text-brand hover:text-brand/80"
+                    : "text-surface-muted hover:text-brand"
+                }`}
               >
+                {premium && (
+                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-3 h-3 mr-1 text-brand">
+                    <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clipRule="evenodd" />
+                  </svg>
+                )}
                 {label}
               </Link>
             ))}
@@ -242,7 +268,7 @@ export default function Header() {
         {/* ── Mobile Drawer ────────────────────────────────────── */}
         {mobileOpen && (
           <div className="lg:hidden bg-surface-200 border-t border-surface-300 px-4 py-4 space-y-1">
-            {BOTTOM_NAV.map(({ href, label }) => (
+            {PRIMARY_NAV.map(({ href, label }) => (
               <MobileLink key={href} href={href} onClick={() => setMobileOpen(false)}>{label}</MobileLink>
             ))}
             <div className="border-t border-surface-300 pt-2 mt-2">
@@ -276,6 +302,24 @@ export default function Header() {
           </div>
         )}
       </header>
+
+      {/* ── Mobile Bottom Nav (sticky) ─────────────────────── */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-100 border-t border-surface-300 safe-area-bottom">
+        <div className="flex items-center justify-around h-14">
+          {MOBILE_NAV.map(({ href, label, icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex flex-col items-center justify-center gap-0.5 text-surface-muted hover:text-brand transition-colors py-1 px-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
+              </svg>
+              <span className="text-[9px] font-bold">{label}</span>
+            </Link>
+          ))}
+        </div>
+      </nav>
     </>
   );
 }

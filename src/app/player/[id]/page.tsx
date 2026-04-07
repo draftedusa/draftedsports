@@ -53,7 +53,7 @@ export default async function PlayerPage({ params }: Props) {
             <Link href={`/team/${team.slug}`} className="text-xs text-surface-muted hover:text-surface-text font-semibold">
               {team.logo} {team.name}
             </Link>
-            <span className="text-gray-700">·</span>
+            <span className="text-surface-muted">·</span>
             <span className="text-xs text-surface-muted font-mono">{player.position}</span>
           </div>
           <h1 className="text-4xl font-black text-surface-text">{player.name}</h1>
