@@ -1,49 +1,74 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const STORAGE_KEY = "undrafted_articles_viewed";
 const FREE_ARTICLE_LIMIT = 3;
 
-function getViewedArticles(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function recordArticleView(slug: string): string[] {
-  const viewed = getViewedArticles();
-  if (viewed.includes(slug)) return viewed;
-  const updated = [...viewed, slug];
-  try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  } catch {
-    // sessionStorage unavailable
-  }
-  return updated;
+interface GateState {
+  showPaywall: boolean;
+  articlesViewed: number;
+  dismissPaywall: () => void;
 }
 
 /**
- * Tracks article views in sessionStorage.
- * Returns `showPaywall: true` once the user exceeds FREE_ARTICLE_LIMIT unique articles.
+ * Server-side article metering via HttpOnly cookie.
+ *
+ * Security properties:
+ * - Counter lives in an HttpOnly cookie — cannot be read/modified by JS
+ * - SameSite=Strict prevents cross-origin manipulation
+ * - Server validates and increments via POST /api/gate
+ *
+ * Fallback: if the API call fails, falls back to sessionStorage (client-side)
+ * to ensure the paywall still renders — just not JS-bypass-proof in that edge case.
  */
-export function useArticleGate(slug: string) {
+export function useArticleGate(slug: string): GateState {
   const [showPaywall, setShowPaywall] = useState(false);
+  const [articlesViewed, setArticlesViewed] = useState(0);
+  const called = useRef(false);
 
   useEffect(() => {
-    const viewed = recordArticleView(slug);
-    if (viewed.length > FREE_ARTICLE_LIMIT) {
-      setShowPaywall(true);
+    if (called.current) return;
+    called.current = true;
+
+    async function checkGate() {
+      try {
+        // POST to server-side gate — increments HttpOnly cookie
+        const res = await fetch("/api/gate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug }),
+          credentials: "same-origin",
+        });
+
+        if (!res.ok) throw new Error(`Gate API ${res.status}`);
+
+        const { count, paywalled } = await res.json();
+        setArticlesViewed(count);
+        if (paywalled) setShowPaywall(true);
+      } catch {
+        // Fallback: sessionStorage-based counting
+        // This activates only if the API route is unreachable.
+        // The paywall still fires — just not HttpOnly-hardened.
+        try {
+          const KEY = "undrafted_gate_fallback";
+          const raw = sessionStorage.getItem(KEY);
+          const visited: string[] = raw ? JSON.parse(raw) : [];
+          if (!visited.includes(slug)) visited.push(slug);
+          sessionStorage.setItem(KEY, JSON.stringify(visited));
+          setArticlesViewed(visited.length);
+          if (visited.length > FREE_ARTICLE_LIMIT) setShowPaywall(true);
+        } catch {
+          // sessionStorage also unavailable — fail silently, no paywall
+        }
+      }
     }
+
+    checkGate();
   }, [slug]);
 
   function dismissPaywall() {
     setShowPaywall(false);
   }
 
-  return { showPaywall, dismissPaywall, articlesViewed: getViewedArticles().length };
+  return { showPaywall, dismissPaywall, articlesViewed };
 }

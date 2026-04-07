@@ -2,6 +2,10 @@ import Link from "next/link";
 import { transactions } from "@/data/transactions";
 import { teams } from "@/data/teams";
 import { leagues } from "@/data/leagues";
+import LiveTransactionsFeed from "@/components/live/LiveTransactionsFeed";
+
+// ISR: revalidate every 5 minutes
+export const revalidate = 300;
 
 const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
 
@@ -26,6 +30,15 @@ export default function TransactionsPage() {
       <h1 className="text-2xl font-black text-surface-text border-b border-surface-300 pb-4">
         Transactions &amp; News
       </h1>
+
+      {/* Live Feed — pulls from /api/transactions with ESPN RSS */}
+      <section>
+        <div className="flex items-center gap-2 mb-4 border-b border-surface-300 pb-2">
+          <h2 className="text-lg font-bold text-surface-text">Latest News</h2>
+          <span className="text-xs text-surface-muted font-normal">Live · Updates every 5 min</span>
+        </div>
+        <LiveTransactionsFeed limit={6} />
+      </section>
 
       {/* Breaking */}
       {breaking.length > 0 && (
