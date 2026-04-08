@@ -10,6 +10,7 @@ import NewsletterForm from "@/components/ui/NewsletterForm";
 import FanPulse from "@/components/community/FanPulse";
 import WatchMiniWidget from "@/components/video/WatchMiniWidget";
 import FanPulseMiniWidget from "@/components/community/FanPulseMiniWidget";
+import NativeAdPlacement from "@/components/monetization/NativeAdPlacement";
 import { liveGames, topArticles, formatCount, timeAgo } from "@/lib/utils";
 
 export default function HomePage() {
@@ -178,6 +179,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── NATIVE AD — after analysis row ──────────────────── */}
+      <NativeAdPlacement variant="feed" />
+
       {/* ── PATTERN INTERRUPTER — Newsletter CTA ────────────── */}
       <section className="bg-gradient-to-r from-brand/10 to-brand-light/5 border border-brand/20 rounded-xl p-6 sm:p-8 text-center">
         <h2 className="text-xl sm:text-2xl font-black tracking-tighter text-surface-text mb-2">
@@ -243,6 +247,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── NATIVE AD — after trending ───────────────────────── */}
+      <NativeAdPlacement variant="feed" />
 
       {/* ── 7. PREMIUM / SUBSCRIBER-ONLY ROW ────────────────── */}
       <section>

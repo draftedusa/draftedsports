@@ -25,8 +25,11 @@ export default function VideoCard({ video, index }: VideoCardProps) {
   const [playing, setPlaying]   = useState(false);
   const [muted, setMuted]       = useState(true);
   const [progress, setProgress] = useState(0);
-  const [liked, setLiked]       = useState(false);
+  const [liked, setLiked]         = useState(false);
   const [likeCount, setLikeCount] = useState(video.likes);
+  const [reposted, setReposted]   = useState(false);
+  const [repostCount, setRepostCount] = useState(Math.floor(video.likes * 0.12));
+  const [commentCount] = useState(Math.floor(video.likes * 0.08));
 
   // IntersectionObserver: auto-play when ≥ 60% visible
   useEffect(() => {
@@ -77,6 +80,13 @@ export default function VideoCard({ video, index }: VideoCardProps) {
   function handleLike() {
     setLiked((prev) => {
       setLikeCount((c) => prev ? c - 1 : c + 1);
+      return !prev;
+    });
+  }
+
+  function handleRepost() {
+    setReposted((prev) => {
+      setRepostCount((c) => prev ? c - 1 : c + 1);
       return !prev;
     });
   }
@@ -183,6 +193,34 @@ export default function VideoCard({ video, index }: VideoCardProps) {
               </svg>
             </div>
             <span className="text-[9px] text-white/70 font-bold">{formatViews(likeCount)}</span>
+          </button>
+
+          {/* Comment */}
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className="flex flex-col items-center gap-1 z-30"
+            aria-label="Comment"
+          >
+            <div className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+            </div>
+            <span className="text-[9px] text-white/70 font-bold">{formatViews(commentCount)}</span>
+          </button>
+
+          {/* Repost */}
+          <button
+            onClick={(e) => { e.stopPropagation(); handleRepost(); }}
+            className="flex flex-col items-center gap-1 z-30"
+            aria-label="Repost"
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${reposted ? "bg-emerald-500" : "bg-black/60 backdrop-blur-sm"}`}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
+                <path fillRule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="text-[9px] text-white/70 font-bold">{formatViews(repostCount)}</span>
           </button>
 
           {/* Share */}
