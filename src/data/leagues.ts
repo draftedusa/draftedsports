@@ -29,4 +29,28 @@ export const leagues: League[] = [
     sport: "Hockey",
     logo: "🏒",
   },
+  {
+    id: "mls",
+    name: "MLS",
+    slug: "mls",
+    sport: "Soccer",
+    logo: "⚽",
+  },
+  {
+    id: "wnba",
+    name: "WNBA",
+    slug: "wnba",
+    sport: "Basketball",
+    logo: "🏀",
+  },
+  {
+    id: "college",
+    name: "College",
+    slug: "college",
+    sport: "Multi",
+    logo: "🎓",
+  },
 ];
+
+/** Leagues shown in the primary header icon row (core 4 + new 3) */
+export const primaryLeagues = leagues;

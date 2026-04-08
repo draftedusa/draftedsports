@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { leagues } from "@/data/leagues";
@@ -26,28 +26,39 @@ function buildTickerItems() {
 }
 
 const PRIMARY_NAV = [
-  { href: "/",           label: "Home" },
-  { href: "/scores",     label: "Scores" },
-  { href: "/watch",      label: "Watch" },
-  { href: "/search",     label: "Analysis" },
-  { href: "/feed",       label: "Feed" },
-  { href: "/standings",  label: "Premium", premium: true },
+  { href: "/",          label: "Home" },
+  { href: "/scores",    label: "Scores" },
+  { href: "/watch",     label: "Watch" },
+  { href: "/analysis",  label: "Analysis" },
+  { href: "/feed",      label: "Feed" },
+  { href: "/premium",   label: "Premium", premium: true },
 ];
 
 const MOBILE_NAV = [
-  { href: "/",       label: "Home",   icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-  { href: "/scores", label: "Scores", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-  { href: "/watch",  label: "Watch",  icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
-  { href: "/feed",   label: "Feed",   icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
-  { href: "/profile",label: "Profile",icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" },
+  { href: "/",        label: "Home",    icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+  { href: "/scores",  label: "Scores",  icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
+  { href: "/watch",   label: "Watch",   icon: "M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+  { href: "/feed",    label: "Feed",    icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" },
+  { href: "/profile", label: "Profile", icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" },
+];
+
+const LEAGUE_QUICK_LINKS = [
+  { label: "Home",   suffix: "" },
+  { label: "Scores", suffix: "/scores" },
+  { label: "Rumors", suffix: "/transactions" },
+  { label: "Standings", suffix: "/standings" },
 ];
 
 export default function Header() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [dropOpen, setDropOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const dropRef = useRef<HTMLDivElement>(null);
+  const [mobileOpen, setMobileOpen]       = useState(false);
+  const [dirOpen, setDirOpen]             = useState(false);
+  const [dropOpen, setDropOpen]           = useState(false);
+  const [searchOpen, setSearchOpen]       = useState(false);
+  const [scrolled, setScrolled]           = useState(false);
+  const [hoveredLeague, setHoveredLeague] = useState<string | null>(null);
+  const megaRef    = useRef<HTMLDivElement>(null);
+  const dropRef    = useRef<HTMLDivElement>(null);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: session } = useSession();
   const ticker = buildTickerItems();
   const isAdmin = (session?.user as Record<string, unknown> | undefined)?.role === "admin";
@@ -68,84 +79,277 @@ export default function Header() {
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setSearchOpen(true); }
+      if (e.key === "Escape") { setDirOpen(false); setHoveredLeague(null); }
     };
     document.addEventListener("keydown", fn);
     return () => document.removeEventListener("keydown", fn);
   }, []);
 
+  const openMega  = useCallback((id: string) => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    setHoveredLeague(id);
+  }, []);
+
+  const closeMega = useCallback(() => {
+    leaveTimer.current = setTimeout(() => setHoveredLeague(null), 120);
+  }, []);
+
+  const keepMega  = useCallback(() => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+  }, []);
+
+  const activeLeagueTeams = hoveredLeague
+    ? teams.filter((t) => t.leagueId === hoveredLeague).slice(0, 12)
+    : [];
+
   return (
     <>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* ── Full-Screen Site Directory ───────────────────────── */}
+      {dirOpen && (
+        <div className="fixed inset-0 z-[100] bg-surface-100/95 backdrop-blur-sm overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-6 py-8">
+            <div className="flex items-center justify-between mb-8">
+              <span className="text-2xl font-black italic tracking-tighter text-surface-text">
+                UN<span className="text-brand">DRAFTED</span>
+              </span>
+              <button
+                onClick={() => setDirOpen(false)}
+                className="w-10 h-10 rounded-full bg-surface-200 hover:bg-surface-300 flex items-center justify-center text-surface-muted transition-colors"
+                aria-label="Close directory"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+              {/* Primary nav */}
+              <div>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-brand mb-3">Navigate</h3>
+                <ul className="space-y-1.5">
+                  {PRIMARY_NAV.map(({ href, label }) => (
+                    <li key={href}>
+                      <Link href={href} onClick={() => setDirOpen(false)}
+                        className="text-sm font-semibold text-surface-text hover:text-brand transition-colors">
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Each league */}
+              {leagues.map((l) => {
+                const leagueTeams = teams.filter((t) => t.leagueId === l.id).slice(0, 8);
+                return (
+                  <div key={l.id}>
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-brand mb-3">
+                      {l.logo} {l.name}
+                    </h3>
+                    <ul className="space-y-1.5">
+                      <li>
+                        <Link href={`/league/${l.slug}`} onClick={() => setDirOpen(false)}
+                          className="text-xs font-semibold text-surface-text hover:text-brand transition-colors">
+                          League Home
+                        </Link>
+                      </li>
+                      {leagueTeams.map((t) => (
+                        <li key={t.id}>
+                          <Link href={`/team/${t.slug}`} onClick={() => setDirOpen(false)}
+                            className="text-xs text-surface-muted hover:text-surface-text transition-colors">
+                            {t.logo} {t.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+
+              {/* Compliance */}
+              <div>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-brand mb-3">Company</h3>
+                <ul className="space-y-1.5">
+                  {["/about","/contact","/privacy-policy","/terms","/accessibility"].map((href) => (
+                    <li key={href}>
+                      <Link href={href} onClick={() => setDirOpen(false)}
+                        className="text-xs text-surface-muted hover:text-surface-text transition-colors capitalize">
+                        {href.replace("/","")}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <header
         className={`bg-surface-100 border-b border-surface-300 sticky top-0 z-50 transition-shadow duration-200 ${
           scrolled ? "header-scrolled" : ""
         }`}
       >
-        {/* ── Ticker ──────────────────────────────────────────── */}
-        <div className="bg-brand overflow-hidden h-7 flex items-center">
+        {/* ── Ticker: mini-cards ──────────────────────────────── */}
+        <div className="bg-brand overflow-hidden h-8 flex items-center">
           <span className="shrink-0 px-3 text-xs font-black text-white tracking-widest border-r border-white/20 h-full flex items-center">
             LIVE
           </span>
           <div className="flex-1 overflow-hidden">
-            <div className="flex gap-12 whitespace-nowrap animate-ticker text-xs text-white font-medium">
-              {/* Desktop: full detail */}
+            <div className="flex gap-2 whitespace-nowrap animate-ticker py-1 px-2">
               {[...ticker.live, ...ticker.live].map((item, i) => (
-                <span key={`l${i}`} className="shrink-0 hidden sm:inline">
-                  🔴 {item.away.name} {item.game.awayScore} — {item.home.name} {item.game.homeScore} · {item.game.quarter} {item.game.timeRemaining}
-                </span>
+                <div key={`lc${i}`}
+                  className="inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-2.5 py-0.5 shrink-0">
+                  <span className="text-sm leading-none">{item.away.logo}</span>
+                  <span className="text-white text-[11px] font-black tabular-nums">
+                    {item.game.awayScore}
+                  </span>
+                  <span className="text-white/50 text-[10px]">–</span>
+                  <span className="text-white text-[11px] font-black tabular-nums">
+                    {item.game.homeScore}
+                  </span>
+                  <span className="text-sm leading-none">{item.home.logo}</span>
+                  <span className="text-white/60 text-[10px] ml-1">{item.game.quarter}</span>
+                </div>
               ))}
               {[...ticker.breaking, ...ticker.breaking].map((item, i) => (
-                <span key={`b${i}`} className="shrink-0 hidden sm:inline">⚡ {item.headline}</span>
-              ))}
-              {/* Mobile: compact — logos + score + time only */}
-              {[...ticker.live, ...ticker.live].map((item, i) => (
-                <span key={`ml${i}`} className="shrink-0 sm:hidden">
-                  {item.away.logo} {item.game.awayScore}–{item.game.homeScore} {item.home.logo} · {item.game.quarter}
-                </span>
-              ))}
-              {[...ticker.breaking, ...ticker.breaking].map((item, i) => (
-                <span key={`mb${i}`} className="shrink-0 sm:hidden">⚡ Breaking</span>
+                <div key={`bc${i}`}
+                  className="inline-flex items-center gap-1.5 bg-red-500/30 rounded-lg px-2.5 py-0.5 shrink-0">
+                  <span className="text-white text-[10px] font-bold max-w-[200px] truncate">
+                    ⚡ {item.headline}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* ── Top Tier: Logo | League Icons | Search+Gear+Auth ─── */}
-        <div className="max-w-[1400px] mx-auto px-4 flex items-center h-14 gap-4">
+        {/* ── Top Tier: Dir + Logo | League Mega-Menu | Actions ── */}
+        <div className="max-w-[1400px] mx-auto px-4 flex items-center h-14 gap-3">
+
+          {/* Site Directory hamburger */}
+          <button
+            onClick={() => setDirOpen(true)}
+            className="shrink-0 w-9 h-9 flex flex-col items-center justify-center gap-1 rounded-lg text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors"
+            aria-label="Site directory"
+          >
+            <span className="block w-4 h-0.5 bg-current rounded-full" />
+            <span className="block w-4 h-0.5 bg-current rounded-full" />
+            <span className="block w-4 h-0.5 bg-current rounded-full" />
+          </button>
+
           <Link href="/" className="shrink-0">
             <span className="text-2xl font-black italic tracking-tighter text-surface-text">
               UN<span className="text-brand">DRAFTED</span>
             </span>
           </Link>
 
-          {/* Center: League Toolbar — icons only */}
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-3">
+          {/* Center: League icons with Mega-Menu */}
+          <div
+            ref={megaRef}
+            className="hidden lg:flex flex-1 items-center justify-center gap-3 relative"
+            onMouseLeave={closeMega}
+          >
             {leagues.map((l) => (
-              <Link
+              <div
                 key={l.id}
-                href={`/league/${l.slug}`}
-                title={l.name}
-                className="relative flex flex-col items-center gap-0.5 group"
+                className="relative"
+                onMouseEnter={() => openMega(l.id)}
               >
-                <span className="w-9 h-9 rounded-full bg-surface-200 flex items-center justify-center text-lg group-hover:ring-2 ring-brand ring-offset-1 ring-offset-surface-100 transition-all duration-150">
-                  {l.logo}
-                </span>
-                <span className="text-[9px] font-bold text-surface-muted group-hover:text-brand transition-colors uppercase tracking-wider leading-none">
-                  {l.name}
-                </span>
-                <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-brand text-[10px] leading-none">▾</span>
-              </Link>
+                <Link
+                  href={`/league/${l.slug}`}
+                  className="relative flex flex-col items-center gap-0.5 group"
+                >
+                  <span className={`w-9 h-9 rounded-full bg-surface-200 flex items-center justify-center text-lg transition-all duration-150 ${
+                    hoveredLeague === l.id
+                      ? "ring-2 ring-brand ring-offset-1 ring-offset-surface-100"
+                      : "group-hover:ring-2 ring-brand ring-offset-1 ring-offset-surface-100"
+                  }`}>
+                    {l.logo}
+                  </span>
+                  <span className={`text-[9px] font-bold uppercase tracking-wider leading-none transition-colors ${
+                    hoveredLeague === l.id ? "text-brand" : "text-surface-muted group-hover:text-brand"
+                  }`}>
+                    {l.name}
+                  </span>
+                </Link>
+              </div>
             ))}
-          </nav>
+
+            {/* Mega-Menu Dropdown */}
+            {hoveredLeague && (
+              <div
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[480px] bg-surface-100 border border-surface-300 rounded-2xl shadow-2xl overflow-hidden z-50"
+                onMouseEnter={keepMega}
+                onMouseLeave={closeMega}
+              >
+                {(() => {
+                  const league = leagues.find((l) => l.id === hoveredLeague);
+                  if (!league) return null;
+                  return (
+                    <>
+                      {/* Mega-header */}
+                      <div className="flex items-center gap-3 px-4 py-3 bg-surface-200 border-b border-surface-300">
+                        <span className="text-2xl">{league.logo}</span>
+                        <div>
+                          <p className="text-sm font-black text-surface-text">{league.name}</p>
+                          <p className="text-[10px] text-surface-muted">{league.sport}</p>
+                        </div>
+                        <div className="ml-auto flex items-center gap-1">
+                          {LEAGUE_QUICK_LINKS.map(({ label, suffix }) => (
+                            <Link
+                              key={label}
+                              href={suffix ? `/league/${league.slug}${suffix}` : `/league/${league.slug}`}
+                              className="px-2.5 py-1 text-[10px] font-bold text-surface-muted hover:text-brand hover:bg-surface-300 rounded-lg transition-colors"
+                              onClick={() => setHoveredLeague(null)}
+                            >
+                              {label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Team grid */}
+                      <div className="p-4">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-surface-muted mb-3">Teams</p>
+                        {activeLeagueTeams.length > 0 ? (
+                          <div className="grid grid-cols-3 gap-2">
+                            {activeLeagueTeams.map((t) => (
+                              <Link
+                                key={t.id}
+                                href={`/team/${t.slug}`}
+                                className="flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-surface-200 transition-colors group"
+                                onClick={() => setHoveredLeague(null)}
+                              >
+                                <span className="text-lg shrink-0">{t.logo}</span>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-semibold text-surface-text group-hover:text-brand transition-colors truncate leading-tight">
+                                    {t.name}
+                                  </p>
+                                  <p className="text-[9px] text-surface-muted">{t.record}</p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-surface-muted text-center py-4">
+                            Coming soon — teams being added.
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
 
           {/* Far-right: Search + Settings + Theme + Auth */}
           <div className="flex items-center gap-1 ml-auto shrink-0">
-            {/* Search — opens modal ONLY */}
             <button
               onClick={() => setSearchOpen(true)}
               className="flex w-8 h-8 items-center justify-center rounded-lg text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors"
@@ -156,7 +360,6 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* Profile / Settings gear */}
             <Link
               href="/profile"
               className="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors"
@@ -169,13 +372,11 @@ export default function Header() {
 
             <ThemeToggle />
 
-            {/* Auth */}
             {session ? (
               <div ref={dropRef} className="relative hidden lg:block">
                 <button
                   onClick={() => setDropOpen(!dropOpen)}
                   className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-surface-200 transition-colors"
-                  aria-label="Account menu"
                 >
                   <span className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold">
                     {session.user?.name?.[0] ?? "U"}
@@ -185,7 +386,6 @@ export default function Header() {
                     <path fillRule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
                   </svg>
                 </button>
-
                 {dropOpen && (
                   <div className="absolute right-0 top-full mt-1 w-52 bg-surface-100 border border-surface-300 rounded-xl shadow-xl overflow-hidden">
                     <div className="px-3 py-2.5 border-b border-surface-300">
@@ -228,7 +428,7 @@ export default function Header() {
               </Link>
             )}
 
-            {/* Hamburger — mobile */}
+            {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="lg:hidden w-9 h-9 flex flex-col items-center justify-center gap-1.5 text-surface-muted hover:text-surface-text"
@@ -249,9 +449,7 @@ export default function Header() {
                 key={href}
                 href={href}
                 className={`px-4 h-full flex items-center text-xs font-semibold transition-colors ${
-                  premium
-                    ? "text-brand hover:text-brand/80"
-                    : "text-surface-muted hover:text-brand"
+                  premium ? "text-brand hover:text-brand/80" : "text-surface-muted hover:text-brand"
                 }`}
               >
                 {premium && (
@@ -303,7 +501,7 @@ export default function Header() {
         )}
       </header>
 
-      {/* ── Mobile Bottom Nav (sticky) ─────────────────────── */}
+      {/* ── Mobile Bottom Nav ─────────────────────────────────── */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-surface-100 border-t border-surface-300 safe-area-bottom">
         <div className="flex items-center justify-around h-14">
           {MOBILE_NAV.map(({ href, label, icon }) => (
