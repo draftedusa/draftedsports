@@ -8,6 +8,8 @@ import GameCard from "@/components/cards/GameCard";
 import ArticleCard from "@/components/cards/ArticleCard";
 import NewsletterForm from "@/components/ui/NewsletterForm";
 import FanPulse from "@/components/community/FanPulse";
+import WatchMiniWidget from "@/components/video/WatchMiniWidget";
+import FanPulseMiniWidget from "@/components/community/FanPulseMiniWidget";
 import { liveGames, topArticles, formatCount, timeAgo } from "@/lib/utils";
 
 export default function HomePage() {
@@ -187,29 +189,37 @@ export default function HomePage() {
         <NewsletterForm />
       </section>
 
-      {/* ── 5. WATCH / STUDIO CLIPS ROW ─────────────────────── */}
-      <section>
-        <SectionHeader title="Watch & Studio" href="/watch" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {watchArticles.map((a) => (
-            <Link key={a.id} href={`/article/${a.slug}`}
-              className="bg-surface-200 border border-surface-300 rounded-xl overflow-hidden hover:border-brand/40 transition-colors group">
-              <div className="aspect-video bg-gradient-to-br from-brand/10 to-brand-light/5 flex items-center justify-center text-3xl relative">
-                🎬
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-9 h-9 rounded-full bg-brand/90 text-white flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 ml-0.5"><path d="M8 5v14l11-7z"/></svg>
+      {/* ── 5. WATCH / STUDIO CLIPS + MINI WIDGETS ROW ─────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <section className="xl:col-span-2">
+          <SectionHeader title="Watch & Studio" href="/watch" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {watchArticles.map((a) => (
+              <Link key={a.id} href={`/article/${a.slug}`}
+                className="bg-surface-200 border border-surface-300 rounded-xl overflow-hidden hover:border-brand/40 transition-colors group">
+                <div className="aspect-video bg-gradient-to-br from-surface-300/80 to-surface-200 flex items-center justify-center text-3xl relative">
+                  🎬
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-9 h-9 rounded-full bg-brand/90 text-white flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 ml-0.5"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="p-3">
-                <p className="text-xs font-bold text-surface-text leading-snug line-clamp-2">{a.title}</p>
-                <p className="text-[10px] text-surface-muted mt-1">{a.byline} · {a.readTime}m</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+                <div className="p-3">
+                  <p className="text-xs font-bold text-surface-text leading-snug line-clamp-2">{a.title}</p>
+                  <p className="text-[10px] text-surface-muted mt-1">{a.byline} · {a.readTime}m</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Right rail: WatchMiniWidget + FanPulseMiniWidget */}
+        <aside className="space-y-4">
+          <WatchMiniWidget limit={3} title="Top Videos" />
+          <FanPulseMiniWidget limit={2} />
+        </aside>
+      </div>
 
       {/* ── 6. COMMUNITY ROW ────────────────────────────────── */}
       <section>

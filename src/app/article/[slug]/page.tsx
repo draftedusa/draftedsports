@@ -10,6 +10,8 @@ import { threads, comments } from "@/data/comments";
 import { polls } from "@/data/polls";
 import Panel from "@/components/ui/Panel";
 import ArticleCard from "@/components/cards/ArticleCard";
+import WatchMiniWidget from "@/components/video/WatchMiniWidget";
+import FanPulseMiniWidget from "@/components/community/FanPulseMiniWidget";
 import Badge from "@/components/ui/Badge";
 import { formatCount, timeAgo } from "@/lib/utils";
 import { useArticleGate } from "@/lib/hooks/useArticleGate";
@@ -306,6 +308,12 @@ export default function ArticlePage({ params }: Props) {
               </div>
             </Panel>
           )}
+
+          {/* Watch mini rail */}
+          <WatchMiniWidget limit={3} title="More to Watch" />
+
+          {/* Fan Pulse snippet */}
+          <FanPulseMiniWidget limit={2} />
         </div>
       </div>
     </div>
