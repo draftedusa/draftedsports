@@ -106,7 +106,7 @@ export default async function LeaguePage({ params }: Props) {
                 <tr key={team.id} className="hover:bg-surface-300/40 transition-colors">
                   <td className="px-4 py-2.5 text-xs text-surface-muted">{team.standing}</td>
                   <td className="px-4 py-2.5">
-                    <Link href={`/team/${team.slug}`} className="flex items-center gap-2 hover:text-brand transition-colors">
+                    <Link href={`/league/${league.slug}/${team.slug}`} className="flex items-center gap-2 hover:text-brand transition-colors">
                       <span>{team.logo}</span>
                       <span className="font-semibold text-surface-text text-sm">{team.name}</span>
                     </Link>
