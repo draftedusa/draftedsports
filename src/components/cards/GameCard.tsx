@@ -24,7 +24,7 @@ export default function GameCard({ game, homeTeam, awayTeam, compact = false }: 
       onMouseLeave={() => setHovered(false)}
     >
       <Link href={`/game/${game.id}`}>
-        <div className={`bg-surface-200 border rounded-xl hover:border-brand/40 transition-colors cursor-pointer ${isLive ? "border-brand/60" : "border-surface-300"} ${compact ? "p-3" : "p-4"}`}>
+        <div className={`bg-surface-200 border rounded-xl hover:border-brand/40 cursor-pointer card-lift ${isLive ? "border-brand/60" : "border-surface-300"} ${compact ? "p-3" : "p-4"}`}>
           <div className="flex items-center justify-between mb-3">
             <GameStatusBadge status={game.status} />
             {isLive && (

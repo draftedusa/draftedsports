@@ -8,6 +8,7 @@ import LeagueScheduleSidebar from "@/components/sidebar/LeagueScheduleSidebar";
 import WatchMiniWidget from "@/components/video/WatchMiniWidget";
 import FanPulseMiniWidget from "@/components/community/FanPulseMiniWidget";
 import NativeAdPlacement from "@/components/monetization/NativeAdPlacement";
+import RecommendedForYou from "@/components/sidebar/RecommendedForYou";
 
 export default function RightRail() {
   const pathname = usePathname();
@@ -29,6 +30,7 @@ export default function RightRail() {
           <TrendingList />
           <NativeAdPlacement variant="rail" />
           <MyTeams />
+          <RecommendedForYou limit={5} />
           <WatchMiniWidget limit={3} />
           <FanPulseMiniWidget limit={2} />
         </>

@@ -197,6 +197,43 @@ h5, h6 {
 .animate-ticker {
   animation: ticker 40s linear infinite;
 }
+
+/* ── Card lift micro-interaction (Phase 4.1) ───────────── */
+.card-lift {
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              border-color 150ms ease;
+}
+.card-lift:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.2), 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Theme toggle pill (Phase 4.3) ─────────────────────── */
+.theme-pill {
+  position: relative;
+  display: inline-flex;
+  width: 5rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: var(--surface-300);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+  transition: background 200ms ease;
+  align-items: center;
+  padding: 0 0.25rem;
+}
+.theme-pill-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: var(--brand);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+.dark .theme-pill-thumb {
+  transform: translateX(3.25rem);
+}
 .animate-ticker:hover {
   animation-play-state: paused;
 }

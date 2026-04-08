@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import SiteShell from "@/components/layout/SiteShell";
+import TutorialModal from "@/components/ui/TutorialModal";
 
 export const metadata: Metadata = {
   title: "UNDRAFTED — Mock Sports Media",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col bg-surface-100 text-surface-text antialiased">
         <Providers>
           <SiteShell>{children}</SiteShell>
+          <TutorialModal />
         </Providers>
       </body>
     </html>

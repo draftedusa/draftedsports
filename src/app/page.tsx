@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRef } from "react";
 import { games } from "@/data/games";
 import { teams } from "@/data/teams";
 import { articles } from "@/data/articles";
@@ -95,24 +98,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 2. PERSONALIZED RAIL — Your Teams / Continue ────── */}
-      <section>
-        <SectionHeader title="Your Teams" badge="Personalized" />
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-          {leagues.map((league) => {
-            const leagueTeams = teams.filter((t) => t.leagueId === league.id).slice(0, 3);
-            return leagueTeams.map((team) => (
-              <Link key={team.id} href={`/team/${team.slug}`}
-                className="shrink-0 flex items-center gap-2.5 px-4 py-3 bg-surface-200 border border-surface-300 hover:border-brand/40 rounded-xl transition-colors min-w-[160px]">
-                <span className="text-2xl">{team.logo}</span>
-                <div>
-                  <p className="text-xs font-bold text-surface-text">{team.name}</p>
-                  <p className="text-[10px] text-surface-muted">{team.record}</p>
-                </div>
-              </Link>
-            ));
-          })}
-        </div>
-      </section>
+      <PersonalizedRail />
 
       {/* ── 3. LIVE + BREAKING ROW ──────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -294,6 +280,61 @@ export default function HomePage() {
       })}
 
     </div>
+  );
+}
+
+function PersonalizedRail() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const allTeams = leagues.flatMap((league) =>
+    teams.filter((t) => t.leagueId === league.id).slice(0, 3)
+  );
+
+  function scroll(dir: "left" | "right") {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollBy({ left: dir === "left" ? -320 : 320, behavior: "smooth" });
+  }
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4 border-b border-surface-300 pb-2">
+        <h2 className="text-lg font-bold text-surface-text flex items-center gap-2">
+          Your Teams
+          <span className="text-sm text-surface-muted font-normal">Personalized</span>
+        </h2>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => scroll("left")}
+            className="w-7 h-7 rounded-lg bg-surface-200 border border-surface-300 hover:border-brand/40 flex items-center justify-center transition-colors"
+            aria-label="Scroll left"
+          >
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-surface-text">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+          <button
+            onClick={() => scroll("right")}
+            className="w-7 h-7 rounded-lg bg-surface-200 border border-surface-300 hover:border-brand/40 flex items-center justify-center transition-colors"
+            aria-label="Scroll right"
+          >
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 text-surface-text">
+              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div ref={scrollRef} className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+        {allTeams.map((team) => (
+          <Link key={team.id} href={`/team/${team.slug}`}
+            className="shrink-0 flex items-center gap-2.5 px-4 py-3 bg-surface-200 border border-surface-300 hover:border-brand/40 rounded-xl transition-colors min-w-[160px] card-lift">
+            <span className="text-2xl">{team.logo}</span>
+            <div>
+              <p className="text-xs font-bold text-surface-text">{team.name}</p>
+              <p className="text-[10px] text-surface-muted">{team.record}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -34,7 +34,7 @@ export default function ArticleCard({ article, variant = "default", isTrending }
   if (variant === "featured") {
     return (
       <Link href={`/article/${article.slug}`}>
-        <div className="relative bg-surface-200 border border-surface-300 rounded-xl overflow-hidden hover:border-brand/40 transition-colors cursor-pointer h-64 flex flex-col justify-end">
+        <div className="relative bg-surface-200 border border-surface-300 rounded-xl overflow-hidden hover:border-brand/40 cursor-pointer h-64 flex flex-col justify-end card-lift">
           <div className="absolute inset-0 bg-gradient-to-br from-brand/10 to-brand-light/5" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute inset-0 flex items-center justify-center text-6xl opacity-20 select-none">
@@ -105,7 +105,7 @@ export default function ArticleCard({ article, variant = "default", isTrending }
   // Default + Premium cards
   return (
     <Link href={`/article/${article.slug}`}>
-      <div className={`bg-surface-200 border rounded-xl overflow-hidden hover:border-brand/40 transition-colors cursor-pointer group ${
+      <div className={`bg-surface-200 border rounded-xl overflow-hidden hover:border-brand/40 cursor-pointer group card-lift ${
         isPremium ? "border-brand/20" : "border-surface-300"
       }`}>
         <div className="h-36 bg-gradient-to-br from-surface-300/80 to-surface-200 flex items-center justify-center text-4xl relative">

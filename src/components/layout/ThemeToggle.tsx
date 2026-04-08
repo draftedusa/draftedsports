@@ -14,10 +14,20 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="w-8 h-8 flex items-center justify-center rounded-lg text-surface-muted hover:text-surface-text hover:bg-surface-200 transition-colors"
-      aria-label="Toggle theme"
+      className="theme-pill"
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      role="switch"
+      aria-checked={isDark}
     >
-      {isDark ? "☀️" : "🌙"}
+      {/* Labels */}
+      <span className={`absolute left-6 text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-0" : "opacity-60"} text-surface-text`}>
+        Light
+      </span>
+      <span className={`absolute right-1.5 text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-60" : "opacity-0"} text-surface-text`}>
+        Dark
+      </span>
+      {/* Thumb */}
+      <span className="theme-pill-thumb" />
     </button>
   );
 }
