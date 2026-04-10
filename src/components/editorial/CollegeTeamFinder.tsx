@@ -45,49 +45,49 @@ const ALL_TEAMS: DirectoryTeam[] = [
   ...AUG_TEAMS,
 ];
 
-const SUB_LEAGUES  = ["All", "FBS", "FCS", "HBCU"];
-const CONFERENCES  = ["All", "SEC", "Big Ten", "ACC", "Big 12", "Pac-12", "SWAC", "MEAC", "Big Sky", "Ivy"];
+const SUB_LEAGUES = ["All", "FBS", "FCS", "HBCU"];
+const CONFERENCES = ["All", "SEC", "Big Ten", "ACC", "Big 12", "Pac-12", "SWAC", "MEAC", "Big Sky", "Ivy"];
 
 // ─────────────────────────────────────────────────────────
 // CollegeTeamFinder
 // ─────────────────────────────────────────────────────────
 export default function CollegeTeamFinder() {
-  const [activeSub,    setActiveSub]    = useState("All");
-  const [activeConf,   setActiveConf]   = useState("All");
-  const [searchQuery,  setSearchQuery]  = useState("");
-  const [confOpen,     setConfOpen]     = useState(false);
+  const [activeSub,   setActiveSub]   = useState("All");
+  const [activeConf,  setActiveConf]  = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [confOpen,    setConfOpen]    = useState(false);
 
   const filtered = ALL_TEAMS.filter((team) => {
-    const matchesSub    = activeSub   === "All" || team.sub  === activeSub;
-    const matchesConf   = activeConf  === "All" || team.conf === activeConf;
+    const matchesSub    = activeSub  === "All" || team.sub  === activeSub;
+    const matchesConf   = activeConf === "All" || team.conf === activeConf;
     const matchesSearch = team.name.toLowerCase().includes(searchQuery.toLowerCase())
                        || team.conf.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSub && matchesConf && matchesSearch;
   });
 
   return (
-    <div className="min-h-screen bg-black p-8">
+    <div className="min-h-screen bg-surface-100 p-8">
 
       {/* ── Header ───────────────────────────────────── */}
-      <div className="mb-12 flex flex-col justify-between gap-6 border-b border-white/10 pb-8 md:flex-row md:items-end">
+      <div className="mb-12 flex flex-col justify-between gap-6 border-b border-surface-300 pb-8 md:flex-row md:items-end">
         <div>
           <div className="mb-2 flex items-center gap-2 text-red-600">
             <GraduationCap size={20} />
             <span className="text-xs font-black uppercase tracking-[0.2em]">College Football</span>
           </div>
-          <h1 className="text-5xl font-black italic uppercase text-white tracking-tighter">Team Directory</h1>
-          <p className="mt-1 text-xs text-white/30">{ALL_TEAMS.length} programs · FBS, FCS &amp; HBCU</p>
+          <h1 className="text-5xl font-black italic uppercase text-surface-text tracking-tighter">Team Directory</h1>
+          <p className="mt-1 text-xs text-surface-muted">{ALL_TEAMS.length} programs · FBS, FCS &amp; HBCU</p>
         </div>
 
         {/* Search */}
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-muted" size={18} />
           <input
             type="text"
             placeholder="Search teams or conferences…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-full border border-white/10 bg-zinc-900 py-3 pl-12 pr-4 text-sm text-white placeholder:text-white/30 focus:border-red-600 focus:outline-none transition-all"
+            className="w-full rounded-full border border-surface-300 bg-surface-200 py-3 pl-12 pr-4 text-sm text-surface-text placeholder:text-surface-muted focus:border-brand focus:outline-none transition-all"
           />
         </div>
       </div>
@@ -102,8 +102,8 @@ export default function CollegeTeamFinder() {
               onClick={() => setActiveSub(sub)}
               className={`whitespace-nowrap rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
                 activeSub === sub
-                  ? "bg-white text-black"
-                  : "border border-white/10 text-white/40 hover:text-white"
+                  ? "bg-brand text-white"
+                  : "border border-surface-300 text-surface-muted hover:text-surface-text hover:border-brand/40"
               }`}
             >
               {sub}
@@ -115,20 +115,22 @@ export default function CollegeTeamFinder() {
         <div className="relative ml-auto">
           <button
             onClick={() => setConfOpen((o) => !o)}
-            className="flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors"
+            className="flex items-center gap-2 rounded-full border border-surface-300 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-muted hover:text-surface-text hover:border-brand/40 transition-colors"
           >
             <Filter size={12} />
             {activeConf === "All" ? "Conference" : activeConf}
           </button>
 
           {confOpen && (
-            <div className="absolute right-0 top-10 z-30 w-44 rounded-xl border border-white/10 bg-zinc-950 p-2 shadow-2xl">
+            <div className="absolute right-0 top-10 z-30 w-44 rounded-xl border border-surface-300 bg-surface-100 p-2 shadow-2xl">
               {CONFERENCES.map((conf) => (
                 <button
                   key={conf}
                   onClick={() => { setActiveConf(conf); setConfOpen(false); }}
                   className={`w-full rounded-lg px-3 py-2 text-left text-[10px] font-bold uppercase tracking-tight transition-colors ${
-                    activeConf === conf ? "bg-white/10 text-white" : "text-white/40 hover:text-white"
+                    activeConf === conf
+                      ? "bg-brand/10 text-brand"
+                      : "text-surface-muted hover:text-surface-text hover:bg-surface-200"
                   }`}
                 >
                   {conf}
@@ -140,7 +142,7 @@ export default function CollegeTeamFinder() {
       </div>
 
       {/* ── Results count ────────────────────────────── */}
-      <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-white/20">
+      <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-surface-muted">
         {filtered.length} {filtered.length === 1 ? "team" : "teams"}
       </p>
 
@@ -150,25 +152,25 @@ export default function CollegeTeamFinder() {
           {filtered.map((team) => (
             <div
               key={team.id}
-              className="group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/50 p-6 transition-all hover:border-white/20 hover:bg-zinc-900"
+              className="group relative overflow-hidden rounded-xl border border-surface-300 bg-surface-200 p-6 shadow-sm transition-all hover:shadow-md hover:border-brand/40 hover:bg-surface-200"
             >
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-black text-3xl shadow-inner group-hover:scale-110 transition-transform shrink-0">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-surface-100 text-3xl shadow-inner group-hover:scale-110 transition-transform shrink-0">
                   {team.logo}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-black text-white leading-tight truncate">{team.name}</h3>
-                  <p className="text-[10px] font-bold uppercase text-white/40">{team.conf}</p>
+                  <h3 className="text-lg font-black text-surface-text leading-tight truncate">{team.name}</h3>
+                  <p className="text-[10px] font-bold uppercase text-surface-muted">{team.conf}</p>
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
-                <span className="rounded bg-white/5 px-2 py-1 text-[9px] font-black text-white/60 uppercase shrink-0">
+              <div className="mt-6 flex items-center justify-between border-t border-surface-300 pt-4">
+                <span className="rounded bg-surface-300 px-2 py-1 text-[9px] font-black text-surface-muted uppercase shrink-0">
                   {team.sub}
                 </span>
                 <Link
                   href={`/team/${team.slug}`}
-                  className="flex items-center gap-1 text-[10px] font-black text-red-600 uppercase tracking-tighter group-hover:gap-2 transition-all"
+                  className="flex items-center gap-1 text-[10px] font-black text-brand uppercase tracking-tighter group-hover:gap-2 transition-all"
                 >
                   Team Page <ChevronRight size={14} />
                 </Link>
@@ -178,8 +180,8 @@ export default function CollegeTeamFinder() {
         </div>
       ) : (
         <div className="py-24 text-center">
-          <p className="text-2xl font-black italic text-white/10 uppercase">No teams found</p>
-          <p className="mt-2 text-xs text-white/20">Try adjusting your search or filters.</p>
+          <p className="text-2xl font-black italic text-surface-muted/30 uppercase">No teams found</p>
+          <p className="mt-2 text-xs text-surface-muted">Try adjusting your search or filters.</p>
         </div>
       )}
 
