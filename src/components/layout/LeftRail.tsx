@@ -5,17 +5,17 @@ import { usePathname } from "next/navigation";
 import { leagues } from "@/data/leagues";
 
 const BASE_QUICK_LINKS = [
-  { href: "/league/nba",  label: "NBA",                      icon: "🏀" },
-  { href: "/league/nba",  label: "NBA G League",             icon: "🏀" },
-  { href: "/league/nfl",  label: "NFL",                      icon: "🏈" },
-  { href: "/league/nfl",  label: "NFL 1st Round Mock Draft", icon: "📋" },
-  { href: "/league/mlb",  label: "MLB",                      icon: "⚾" },
-  { href: "/league/nhl",  label: "NHL",                      icon: "🏒" },
+  { href: "/league/nba",  label: "NBA",           icon: "🏀" },
+  { href: "/league/nfl",  label: "NFL",           icon: "🏈" },
+  { href: "/league/mlb",  label: "MLB",           icon: "⚾" },
+  { href: "/league/nhl",  label: "NHL",           icon: "🏒" },
+  { href: "/pipeline",    label: "Pipeline",      icon: "📋" },
+  { href: "/pipeline",    label: "Mock Draft",    icon: "🎯" },
 ];
 
 const LEAGUE_TOOLS: Record<string, { label: string; icon: string; href: string }[]> = {
   nfl: [
-    { label: "Mock Draft Board",  icon: "📋", href: "/league/nfl" },
+    { label: "Mock Draft Board",  icon: "📋", href: "/pipeline" },
     { label: "Free Agency",       icon: "✍️", href: "/transactions" },
     { label: "Injury Report",     icon: "🩹", href: "/transactions" },
     { label: "Power Rankings",    icon: "🏆", href: "/standings" },
@@ -24,8 +24,8 @@ const LEAGUE_TOOLS: Record<string, { label: string; icon: string; href: string }
   ],
   nba: [
     { label: "Trade Tracker",     icon: "🔄", href: "/transactions" },
-    { label: "G League",          icon: "🏀", href: "/league/nba" },
-    { label: "Draft Prospects",   icon: "📋", href: "/league/nba" },
+    { label: "Draft Prospects",   icon: "📋", href: "/pipeline" },
+    { label: "Pipeline Board",    icon: "🎯", href: "/pipeline" },
     { label: "Injury Report",     icon: "🩹", href: "/transactions" },
     { label: "Schedule",          icon: "📅", href: "/scores" },
     { label: "Stats Leaders",     icon: "📊", href: "/league/nba" },

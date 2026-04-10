@@ -21,10 +21,11 @@ const PRIMARY_IDS = ["nfl", "nba", "mlb", "nhl", "wnba", "mls", "college"];
 
 /** Links shown in the mobile drawer quick-access section. */
 const DRAWER_LINKS = [
-  { href: "/scores",  label: "Scores"    },
-  { href: "/watch",   label: "Watch"     },
-  { href: "/feed",    label: "Fan Pulse" },
-  { href: "/premium", label: "Premium ⭐" },
+  { href: "/scores",   label: "Scores"      },
+  { href: "/watch",    label: "Watch"       },
+  { href: "/feed",     label: "Fan Pulse"   },
+  { href: "/pipeline", label: "Pipeline 📋" },
+  { href: "/premium",  label: "Premium ⭐"  },
 ];
 
 // ─────────────────────────────────────────────────────────
@@ -219,6 +220,14 @@ export default function Header() {
             className="hidden lg:flex flex-1 items-center gap-0.5 relative h-full"
             onMouseLeave={closeMega}
           >
+            {/* Pipeline link (before league buttons) */}
+            <Link
+              href="/pipeline"
+              className="inline-flex items-center gap-1.5 px-2.5 h-8 rounded-lg text-[11px] font-semibold text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors shrink-0 mr-1"
+            >
+              <span className="text-[13px] leading-none">📋</span>
+              <span className="hidden xl:inline whitespace-nowrap">Pipeline</span>
+            </Link>
             {primaryLeagues.map((league) => {
               const isOpen = hoveredLeague === league.id;
               return (

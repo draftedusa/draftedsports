@@ -220,6 +220,18 @@ function MegaMenuPanel({
         </div>
       </div>
 
+      {/* ── Pipeline quick-link ───────────────────────── */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-brand/5 border-b border-surface-300">
+        <span className="text-xs">📋</span>
+        <Link
+          href="/pipeline"
+          onClick={onClose}
+          className="text-[10px] font-black text-brand hover:text-brand/80 uppercase tracking-widest transition-colors"
+        >
+          The Pipeline — Draft Prospects &amp; Mock Boards →
+        </Link>
+      </div>
+
       {/* ── Team grid ─────────────────────────────────── */}
       <div className="p-4 max-h-[72vh] overflow-y-auto">
         {hasTree ? (
