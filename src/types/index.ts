@@ -153,6 +153,8 @@ export interface User {
   recentComments: string[];
   role?: "admin" | "user";
   password?: string;
+  /** Loyalty points — "DraftCoin" */
+  draftCoins?: number;
 }
 
 // ── Tags ─────────────────────────────────────────────

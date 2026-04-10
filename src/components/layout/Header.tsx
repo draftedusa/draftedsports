@@ -10,6 +10,7 @@ import { transactions } from "@/data/transactions";
 import ThemeToggle from "./ThemeToggle";
 import SearchModal from "./SearchModal";
 import MegaMenu from "./MegaMenu";
+import PointsCounter from "@/components/ui/PointsCounter";
 
 // ─────────────────────────────────────────────────────────
 // Config
@@ -293,6 +294,9 @@ export default function Header() {
             >
               <IcoGear />
             </Link>
+
+            {/* DraftCoin loyalty counter */}
+            <PointsCounter />
 
             <ThemeToggle />
 

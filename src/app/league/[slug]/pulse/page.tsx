@@ -10,6 +10,7 @@ import ContentCard from "@/components/cards/ContentCard";
 import DynamicFeed from "@/components/social/DynamicFeed";
 import Kicker from "@/components/ui/Kicker";
 import OddsCard from "@/components/betting/OddsCard";
+import HypeMeter from "@/components/live/HypeMeter";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -65,10 +66,16 @@ function ScoresRail({
 
         const line = bettingLineMap[g.id];
 
-        // Games with betting lines → interactive OddsCard
+        // Games with betting lines → interactive OddsCard + HypeMeter for live
         if (line) {
           return (
             <div key={g.id} className="border-b border-surface-300 dark:border-white/5">
+              {/* HypeMeter strip for live games */}
+              {g.status === "live" && (
+                <div className="flex items-center gap-2 px-3 pt-2.5 pb-1">
+                  <HypeMeter game={g} compact />
+                </div>
+              )}
               <OddsCard
                 game={g}
                 homeTeam={home}

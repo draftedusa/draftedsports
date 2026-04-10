@@ -67,6 +67,11 @@ function BetSlipPanel() {
   }, 0);
 
   function handlePlace() {
+    // Award Sharp Eye badge + DraftCoins
+    localStorage.setItem("undrafted-bets-placed", "true");
+    const coinsEarned = bets.length * 10;
+    window.dispatchEvent(new CustomEvent("draft-coin-award", { detail: coinsEarned }));
+
     setPlaced(true);
     setTimeout(() => {
       setPlaced(false);

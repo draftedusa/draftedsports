@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { leagues } from "@/data/leagues";
 import { BetSlipProvider } from "@/components/betting/BetSlipContext";
 import LeagueTabs from "@/components/betting/LeagueTabs";
+import ReactionEmitter from "@/components/live/ReactionEmitter";
 
 interface Props {
   children: ReactNode;
@@ -18,6 +19,8 @@ export default async function LeagueLayout({ children, params }: Props) {
     <BetSlipProvider>
       <LeagueTabs slug={slug} leagueName={league.name} />
       {children}
+      {/* Reaction emitter — only visible on Pulse & Betting routes */}
+      <ReactionEmitter slug={slug} />
     </BetSlipProvider>
   );
 }

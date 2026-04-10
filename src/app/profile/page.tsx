@@ -13,6 +13,7 @@ import { socialPosts } from "@/data/social-posts";
 import type { Team } from "@/types";
 import DynamicFeed from "@/components/social/DynamicFeed";
 import TeamPicker from "@/components/profile/TeamPicker";
+import BadgeWall from "@/components/profile/BadgeWall";
 
 // ─────────────────────────────────────────────────────────
 // Team lookup (expanded + legacy extras)
@@ -231,6 +232,14 @@ export default function ProfilePage() {
         <StatPill value={favoriteIds.length}                                  label="Teams" />
         <StatPill value={savedArticles.length}                                label="Saved" />
       </div>
+
+      {/* ══════════════════════════════════════════════
+          BADGE WALL
+          ══════════════════════════════════════════════ */}
+      <BadgeWall
+        joinedAt={myProfile?.joinedAt ?? "2026-01-01"}
+        favoriteCount={favoriteIds.length}
+      />
 
       {/* ══════════════════════════════════════════════
           MAIN GRID
