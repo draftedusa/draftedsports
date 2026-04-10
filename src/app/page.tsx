@@ -9,6 +9,8 @@ import { leagues } from "@/data/leagues";
 import { transactions } from "@/data/transactions";
 import GameCard from "@/components/cards/GameCard";
 import ArticleCard from "@/components/cards/ArticleCard";
+import ContentCard from "@/components/cards/ContentCard";
+import LayoutAlpha from "@/components/layout/LayoutAlpha";
 import NewsletterForm from "@/components/ui/NewsletterForm";
 import FanPulse from "@/components/community/FanPulse";
 import WatchMiniWidget from "@/components/video/WatchMiniWidget";
@@ -34,68 +36,40 @@ export default function HomePage() {
   return (
     <div className="space-y-10">
 
-      {/* ── 1. HERO MODULE — Massive Live Story ──────────────── */}
-      <section className="relative bg-gradient-to-br from-brand/20 via-brand-light/5 to-surface-200 rounded-2xl overflow-hidden border border-surface-300">
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-100 via-transparent to-transparent" />
-        <div className="relative p-6 sm:p-10">
-          {live.length > 0 ? (
-            <>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-xs font-black tracking-widest uppercase text-red-500">Live Now</span>
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tighter leading-none text-surface-text mb-3">
-                {teamMap[live[0].awayTeamId]?.name} vs {teamMap[live[0].homeTeamId]?.name}
-              </h1>
-              <p className="text-lg sm:text-xl font-bold text-surface-muted mb-1 tabular-nums">
-                {live[0].awayScore} – {live[0].homeScore} · {live[0].quarter} {live[0].timeRemaining}
-              </p>
-              <p className="text-sm text-surface-muted mb-6 max-w-lg">
-                {featured.title}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href={`/game/${live[0].id}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand/90 text-white text-sm font-bold rounded-xl transition-colors">
-                  <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
-                  Watch Live Reactions
-                </Link>
-                <Link href="/scores"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-200 hover:bg-surface-300 border border-surface-300 text-surface-text text-sm font-bold rounded-xl transition-colors">
-                  Track Game
-                </Link>
-                <Link href="/feed"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-200 hover:bg-surface-300 border border-surface-300 text-surface-text text-sm font-bold rounded-xl transition-colors">
-                  Join Fan Pulse
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-black tracking-widest uppercase text-brand">Featured</span>
-              </div>
-              <Link href={`/article/${featured.slug}`} className="group">
-                <h1 className="text-3xl sm:text-5xl font-black tracking-tighter leading-none text-surface-text group-hover:text-brand transition-colors mb-3">
-                  {featured.title}
-                </h1>
-                {featured.excerpt && (
-                  <p className="text-sm text-surface-muted mb-4 max-w-lg leading-relaxed">{featured.excerpt}</p>
-                )}
-                <div className="flex items-center gap-2 text-xs text-surface-muted">
-                  <div className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold shrink-0">
-                    {featured.byline[0]}
-                  </div>
-                  <span className="font-semibold">{featured.byline}</span>
-                  <span>·</span>
-                  <span>{timeAgo(featured.publishDate)}</span>
-                  <span>·</span>
-                  <span>{formatCount(featured.views)} views</span>
-                </div>
-              </Link>
-            </>
-          )}
+      {/* ── 1. EDITORIAL HERO — LayoutAlpha ──────────────────── */}
+      {live.length > 0 && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse shrink-0" />
+          <span className="text-xs font-black uppercase tracking-widest text-red-500">Live</span>
+          <span className="text-sm font-bold text-surface-text">
+            {teamMap[live[0].awayTeamId]?.name} {live[0].awayScore}
+            <span className="text-surface-muted mx-1">–</span>
+            {live[0].homeScore} {teamMap[live[0].homeTeamId]?.name}
+          </span>
+          <span className="text-xs text-surface-muted ml-auto">{live[0].quarter} {live[0].timeRemaining}</span>
+          <Link href={`/game/${live[0].id}`} className="text-xs font-bold text-brand hover:underline ml-2 shrink-0">
+            Track →
+          </Link>
         </div>
-      </section>
+      )}
+
+      <LayoutAlpha
+        left={
+          <>
+            {sorted.slice(1, 3).map((a) => (
+              <ContentCard key={a.id} article={a} />
+            ))}
+          </>
+        }
+        center={<ContentCard article={featured} />}
+        right={
+          <div className="divide-y divide-surface-300">
+            {sorted.slice(3, 10).map((a) => (
+              <ContentCard key={a.id} article={a} />
+            ))}
+          </div>
+        }
+      />
 
       {/* ── 2. PERSONALIZED RAIL — Your Teams / Continue ────── */}
       <PersonalizedRail />
