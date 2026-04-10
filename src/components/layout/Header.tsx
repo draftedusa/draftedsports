@@ -264,13 +264,13 @@ export default function Header() {
               {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
                 <div
                   key={`${item.id}-${i}`}
-                  onMouseEnter={() => setHoveredTickerId(`${item.id}-${i}`)}
+                  onMouseEnter={() => setHoveredTickerId(item.id)}
                   onMouseLeave={() => setHoveredTickerId(null)}
-                  className="relative flex h-10 shrink-0 min-w-[200px] items-center border-r border-white/5 px-6 transition-colors hover:bg-white/5 cursor-pointer"
+                  className="relative flex h-10 shrink-0 min-w-[220px] items-center border-r border-white/5 px-6 transition-colors hover:bg-white/5 cursor-pointer"
                 >
                   {/* Score / news view */}
-                  <div className={`flex items-center gap-3 transition-opacity duration-150 ${
-                    hoveredTickerId === `${item.id}-${i}` && item.type === "GAME" ? "opacity-0" : "opacity-100"
+                  <div className={`flex items-center gap-3 transition-opacity duration-200 ${
+                    hoveredTickerId === item.id && item.type === "GAME" ? "opacity-0" : "opacity-100"
                   }`}>
                     {item.type === "GAME" ? (
                       <>
@@ -281,31 +281,36 @@ export default function Header() {
                         </span>
                       </>
                     ) : (
-                      <>
-                        {item.newsKind === "zap"
-                          ? <Zap size={12} className="text-yellow-400 shrink-0" />
-                          : <Newspaper size={12} className="text-blue-400 shrink-0" />}
-                        <span className="text-[9px] font-bold text-yellow-500 uppercase tracking-tighter">{item.category}</span>
-                        <span className="text-[11px] font-medium text-white/90 underline decoration-white/20 underline-offset-4">
-                          {item.title}
-                        </span>
-                      </>
+                      <div className="flex items-center gap-2">
+                        <div className="rounded-full bg-yellow-500/10 p-1 shrink-0">
+                          {item.newsKind === "zap"
+                            ? <Zap size={12} className="text-yellow-400" />
+                            : <Newspaper size={12} className="text-blue-400" />}
+                        </div>
+                        <span className="text-[11px] font-medium text-white/90 truncate">{item.title}</span>
+                      </div>
                     )}
                   </div>
 
                   {/* Hover portal — GAME only */}
-                  {item.type === "GAME" && hoveredTickerId === `${item.id}-${i}` && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-4 bg-zinc-900 px-2">
-                      <Link href={`/game/${item.gameId}`}
-                        className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors">
-                        <BarChart2 size={12} /> Boxscore
-                      </Link>
-                      <Link href={`/game/${item.gameId}`}
-                        className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors">
-                        <Tv size={12} /> Gamecast
-                      </Link>
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {item.type === "GAME" && hoveredTickerId === item.id && (
+                      <motion.div
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute inset-0 z-30 flex items-center justify-center gap-5 bg-zinc-900 px-2"
+                      >
+                        <Link href={`/game/${item.gameId}`}
+                          className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors tracking-tighter">
+                          <BarChart2 size={12} /> Boxscore
+                        </Link>
+                        <Link href={`/game/${item.gameId}`}
+                          className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors tracking-tighter">
+                          <Tv size={12} /> Gamecast
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
             </div>
