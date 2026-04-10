@@ -1,54 +1,44 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import {
-  Search, Settings, Moon, Sun, Bell,
-  ChevronDown, PlayCircle, Activity, Star, X, User,
+  Search, Bell, PlayCircle, Activity, Star, X, ClipboardList, ChevronDown,
 } from "lucide-react";
 import { leagues } from "@/data/leagues";
 import ThemeToggle from "./ThemeToggle";
 import SearchModal from "./SearchModal";
-import MegaMenu from "./MegaMenu";
 import PointsCounter from "@/components/ui/PointsCounter";
 
 // ─────────────────────────────────────────────────────────
 // Config
 // ─────────────────────────────────────────────────────────
-
-/** Leagues shown in the sub-nav league strip. */
-const PRIMARY_IDS = ["nfl", "nba", "mlb", "nhl", "wnba", "mls", "college"];
-
-/** Links shown in the directory drawer. */
-const DRAWER_LINKS = [
-  { href: "/watch",    label: "Watch"      },
-  { href: "/feed",     label: "Fan Pulse"  },
-  { href: "/scores",   label: "Live Scores"},
-  { href: "/pipeline", label: "Pipeline 📋"},
-  { href: "/premium",  label: "Premium ⭐" },
+const LEAGUES = [
+  { name: "NFL",     href: "/league/nfl",     icon: "🏈" },
+  { name: "NBA",     href: "/league/nba",     icon: "🏀" },
+  { name: "MLB",     href: "/league/mlb",     icon: "⚾" },
+  { name: "NHL",     href: "/league/nhl",     icon: "🏒" },
+  { name: "Soccer",  href: "/league/soccer",  icon: "⚽" },
+  { name: "College", href: "/league/college", icon: "🎓" },
+  { name: "WNBA",    href: "/league/wnba",    icon: "🏀" },
 ];
 
 // ─────────────────────────────────────────────────────────
 // Header
 // ─────────────────────────────────────────────────────────
 export default function Header() {
-  const [isDirOpen,     setIsDirOpen]     = useState(false);
-  const [searchOpen,    setSearchOpen]    = useState(false);
-  const [hoveredLeague, setHoveredLeague] = useState<string | null>(null);
-  const [userMenuOpen,  setUserMenuOpen]  = useState(false);
+  const [isDirOpen,   setIsDirOpen]   = useState(false);
+  const [searchOpen,  setSearchOpen]  = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const leaveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const { data: session } = useSession();
   const isAdmin = (session?.user as Record<string, unknown> | undefined)?.role === "admin";
 
-  const primaryLeagues = leagues.filter((l) => PRIMARY_IDS.includes(l.id));
-
   // ── Effects ──────────────────────────────────────────
-  // Lock body scroll while drawer is open
+  // Body scroll lock while directory is open
   useEffect(() => {
     document.body.style.overflow = isDirOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -68,117 +58,25 @@ export default function Header() {
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); setSearchOpen(true); }
-      if (e.key === "Escape") { setHoveredLeague(null); setIsDirOpen(false); }
+      if (e.key === "Escape") setIsDirOpen(false);
     };
     document.addEventListener("keydown", fn);
     return () => document.removeEventListener("keydown", fn);
-  }, []);
-
-  // ── Mega-menu hover dwell (150 ms grace) ─────────────
-  const openMega = useCallback((id: string) => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    setHoveredLeague(id);
-  }, []);
-
-  const closeMega = useCallback(() => {
-    leaveTimer.current = setTimeout(() => setHoveredLeague(null), 150);
-  }, []);
-
-  const keepMega = useCallback(() => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
   }, []);
 
   return (
     <>
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      {/* ── Directory drawer backdrop ─────────────────── */}
-      <AnimatePresence>
-        {isDirOpen && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setIsDirOpen(false)}
-            className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-md"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* ── Directory drawer ──────────────────────────── */}
-      <AnimatePresence>
-        {isDirOpen && (
-          <motion.aside
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 z-[110] h-screen w-[50vw] min-w-[280px] max-w-sm bg-black border-r border-white/10 p-10 shadow-2xl overflow-y-auto"
-            aria-label="Site directory"
-          >
-            <div className="flex items-center justify-between mb-16">
-              <h2 className="text-3xl font-black italic tracking-tighter text-white">DIRECTORY</h2>
-              <button
-                onClick={() => setIsDirOpen(false)}
-                aria-label="Close directory"
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors"
-              >
-                <X size={32} />
-              </button>
-            </div>
-
-            {/* Two-column site map */}
-            <div className="grid grid-cols-2 gap-12">
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-red-600 mb-6">Quick Links</h3>
-                <div className="flex flex-col gap-5 text-2xl font-black text-white">
-                  {DRAWER_LINKS.map(({ href, label }) => (
-                    <Link key={href} href={href} onClick={() => setIsDirOpen(false)}
-                      className="hover:text-white/70 transition-colors">
-                      {label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-red-600 mb-6">Leagues</h3>
-                <div className="flex flex-col gap-4 text-lg font-bold text-white/70">
-                  {leagues.map((l) => (
-                    <Link key={l.id} href={`/league/${l.slug}`}
-                      onClick={() => setIsDirOpen(false)}
-                      className="hover:text-white flex items-center gap-3 transition-colors"
-                    >
-                      <span className="text-2xl">{l.logo}</span>
-                      {l.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Drawer footer */}
-            <div className="absolute bottom-10 left-10 right-10">
-              <div className="flex items-center justify-between border-t border-white/5 pt-6">
-                <p className="text-[10px] text-white/20 uppercase font-bold tracking-widest">
-                  © 2026 UNDRAFTED MEDIA
-                </p>
-                <div className="flex gap-4 text-white/20">
-                  <Settings size={16} />
-                  <User size={16} />
-                </div>
-              </div>
-            </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-
       {/* ════════════════════════════════════════════════ */}
       {/*  HEADER                                          */}
       {/* ════════════════════════════════════════════════ */}
-      <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-black/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-black">
 
-        {/* ── Main row: Hamburger + Logo | Nav | Actions ── */}
+        {/* ── 1. Main taskbar ──────────────────────────── */}
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
 
-          {/* Left: directory toggle + logo */}
+          {/* Left: hamburger + logo */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsDirOpen(!isDirOpen)}
@@ -186,26 +84,14 @@ export default function Header() {
               aria-expanded={isDirOpen}
               className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md hover:bg-white/10 transition-colors"
             >
-              <motion.div
-                animate={isDirOpen ? { rotate: 45, y: 7.5 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="h-0.5 w-6 bg-white"
-              />
-              <motion.div
-                animate={isDirOpen ? { opacity: 0 } : { opacity: 1 }}
-                transition={{ duration: 0.15 }}
-                className="h-0.5 w-6 bg-white"
-              />
-              <motion.div
-                animate={isDirOpen ? { rotate: -45, y: -7.5 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="h-0.5 w-6 bg-white"
-              />
+              <motion.div animate={isDirOpen ? { rotate: 45, y: 7.5 } : { rotate: 0, y: 0 }} className="h-0.5 w-6 bg-white" />
+              <motion.div animate={isDirOpen ? { opacity: 0 } : { opacity: 1 }} className="h-0.5 w-6 bg-white" />
+              <motion.div animate={isDirOpen ? { rotate: -45, y: -7.5 } : { rotate: 0, y: 0 }} className="h-0.5 w-6 bg-white" />
             </button>
 
             <Link href="/" aria-label="UNDRAFTED – home"
-              className="flex items-center text-2xl font-black tracking-tighter text-white select-none">
-              <span className="bg-red-600 px-1.5 text-black">U</span>NDRAFTED
+              className="text-2xl font-black tracking-tighter text-white select-none">
+              UNDRAFTED
             </Link>
           </div>
 
@@ -213,25 +99,20 @@ export default function Header() {
           <nav className="hidden items-center gap-10 lg:flex">
             <Link href="/watch"
               className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all">
-              <PlayCircle size={16} className="text-red-500" />
-              Watch
+              <PlayCircle size={16} className="text-red-500" /> Watch
             </Link>
             <Link href="/feed"
               className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all">
-              <Activity size={16} className="text-green-500" />
-              Fan Pulse
+              <Activity size={16} className="text-green-500" /> Fan Pulse
             </Link>
             <Link href="/premium"
               className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/60 hover:text-white transition-all">
-              <Star size={16} className="text-yellow-500" />
-              Premium
+              <Star size={16} className="text-yellow-500" /> Premium
             </Link>
           </nav>
 
-          {/* Right: utility actions */}
-          <div className="flex items-center gap-1">
-
-            {/* Search */}
+          {/* Right: utility + auth */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search (⌘K)"
@@ -240,7 +121,6 @@ export default function Header() {
               <Search size={20} />
             </button>
 
-            {/* Notifications */}
             <div className="relative hidden lg:block">
               <button aria-label="Notifications" className="p-2 text-white/60 hover:text-white transition-colors">
                 <Bell size={20} />
@@ -248,19 +128,10 @@ export default function Header() {
               <span aria-hidden className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-2 ring-black" />
             </div>
 
-            {/* Settings / Profile */}
-            <Link href="/profile" aria-label="Settings & Profile"
-              className="hidden p-2 text-white/60 hover:text-white transition-colors md:block">
-              <Settings size={20} />
-            </Link>
-
-            {/* DraftCoin loyalty counter */}
             <PointsCounter />
-
-            {/* Theme toggle */}
             <ThemeToggle />
 
-            {/* Auth (desktop) */}
+            {/* Auth */}
             {session ? (
               <div ref={userMenuRef} className="relative hidden lg:block ml-1">
                 <button
@@ -271,11 +142,8 @@ export default function Header() {
                   <span className="w-7 h-7 rounded-full bg-brand flex items-center justify-center text-white text-xs font-black">
                     {session.user?.name?.[0]?.toUpperCase() ?? "U"}
                   </span>
-                  <motion.div
-                    animate={{ rotate: userMenuOpen ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="text-white/60"
-                  >
+                  <motion.div animate={{ rotate: userMenuOpen ? 180 : 0 }} transition={{ duration: 0.2 }}
+                    className="text-white/60">
                     <ChevronDown size={12} />
                   </motion.div>
                 </button>
@@ -310,7 +178,7 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <div className="ml-2 hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
+              <div className="flex items-center gap-3 border-l border-white/10 pl-4 ml-1">
                 <Link href="/auth/login"
                   className="text-[10px] font-black uppercase text-white/50 hover:text-white transition-colors">
                   Log In
@@ -324,45 +192,88 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ── Sub-nav: League strip + MegaMenu ─────────── */}
-        <div className="relative border-t border-white/5 bg-zinc-950/50" onMouseLeave={closeMega}>
-          <div className="container mx-auto flex h-10 items-center justify-center gap-6 lg:gap-8 overflow-x-auto no-scrollbar">
-            {primaryLeagues.map((league) => (
-              <div
-                key={league.id}
-                onMouseEnter={() => openMega(league.id)}
-                className="flex items-center gap-1 cursor-pointer group shrink-0"
-              >
-                <span className="text-sm leading-none">{league.logo}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 group-hover:text-white transition-colors">
-                  {league.name}
-                </span>
-                <motion.div
-                  animate={{ rotate: hoveredLeague === league.id ? 180 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-white/40"
-                >
-                  <ChevronDown size={12} />
-                </motion.div>
-              </div>
-            ))}
-          </div>
-
-          {/* MegaMenu — positioned below sub-nav */}
-          <div
-            className="absolute top-full left-0 right-0 flex justify-center pointer-events-none"
-            style={{ marginTop: "2px" }}
-          >
-            <div className="pointer-events-auto">
-              <MegaMenu
-                leagueId={hoveredLeague}
-                onClose={() => setHoveredLeague(null)}
-                onMouseEnter={keepMega}
-                onMouseLeave={closeMega}
+        {/* ── 2. Mega-drop directory ────────────────────── */}
+        <AnimatePresence>
+          {isDirOpen && (
+            <>
+              {/* Backdrop — starts below the taskbar */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setIsDirOpen(false)}
+                className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm top-16"
               />
-            </div>
-          </div>
-        </div>
+
+              {/* Horizontal dropdown panel */}
+              <motion.div
+                initial={{ y: "-100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "-100%" }}
+                transition={{ type: "tween", duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                className="absolute left-0 top-16 z-[90] w-full h-[50vh] bg-black border-b border-white/10 shadow-2xl overflow-hidden"
+              >
+                <div className="container mx-auto grid grid-cols-4 gap-12 p-12 h-full">
+
+                  {/* Column 1: Quick Links */}
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-widest text-red-600 mb-6">Quick Links</h3>
+                    <div className="flex flex-col gap-4 text-2xl font-black text-white">
+                      <Link href="/watch" onClick={() => setIsDirOpen(false)}>Watch</Link>
+                      <Link href="/feed" onClick={() => setIsDirOpen(false)}>Fan Pulse</Link>
+                      <Link href="/scores" onClick={() => setIsDirOpen(false)}>Live Scores</Link>
+                      <Link href="/pipeline" onClick={() => setIsDirOpen(false)}
+                        className="flex items-center gap-2">
+                        Pipeline <ClipboardList size={20} />
+                      </Link>
+                      <Link href="/premium" onClick={() => setIsDirOpen(false)}
+                        className="flex items-center gap-2">
+                        Premium <Star size={20} className="text-yellow-500" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Columns 2 & 3: Leagues grid */}
+                  <div className="col-span-2">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-red-600 mb-6">Leagues</h3>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                      {LEAGUES.map((l) => (
+                        <Link key={l.name} href={l.href} onClick={() => setIsDirOpen(false)}
+                          className="text-lg font-bold text-white/70 hover:text-white flex items-center gap-3 transition-colors">
+                          <span className="text-2xl">{l.icon}</span> {l.name}
+                        </Link>
+                      ))}
+                      {/* Additional leagues from data */}
+                      {leagues
+                        .filter((l) => !LEAGUES.some((s) => s.href === `/league/${l.slug}`))
+                        .slice(0, 2)
+                        .map((l) => (
+                          <Link key={l.id} href={`/league/${l.slug}`} onClick={() => setIsDirOpen(false)}
+                            className="text-lg font-bold text-white/70 hover:text-white flex items-center gap-3 transition-colors">
+                            <span className="text-2xl">{l.logo}</span> {l.name}
+                          </Link>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Column 4: Trending / branding */}
+                  <div className="border-l border-white/5 pl-12 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-xs font-black uppercase tracking-widest text-white/30 mb-2">
+                        Currently Trending
+                      </h3>
+                      <p className="text-sm text-white/60 leading-relaxed italic">
+                        "The 2026 NFL Mock Draft is live. Check the Pipeline tab for updates."
+                      </p>
+                    </div>
+                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">
+                      © 2026 UNDRAFTED MEDIA
+                    </p>
+                  </div>
+
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
       </header>
     </>
