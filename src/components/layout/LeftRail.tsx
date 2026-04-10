@@ -79,7 +79,7 @@ export default function LeftRail() {
   const leagueTools = activeLeagueSlug ? LEAGUE_TOOLS[activeLeagueSlug] : null;
 
   return (
-    <aside className="hidden lg:flex flex-col w-56 shrink-0 py-6 sticky top-[96px] self-start h-[calc(100vh-96px)] overflow-y-auto no-scrollbar">
+    <aside className="hidden lg:flex flex-col w-56 shrink-0 py-6 sticky top-[144px] self-start h-[calc(100vh-144px)] overflow-y-auto no-scrollbar">
 
       {/* League-specific tools (contextual) */}
       {activeLeague && leagueTools ? (
