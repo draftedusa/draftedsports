@@ -64,6 +64,14 @@ function IcoBell() {
   );
 }
 
+function IcoGear() {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="w-[18px] h-[18px]">
+      <path fillRule="evenodd" d="M7.84 1.804A1 1 0 0 1 8.82 1h2.36a1 1 0 0 1 .98.804l.295 1.473c.497.144.971.342 1.416.587l1.25-.834a1 1 0 0 1 1.262.125l1.669 1.67a1 1 0 0 1 .125 1.26l-.834 1.25c.245.445.443.92.587 1.417l1.473.294A1 1 0 0 1 20 10v2.36a1 1 0 0 1-.804.98l-1.473.295a6.95 6.95 0 0 1-.587 1.416l.834 1.25a1 1 0 0 1-.125 1.262l-1.67 1.669a1 1 0 0 1-1.26.125l-1.25-.834a6.953 6.953 0 0 1-1.417.587l-.294 1.473A1 1 0 0 1 11.18 21H8.82a1 1 0 0 1-.98-.804l-.295-1.473a6.957 6.957 0 0 1-1.416-.587l-1.25.834a1 1 0 0 1-1.262-.125l-1.669-1.67a1 1 0 0 1-.125-1.26l.834-1.25a6.957 6.957 0 0 1-.587-1.417l-1.473-.294A1 1 0 0 1 0 13.18V10.82a1 1 0 0 1 .804-.98l1.473-.295c.144-.497.342-.971.587-1.416l-.834-1.25a1 1 0 0 1 .125-1.262l1.67-1.669A1 1 0 0 1 5.086 3.824l1.25.834a6.957 6.957 0 0 1 1.417-.587L8.047 1.804ZM10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
 function IcoChevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -276,6 +284,15 @@ export default function Header() {
                 className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-brand ring-[1.5px] ring-surface-100"
               />
             </button>
+
+            {/* Settings / Fan Cave */}
+            <Link
+              href="/profile"
+              aria-label="Settings & Profile"
+              className="hidden lg:flex w-9 h-9 items-center justify-center rounded-lg text-surface-muted hover:text-brand hover:bg-surface-200 transition-colors"
+            >
+              <IcoGear />
+            </Link>
 
             <ThemeToggle />
 

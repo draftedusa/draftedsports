@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { SocialPost } from "@/types/social";
 import { socialPosts } from "@/data/social-posts";
+import { teams as legacyTeams } from "@/data/teams";
 import PostCard from "./PostCard";
 import Composer from "./Composer";
 
@@ -11,20 +12,43 @@ import Composer from "./Composer";
 // ─────────────────────────────────────────────────────────
 const PAGE_SIZE = 6;
 
-function filterPosts(posts: SocialPost[], leagueId?: string): SocialPost[] {
-  const base = leagueId
-    ? posts.filter((p) => p.leagueTag === leagueId || p.repostId != null)
-    : posts;
-  // Pure reposts without an associated league should only show in unfiltered feeds
-  const filtered = leagueId
-    ? base.filter((p) => {
-        if (!p.repostId) return true;
-        // Include repost only if original matches the league
-        const original = posts.find((o) => o.id === p.repostId);
-        return original?.leagueTag === leagueId;
-      })
-    : base;
-  return [...filtered].sort(
+// Team id → leagueId lookup (used for favorites-mode league expansion)
+const TEAM_LEAGUE_MAP = Object.fromEntries(legacyTeams.map((t) => [t.id, t.leagueId]));
+
+function filterPosts(
+  posts: SocialPost[],
+  leagueId?: string,
+  favoriteTeamIds?: string[]
+): SocialPost[] {
+  let filtered = [...posts];
+
+  // ── League filter ────────────────────────────────────
+  if (leagueId) {
+    filtered = filtered.filter((p) => p.leagueTag === leagueId || p.repostId != null);
+    // Exclude reposts whose original doesn't belong to this league
+    filtered = filtered.filter((p) => {
+      if (!p.repostId) return true;
+      const original = posts.find((o) => o.id === p.repostId);
+      return original?.leagueTag === leagueId;
+    });
+  }
+
+  // ── Favorites filter ─────────────────────────────────
+  if (favoriteTeamIds?.length) {
+    // Derive which leagues are represented in the favorites list
+    const favLeagues = new Set(
+      favoriteTeamIds
+        .map((id) => TEAM_LEAGUE_MAP[id])
+        .filter((l): l is string => Boolean(l))
+    );
+    filtered = filtered.filter(
+      (p) =>
+        (p.teamId && favoriteTeamIds.includes(p.teamId)) ||
+        (p.leagueTag && favLeagues.has(p.leagueTag))
+    );
+  }
+
+  return filtered.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
@@ -53,6 +77,8 @@ function PostSkeleton() {
 interface DynamicFeedProps {
   /** Filter to a single league (e.g. "nfl"). Omit for all-sport feed. */
   leagueId?: string;
+  /** Show only posts from these team IDs (and their leagues). Personalized feed. */
+  favoriteTeamIds?: string[];
   /** Hides the Composer at the top */
   hideComposer?: boolean;
   /** Compact post cards (less padding) */
@@ -62,11 +88,12 @@ interface DynamicFeedProps {
 
 export default function DynamicFeed({
   leagueId,
+  favoriteTeamIds,
   hideComposer = false,
   compact = false,
   className = "",
 }: DynamicFeedProps) {
-  const allPosts      = filterPosts(socialPosts, leagueId);
+  const allPosts      = filterPosts(socialPosts, leagueId, favoriteTeamIds);
   const [posts, setPosts]         = useState<SocialPost[]>(allPosts.slice(0, PAGE_SIZE));
   const [page,  setPage]          = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -140,7 +167,11 @@ export default function DynamicFeed({
       {/* ── Feed header ───────────────────────────────── */}
       <div className="px-4 py-2.5 border-b border-surface-300 dark:border-white/5 flex items-center justify-between">
         <span className="text-xs font-black uppercase tracking-widest text-surface-muted">
-          {leagueId ? `${leagueId.toUpperCase()} Pulse` : "Fan Pulse"}
+          {favoriteTeamIds?.length
+            ? "My Feed"
+            : leagueId
+            ? `${leagueId.toUpperCase()} Pulse`
+            : "Fan Pulse"}
         </span>
         <span className="text-[10px] text-surface-muted">{allPosts.length} posts</span>
       </div>
