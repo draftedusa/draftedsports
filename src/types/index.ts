@@ -1,9 +1,38 @@
+// ═══════════════════════════════════════════════════════
+// UNDRAFTED — Core Type System
+// ═══════════════════════════════════════════════════════
+
+// ── League Hierarchy ─────────────────────────────────
+
 export interface League {
   id: string;
   name: string;
   slug: string;
   sport: string;
   logo: string;
+  /** "Standings" (US pro), "Rankings" (NCAA), "Tables" (soccer) */
+  standingsLabel?: "Standings" | "Rankings" | "Tables";
+  /** Country or region */
+  region?: "US" | "Europe" | "Global";
+  /** Whether this league uses conferences */
+  hasConferences?: boolean;
+  /** Whether this league uses divisions */
+  hasDivisions?: boolean;
+}
+
+export interface Conference {
+  id: string;
+  leagueId: string;
+  name: string;
+  shortName: string;
+}
+
+export interface Division {
+  id: string;
+  conferenceId: string;
+  leagueId: string;
+  name: string;
+  shortName: string;
 }
 
 export interface Team {
@@ -11,10 +40,18 @@ export interface Team {
   name: string;
   slug: string;
   leagueId: string;
+  conferenceId?: string;
+  divisionId?: string;
   logo: string;
   record: string;
   standing: number;
   primaryColor: string;
+  /** Secondary/accent color for gradients */
+  secondaryColor?: string;
+  /** City or school name */
+  city?: string;
+  /** Stadium or arena name */
+  venue?: string;
 }
 
 export interface Player {
@@ -24,7 +61,11 @@ export interface Player {
   position: string;
   number: number;
   stats: Record<string, number | string>;
+  /** Optional: headshot emoji placeholder */
+  avatar?: string;
 }
+
+// ── Games & Events ───────────────────────────────────
 
 export type GameStatus = "live" | "final" | "upcoming";
 
@@ -51,7 +92,11 @@ export interface Game {
   timeRemaining: string;
   date: string;
   events: GameEvent[];
+  /** Broadcast network (ESPN, TNT, etc.) */
+  network?: string;
 }
+
+// ── Content ──────────────────────────────────────────
 
 export interface Article {
   id: string;
@@ -69,6 +114,8 @@ export interface Article {
   relatedArticleIds: string[];
   views: number;
   readTime: number;
+  /** Cover image placeholder emoji */
+  coverEmoji?: string;
 }
 
 export interface Thread {
@@ -95,6 +142,8 @@ export interface Comment {
   };
 }
 
+// ── Users & Auth ─────────────────────────────────────
+
 export interface User {
   id: string;
   username: string;
@@ -106,11 +155,15 @@ export interface User {
   password?: string;
 }
 
+// ── Tags ─────────────────────────────────────────────
+
 export interface Tag {
   id: string;
   name: string;
   slug: string;
 }
+
+// ── Highlights ───────────────────────────────────────
 
 export type HighlightStatus = "pending" | "live" | "archived";
 
@@ -124,6 +177,8 @@ export interface Highlight {
   timestamp: string;
   status: HighlightStatus;
 }
+
+// ── Polls ────────────────────────────────────────────
 
 export interface PollOption {
   id: string;
