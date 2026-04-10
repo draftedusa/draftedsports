@@ -3,13 +3,13 @@ import Link from "next/link";
 import { leagues } from "@/data/leagues";
 import { games } from "@/data/games";
 import { teams } from "@/data/teams";
-import { odds } from "@/data/odds";
 import { articles } from "@/data/articles";
+import { bettingLineMap } from "@/data/betting";
 import LayoutGamma from "@/components/layout/LayoutGamma";
 import ContentCard from "@/components/cards/ContentCard";
 import DynamicFeed from "@/components/social/DynamicFeed";
-import GameCard from "@/components/cards/GameCard";
 import Kicker from "@/components/ui/Kicker";
+import OddsCard from "@/components/betting/OddsCard";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,14 +25,15 @@ export function generateStaticParams() {
 function ScoresRail({
   leagueId,
   teamMap,
+  leagueSlug,
 }: {
   leagueId: string;
   teamMap: Record<string, (typeof teams)[number]>;
+  leagueSlug: string;
 }) {
   const leagueGames = games
     .filter((g) => g.leagueId === leagueId)
     .slice(0, 6);
-  const oddsMap = Object.fromEntries(odds.map((o) => [o.gameId, o]));
 
   if (leagueGames.length === 0) {
     return (
@@ -44,25 +45,48 @@ function ScoresRail({
 
   return (
     <div className="space-y-0">
-      <div className="px-3 py-2 border-b border-surface-300 dark:border-white/5">
+      {/* Header */}
+      <div className="px-3 py-2 border-b border-surface-300 dark:border-white/5 flex items-center justify-between">
         <span className="text-[10px] font-black uppercase tracking-widest text-surface-muted">
-          Scores
+          Scores &amp; Lines
         </span>
+        <Link
+          href={`/league/${leagueSlug}/betting`}
+          className="text-[9px] font-bold text-brand hover:text-brand/80 transition-colors"
+        >
+          Full Lines →
+        </Link>
       </div>
 
       {leagueGames.map((g) => {
-        const home   = teamMap[g.homeTeamId];
-        const away   = teamMap[g.awayTeamId];
-        const gameOdds = oddsMap[g.id];
+        const home = teamMap[g.homeTeamId];
+        const away = teamMap[g.awayTeamId];
         if (!home || !away) return null;
 
+        const line = bettingLineMap[g.id];
+
+        // Games with betting lines → interactive OddsCard
+        if (line) {
+          return (
+            <div key={g.id} className="border-b border-surface-300 dark:border-white/5">
+              <OddsCard
+                game={g}
+                homeTeam={home}
+                awayTeam={away}
+                line={line}
+                className="rounded-none border-0 border-none bg-transparent"
+              />
+            </div>
+          );
+        }
+
+        // Fallback: score-only row with link to game page
         return (
           <Link
             key={g.id}
             href={`/game/${g.id}`}
             className="block px-3 py-3 border-b border-surface-300 dark:border-white/5 hover:bg-surface-200/50 transition-colors"
           >
-            {/* Status badge */}
             <div className="flex items-center gap-1.5 mb-1.5">
               {g.status === "live" ? (
                 <>
@@ -77,40 +101,23 @@ function ScoresRail({
                 <span className="text-[9px] text-surface-muted">{g.date}</span>
               )}
             </div>
-
-            {/* Teams + scores */}
             <div className="space-y-1">
-              {[away, home].map((team, i) => {
-                const score = i === 0 ? g.awayScore : g.homeScore;
-                return (
-                  <div key={team.id} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-sm shrink-0">{team.logo}</span>
-                      <span className="text-xs font-semibold text-surface-text truncate">
-                        {team.name.split(" ").at(-1)}
-                      </span>
-                    </div>
-                    {g.status !== "upcoming" && (
-                      <span className="text-xs font-bold text-surface-text tabular-nums shrink-0">
-                        {score}
-                      </span>
-                    )}
+              {[away, home].map((team, i) => (
+                <div key={team.id} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-sm shrink-0">{team.logo}</span>
+                    <span className="text-xs font-semibold text-surface-text truncate">
+                      {team.name.split(" ").at(-1)}
+                    </span>
                   </div>
-                );
-              })}
+                  {g.status !== "upcoming" && (
+                    <span className="text-xs font-bold text-surface-text tabular-nums shrink-0">
+                      {i === 0 ? g.awayScore : g.homeScore}
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
-
-            {/* Odds row */}
-            {gameOdds && g.status === "upcoming" && (
-              <div className="flex gap-3 mt-1.5">
-                <span className="text-[9px] text-surface-muted">
-                  Spread <span className="text-surface-text font-semibold">{gameOdds.spread}</span>
-                </span>
-                <span className="text-[9px] text-surface-muted">
-                  O/U <span className="text-surface-text font-semibold">{gameOdds.overUnder}</span>
-                </span>
-              </div>
-            )}
           </Link>
         );
       })}
@@ -155,7 +162,7 @@ export default async function LeaguePulsePage({ params }: Props) {
       {/* ── LayoutGamma ─────────────────────────────── */}
       <LayoutGamma
         left={
-          <ScoresRail leagueId={league.id} teamMap={teamMap} />
+          <ScoresRail leagueId={league.id} teamMap={teamMap} leagueSlug={league.slug} />
         }
         center={
           <div className="space-y-5">
