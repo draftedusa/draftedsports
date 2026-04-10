@@ -6,8 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
 import {
   Search, Bell, ChevronDown, PlayCircle, Activity,
-  Star, User, Zap, Newspaper,
+  Star, User, Zap, Newspaper, BarChart2, Tv,
 } from "lucide-react";
+import { leagues as leaguesData } from "@/data/leagues";
 import { games } from "@/data/games";
 import { teams } from "@/data/teams";
 import { transactions } from "@/data/transactions";
@@ -16,7 +17,29 @@ import SearchModal from "./SearchModal";
 import PointsCounter from "@/components/ui/PointsCounter";
 
 // ─────────────────────────────────────────────────────────
-// Ticker data — real games interleaved with breaking news
+// League strip config
+// ─────────────────────────────────────────────────────────
+const LEAGUES = [
+  { name: "NFL",     slug: "nfl",     standingsLabel: "Standings" },
+  { name: "NBA",     slug: "nba",     standingsLabel: "Standings" },
+  { name: "MLB",     slug: "mlb",     standingsLabel: "Standings" },
+  { name: "NHL",     slug: "nhl",     standingsLabel: "Standings" },
+  { name: "Soccer",  slug: "soccer",  standingsLabel: "Tables"    },
+  { name: "College", slug: "college", standingsLabel: "Rankings"  },
+];
+
+const LEAGUE_PAGES = [
+  "Home", "News", "Scores", "Schedule",
+  "Standings", "Stats", "Teams", "Players",
+];
+
+function pageHref(slug: string, page: string): string {
+  if (page === "Home") return `/league/${slug}`;
+  return `/league/${slug}/${page.toLowerCase()}`;
+}
+
+// ─────────────────────────────────────────────────────────
+// Ticker data — real games + breaking news
 // ─────────────────────────────────────────────────────────
 const teamMap = Object.fromEntries(teams.map((t) => [t.id, t]));
 
@@ -25,76 +48,63 @@ function teamCode(id: string) {
   return t ? (t.name.split(" ").at(-1) ?? t.name).slice(0, 3).toUpperCase() : "---";
 }
 
-type GameTick = { id: string; type: "GAME"; league: string; home: string; away: string; score: string; status: string; isLive: boolean };
-type NewsTick = { id: string; type: "NEWS"; category: string; title: string; newsKind: "zap" | "paper" };
+type GameTick = {
+  id: string; type: "GAME"; gameId: string;
+  league: string; home: string; away: string; score: string; status: string;
+};
+type NewsTick = {
+  id: string; type: "NEWS";
+  category: string; title: string; newsKind: "zap" | "paper";
+};
 type TickerItem = GameTick | NewsTick;
 
 function buildTicker(): TickerItem[] {
   const items: TickerItem[] = [];
-
-  // Games (live → final, skip upcoming)
   for (const g of games.filter((g) => g.status !== "upcoming").slice(0, 6)) {
     items.push({
-      id: g.id,
-      type: "GAME",
+      id: g.id, type: "GAME", gameId: g.id,
       league: g.leagueId.toUpperCase(),
       home: teamCode(g.homeTeamId),
       away: teamCode(g.awayTeamId),
       score: `${g.awayScore} – ${g.homeScore}`,
       status: g.status === "final" ? "FINAL" : `${g.quarter} ${g.timeRemaining}`.trim(),
-      isLive: g.status === "live",
     });
   }
-
-  // Breaking news
   for (const tx of transactions.filter((t) => t.isBreaking).slice(0, 4)) {
     items.push({
-      id: tx.id,
-      type: "NEWS",
+      id: tx.id, type: "NEWS",
       category: tx.type === "trade" ? "TRANSACTION" : "BREAKING",
       title: tx.headline,
       newsKind: tx.type === "trade" ? "zap" : "paper",
     });
   }
-
   return items;
 }
 
 const TICKER_ITEMS = buildTicker();
 
 // ─────────────────────────────────────────────────────────
-// League strip config
-// ─────────────────────────────────────────────────────────
-const LEAGUES = [
-  { name: "NFL",     href: "/league/nfl"     },
-  { name: "NBA",     href: "/league/nba"     },
-  { name: "MLB",     href: "/league/mlb"     },
-  { name: "NHL",     href: "/league/nhl"     },
-  { name: "Soccer",  href: "/league/soccer"  },
-  { name: "College", href: "/league/college" },
-];
-
-// ─────────────────────────────────────────────────────────
 // Header
 // ─────────────────────────────────────────────────────────
 export default function Header() {
-  const [isDirOpen,     setIsDirOpen]     = useState(false);
-  const [searchOpen,    setSearchOpen]    = useState(false);
-  const [hoveredLeague, setHoveredLeague] = useState<string | null>(null);
-  const [userMenuOpen,  setUserMenuOpen]  = useState(false);
+  const [isDirOpen,       setIsDirOpen]       = useState(false);
+  const [searchOpen,      setSearchOpen]      = useState(false);
+  const [hoveredLeague,   setHoveredLeague]   = useState<string | null>(null);
+  const [hoveredTickerId, setHoveredTickerId] = useState<string | null>(null);
+  const [userMenuOpen,    setUserMenuOpen]    = useState(false);
 
-  const userMenuRef  = useRef<HTMLDivElement>(null);
-  const leaveTimer   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const leaveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { data: session } = useSession();
   const isAdmin = (session?.user as Record<string, unknown> | undefined)?.role === "admin";
 
-  // Body scroll lock while directory is open
+  // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = isDirOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isDirOpen]);
 
-  // Close user dropdown on outside click
+  // Outside click closes user menu
   useEffect(() => {
     const fn = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
@@ -114,17 +124,10 @@ export default function Header() {
     return () => document.removeEventListener("keydown", fn);
   }, []);
 
-  // League dropdown hover with 120 ms grace
-  const openLeague  = (name: string) => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    setHoveredLeague(name);
-  };
-  const closeLeague = () => {
-    leaveTimer.current = setTimeout(() => setHoveredLeague(null), 120);
-  };
-  const keepLeague  = () => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
-  };
+  // League dropdown hover with grace period
+  const openLeague  = (name: string) => { if (leaveTimer.current) clearTimeout(leaveTimer.current); setHoveredLeague(name); };
+  const closeLeague = ()              => { leaveTimer.current = setTimeout(() => setHoveredLeague(null), 120); };
+  const keepLeague  = ()              => { if (leaveTimer.current) clearTimeout(leaveTimer.current); };
 
   return (
     <>
@@ -152,7 +155,7 @@ export default function Header() {
             </button>
 
             <Link href="/" aria-label="Undrafted – home"
-              className="text-2xl font-black tracking-tighter text-white uppercase italic select-none">
+              className="text-2xl font-black tracking-tighter text-white italic uppercase select-none">
               Undrafted
             </Link>
           </div>
@@ -167,9 +170,9 @@ export default function Header() {
               className="flex items-center gap-2 text-[10px] font-black uppercase text-white/60 hover:text-white transition-colors">
               <Activity size={14} className="text-green-500" /> Fan Pulse
             </Link>
-            <Link href="/premium"
+            <Link href="/league/nfl/betting"
               className="flex items-center gap-2 text-[10px] font-black uppercase text-white/60 hover:text-white transition-colors">
-              <Star size={14} className="text-yellow-500" /> Premium
+              <Star size={14} className="text-yellow-500" /> Odds
             </Link>
           </nav>
 
@@ -199,8 +202,8 @@ export default function Header() {
               <User size={16} />
             </Link>
 
-            {/* Auth */}
-            {session ? (
+            {/* Auth dropdown (session-aware) */}
+            {session && (
               <div ref={userMenuRef} className="relative hidden lg:block ml-1">
                 <button
                   onClick={() => setUserMenuOpen((o) => !o)}
@@ -210,8 +213,7 @@ export default function Header() {
                   <span className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-[10px] font-black">
                     {session.user?.name?.[0]?.toUpperCase() ?? "U"}
                   </span>
-                  <motion.div animate={{ rotate: userMenuOpen ? 180 : 0 }} transition={{ duration: 0.2 }}
-                    className="text-white/60">
+                  <motion.div animate={{ rotate: userMenuOpen ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/60">
                     <ChevronDown size={11} />
                   </motion.div>
                 </button>
@@ -241,51 +243,68 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : (
+            )}
+
+            {!session && (
               <div className="ml-2 hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
-                <Link href="/auth/login" className="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors">
-                  Log In
-                </Link>
-                <Link href="/auth/signup" className="rounded bg-white px-3 py-1.5 text-[10px] font-black uppercase text-black hover:bg-zinc-200 transition-colors">
-                  Sign Up
-                </Link>
+                <Link href="/auth/login" className="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors">Log In</Link>
+                <Link href="/auth/signup" className="rounded bg-white px-3 py-1.5 text-[10px] font-black uppercase text-black hover:bg-zinc-200 transition-colors">Sign Up</Link>
               </div>
             )}
           </div>
         </div>
 
-        {/* ── 2. Interwoven scores + news ticker ────────── */}
+        {/* ── 2. Scores / News ticker ───────────────────── */}
         <div className="flex h-10 w-full border-b border-white/10 bg-zinc-950 overflow-hidden">
-          <div className="z-10 shrink-0 bg-red-600 px-4 flex items-center text-[10px] font-black uppercase text-white italic shadow-[10px_0_15px_rgba(0,0,0,0.5)]">
+          <div className="z-20 shrink-0 bg-red-600 px-4 flex items-center text-[10px] font-black uppercase text-white italic shadow-[10px_0_15px_rgba(0,0,0,0.5)]">
             Scores / News
           </div>
           <div className="flex-1 overflow-hidden">
-            <div className="flex animate-ticker whitespace-nowrap items-center h-full">
+            <div className="flex animate-ticker h-full whitespace-nowrap">
               {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-                <div key={`${item.id}-${i}`}
-                  className="flex h-full shrink-0 items-center border-r border-white/5 px-6 gap-3 cursor-pointer hover:bg-white/5 transition-colors">
-                  {item.type === "GAME" ? (
-                    <>
-                      <span className="text-[9px] font-bold text-white/30 uppercase">{item.league}</span>
-                      <span className="text-[11px] font-black text-white">
-                        {item.away} {item.score} {item.home}
-                      </span>
-                      <span className={`text-[9px] font-bold uppercase ${item.status === "FINAL" ? "text-white/30" : "text-red-500"}`}>
-                        {item.status}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {item.newsKind === "zap"
-                        ? <Zap size={12} className="text-yellow-400 shrink-0" />
-                        : <Newspaper size={12} className="text-blue-400 shrink-0" />}
-                      <span className="text-[9px] font-bold text-yellow-500 uppercase tracking-tighter">
-                        {item.category}
-                      </span>
-                      <span className="text-[11px] font-medium text-white/90 underline decoration-white/20 underline-offset-4">
-                        {item.title}
-                      </span>
-                    </>
+                <div
+                  key={`${item.id}-${i}`}
+                  onMouseEnter={() => setHoveredTickerId(`${item.id}-${i}`)}
+                  onMouseLeave={() => setHoveredTickerId(null)}
+                  className="relative flex h-10 shrink-0 min-w-[200px] items-center border-r border-white/5 px-6 transition-colors hover:bg-white/5 cursor-pointer"
+                >
+                  {/* Score / news view */}
+                  <div className={`flex items-center gap-3 transition-opacity duration-150 ${
+                    hoveredTickerId === `${item.id}-${i}` && item.type === "GAME" ? "opacity-0" : "opacity-100"
+                  }`}>
+                    {item.type === "GAME" ? (
+                      <>
+                        <span className="text-[9px] font-bold text-white/30 uppercase">{item.league}</span>
+                        <span className="text-[11px] font-black text-white">{item.away} {item.score} {item.home}</span>
+                        <span className={`text-[9px] font-bold uppercase ${item.status === "FINAL" ? "text-white/30" : "text-red-500"}`}>
+                          {item.status}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        {item.newsKind === "zap"
+                          ? <Zap size={12} className="text-yellow-400 shrink-0" />
+                          : <Newspaper size={12} className="text-blue-400 shrink-0" />}
+                        <span className="text-[9px] font-bold text-yellow-500 uppercase tracking-tighter">{item.category}</span>
+                        <span className="text-[11px] font-medium text-white/90 underline decoration-white/20 underline-offset-4">
+                          {item.title}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Hover portal — GAME only */}
+                  {item.type === "GAME" && hoveredTickerId === `${item.id}-${i}` && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center gap-4 bg-zinc-900 px-2">
+                      <Link href={`/game/${item.gameId}`}
+                        className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors">
+                        <BarChart2 size={12} /> Boxscore
+                      </Link>
+                      <Link href={`/game/${item.gameId}`}
+                        className="flex items-center gap-1 text-[9px] font-black uppercase text-white hover:text-red-500 transition-colors">
+                        <Tv size={12} /> Gamecast
+                      </Link>
+                    </div>
                   )}
                 </div>
               ))}
@@ -293,8 +312,8 @@ export default function Header() {
           </div>
         </div>
 
-        {/* ── 3. League strip with simple dropdowns ─────── */}
-        <div className="hidden lg:flex h-10 w-full items-center justify-center gap-10 bg-black/50 border-b border-white/5">
+        {/* ── 3. League strip with full-page dropdowns ─────── */}
+        <div className="hidden lg:flex h-10 w-full items-center justify-center gap-8 bg-black/50 border-b border-white/5">
           {LEAGUES.map((league) => (
             <div
               key={league.name}
@@ -322,26 +341,21 @@ export default function Header() {
                     transition={{ duration: 0.15 }}
                     onMouseEnter={keepLeague}
                     onMouseLeave={closeLeague}
-                    className="absolute top-10 left-1/2 -translate-x-1/2 w-44 bg-zinc-950 border border-white/10 p-4 shadow-2xl z-50"
+                    className="absolute top-10 left-1/2 -translate-x-1/2 w-64 bg-zinc-950 border border-white/10 p-4 shadow-2xl grid grid-cols-2 gap-x-6 gap-y-2 z-[110]"
                   >
-                    <div className="flex flex-col gap-3">
-                      <Link href={`${league.href}`} onClick={() => setHoveredLeague(null)}
-                        className="text-[10px] font-bold text-white/60 hover:text-white transition-colors">
-                        Home
-                      </Link>
-                      <Link href={`${league.href}/pulse`} onClick={() => setHoveredLeague(null)}
-                        className="text-[10px] font-bold text-white/60 hover:text-white transition-colors">
-                        Live Scores
-                      </Link>
-                      <Link href={`${league.href}/news`} onClick={() => setHoveredLeague(null)}
-                        className="text-[10px] font-bold text-white/60 hover:text-white transition-colors">
-                        News &amp; Rumors
-                      </Link>
-                      <Link href={`${league.href}/standings`} onClick={() => setHoveredLeague(null)}
-                        className="text-[10px] font-bold text-white/60 hover:text-white transition-colors">
-                        Standings
-                      </Link>
-                    </div>
+                    {LEAGUE_PAGES.map((page) => {
+                      const label = page === "Standings" ? league.standingsLabel : page;
+                      return (
+                        <Link
+                          key={page}
+                          href={pageHref(league.slug, page)}
+                          onClick={() => setHoveredLeague(null)}
+                          className="text-[10px] font-bold text-white/50 hover:text-white uppercase tracking-tighter py-1 border-b border-white/5 transition-colors"
+                        >
+                          {label}
+                        </Link>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -349,7 +363,7 @@ export default function Header() {
           ))}
         </div>
 
-        {/* ── 4. Master directory dropdown ─────────────── */}
+        {/* ── 4. Master directory dropdown ─────────────────── */}
         <AnimatePresence>
           {isDirOpen && (
             <>
@@ -367,7 +381,6 @@ export default function Header() {
               >
                 <div className="container mx-auto grid grid-cols-4 gap-12 p-12 h-full">
 
-                  {/* Master Map */}
                   <div>
                     <h3 className="text-[10px] font-black text-red-600 uppercase mb-6 tracking-widest">Master Map</h3>
                     <div className="flex flex-col gap-4 text-2xl font-black text-white italic uppercase">
@@ -378,12 +391,11 @@ export default function Header() {
                     </div>
                   </div>
 
-                  {/* Leagues */}
                   <div>
                     <h3 className="text-[10px] font-black text-red-600 uppercase mb-6 tracking-widest">Leagues</h3>
                     <div className="flex flex-col gap-3 text-lg font-bold text-white/70">
                       {LEAGUES.map((l) => (
-                        <Link key={l.name} href={l.href} onClick={() => setIsDirOpen(false)}
+                        <Link key={l.name} href={`/league/${l.slug}`} onClick={() => setIsDirOpen(false)}
                           className="hover:text-white transition-colors">
                           {l.name}
                         </Link>
@@ -391,7 +403,6 @@ export default function Header() {
                     </div>
                   </div>
 
-                  {/* Tools */}
                   <div>
                     <h3 className="text-[10px] font-black text-red-600 uppercase mb-6 tracking-widest">Tools</h3>
                     <div className="flex flex-col gap-3 text-lg font-bold text-white/70">
@@ -402,7 +413,6 @@ export default function Header() {
                     </div>
                   </div>
 
-                  {/* Trending */}
                   <div className="border-l border-white/5 pl-12 flex flex-col justify-between">
                     <div>
                       <h3 className="text-[10px] font-black text-white/30 uppercase mb-2 tracking-widest">Currently Trending</h3>
@@ -425,7 +435,7 @@ export default function Header() {
 }
 
 // ─────────────────────────────────────────────────────────
-// DropItem — user dropdown entry
+// DropItem helper
 // ─────────────────────────────────────────────────────────
 function DropItem({
   href, onClick, accent, children,
