@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { label: "Home",    href: (slug: string) => `/league/${slug}` },
   { label: "Pulse",   href: (slug: string) => `/league/${slug}/pulse` },
-  { label: "Betting", href: (slug: string) => `/league/${slug}/betting` },
+  { label: "Betting", href: (slug: string) => `/league/${slug}/odds` },
 ] as const;
 
 export default function LeagueTabs({

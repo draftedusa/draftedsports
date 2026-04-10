@@ -61,7 +61,7 @@ export default function ReactionEmitter({ slug }: { slug: string }) {
   // Only visible on pulse and betting sub-routes
   const isVisible =
     pathname === `/league/${slug}/pulse` ||
-    pathname === `/league/${slug}/betting`;
+    pathname === `/league/${slug}/odds`;
 
   const removeParticle = useCallback((id: number) => {
     setParticles((prev) => prev.filter((p) => p.id !== id));

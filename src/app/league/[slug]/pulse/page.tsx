@@ -52,7 +52,7 @@ function ScoresRail({
           Scores &amp; Lines
         </span>
         <Link
-          href={`/league/${leagueSlug}/betting`}
+          href={`/league/${leagueSlug}/odds`}
           className="text-[9px] font-bold text-brand hover:text-brand/80 transition-colors"
         >
           Full Lines →

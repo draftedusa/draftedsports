@@ -170,7 +170,7 @@ export default function Header() {
               className="flex items-center gap-2 text-[10px] font-black uppercase text-white/60 hover:text-white transition-colors">
               <Activity size={14} className="text-green-500" /> Fan Pulse
             </Link>
-            <Link href="/league/nfl/betting"
+            <Link href="/league/nfl/odds"
               className="flex items-center gap-2 text-[10px] font-black uppercase text-white/60 hover:text-white transition-colors">
               <Star size={14} className="text-yellow-500" /> Odds
             </Link>
