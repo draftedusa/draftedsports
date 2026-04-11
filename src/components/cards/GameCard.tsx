@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Game, Team } from "@/types";
 import { GameStatusBadge } from "@/components/ui/Badge";
+import OddsUtility from "@/components/betting/OddsUtility";
 
 interface GameCardProps {
   game: Game;
@@ -54,6 +55,8 @@ export default function GameCard({ game, homeTeam, awayTeam, compact = false }: 
               compact={compact}
             />
           </div>
+
+          {!compact && <OddsUtility spread="-3.5" ou="214" ml="-110" />}
         </div>
       </Link>
 
