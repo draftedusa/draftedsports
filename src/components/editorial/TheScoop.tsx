@@ -6,18 +6,18 @@ import { Zap, Clock, ArrowRight } from 'lucide-react';
 const SCOOP_ENTRIES = [
   {
     id: 1,
-    category: "The Scoop",
     league: "NFL",
-    title: "Chiefs and Travis Kelce finalizing 2-year extension",
+    category: "The Scoop",
+    title: "Chiefs trade for veteran WR",
     detail: "Sources tell UNDRAFTED the deal makes Kelce the highest-paid TE in history.",
     time: "2m ago",
     type: "EXCLUSIVE"
   },
   {
     id: 2,
-    category: "Transactions",
     league: "NBA",
-    title: "Houston Rockets recall Amen Thompson from G-League",
+    category: "The Scoop",
+    title: "Rockets star clears injury report",
     detail: "Expected to be active for tonight's matchup vs. Lakers.",
     time: "14m ago",
     type: "NEWS"
