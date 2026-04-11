@@ -29,12 +29,13 @@ const LEAGUES = [
 ];
 
 const LEAGUE_PAGES = [
-  "Home", "News", "Scores", "Schedule",
+  "Home", "The Scoop", "Scores", "Schedule",
   "Standings", "Stats", "Teams", "Players",
 ];
 
 function pageHref(slug: string, page: string): string {
-  if (page === "Home") return `/league/${slug}`;
+  if (page === "Home")      return `/league/${slug}`;
+  if (page === "The Scoop") return `/scoop`;
   return `/league/${slug}/${page.toLowerCase()}`;
 }
 
