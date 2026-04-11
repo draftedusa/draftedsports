@@ -56,7 +56,11 @@ export default function GameCard({ game, homeTeam, awayTeam, compact = false }: 
             />
           </div>
 
-          {!compact && <OddsUtility spread="-3.5" ou="214" ml="-110" />}
+          {!compact && <OddsUtility
+            spread={game.spread ?? "-3.5"}
+            ou={game.overUnder ?? "214.5"}
+            ml={game.moneylineHome != null ? (game.moneylineHome > 0 ? `+${game.moneylineHome}` : String(game.moneylineHome)) : "-150"}
+          />}
         </div>
       </Link>
 

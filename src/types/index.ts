@@ -94,6 +94,11 @@ export interface Game {
   events: GameEvent[];
   /** Broadcast network (ESPN, TNT, etc.) */
   network?: string;
+  /** Pre-game odds */
+  spread?: string;
+  overUnder?: number;
+  moneylineHome?: number;
+  moneylineAway?: number;
 }
 
 // ── Content ──────────────────────────────────────────
