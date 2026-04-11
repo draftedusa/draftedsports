@@ -10,6 +10,7 @@ import { threads, comments } from "@/data/comments";
 import { polls } from "@/data/polls";
 import { odds } from "@/data/odds";
 import { transactions } from "@/data/transactions";
+import PlayByPlay from "@/components/live/PlayByPlay";
 import { GameStatusBadge } from "@/components/ui/Badge";
 import Panel from "@/components/ui/Panel";
 import { formatCount } from "@/lib/utils";
@@ -172,24 +173,7 @@ export default function GamePage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Play-by-play */}
-          {game.events.length > 0 && (
-            <Panel title="Play-by-Play" accent="border-red-600">
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                {[...game.events].reverse().map((evt) => (
-                  <div key={evt.id} className="flex gap-3 items-start">
-                    <span className="text-xs text-surface-muted tabular-nums shrink-0 pt-0.5 w-20">{evt.time}</span>
-                    <div className="flex-1">
-                      <p className={`text-sm ${evt.isHighlight ? "text-white font-semibold" : "text-surface-text"}`}>
-                        {evt.isHighlight && <span className="text-orange-400 mr-1">🔥</span>}
-                        {evt.description}
-                      </p>
-                    </div>
-                    <span className="text-xs text-surface-muted uppercase shrink-0">{evt.type}</span>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          )}
+          <PlayByPlay events={game.events} />
 
           {/* Poll */}
           {gamePoll && (
