@@ -66,3 +66,21 @@ export function topArticles(articles: Article[], limit = 5): Article[] {
 export function liveGames(games: Game[]): Game[] {
   return games.filter((g) => g.status === "live");
 }
+
+/** Return the league-specific display term for standings or scoop labels. */
+type LeagueTermType = "rankings" | "news";
+type LeagueTerms = { standings: string; scoop: string };
+
+const LEAGUE_TERMS: Record<string, LeagueTerms> = {
+  college: { standings: "Rankings", scoop: "The Scoop" },
+  soccer:  { standings: "Table",    scoop: "The Scoop" },
+  nfl:     { standings: "Standings", scoop: "The Scoop" },
+  nba:     { standings: "Standings", scoop: "The Scoop" },
+};
+
+const LEAGUE_TERMS_FALLBACK: LeagueTerms = { standings: "Standings", scoop: "The Scoop" };
+
+export function getLeagueTerm(slug: string, type: LeagueTermType): string {
+  const league = LEAGUE_TERMS[slug.toLowerCase()] ?? LEAGUE_TERMS_FALLBACK;
+  return type === "rankings" ? league.standings : league.scoop;
+}
