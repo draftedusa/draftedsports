@@ -35,7 +35,7 @@ const LEAGUE_PAGES = [
 
 function pageHref(slug: string, page: string): string {
   if (page === "Home")      return `/league/${slug}`;
-  if (page === "The Scoop") return `/scoop`;
+  if (page === "The Scoop") return `/league/${slug}/scoop`;
   return `/league/${slug}/${page.toLowerCase()}`;
 }
 

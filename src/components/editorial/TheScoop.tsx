@@ -24,19 +24,25 @@ const SCOOP_ENTRIES = [
   }
 ];
 
-export default function TheScoop() {
+export default function TheScoop({ leagueFilter }: { leagueFilter?: string }) {
+  const entries = leagueFilter
+    ? SCOOP_ENTRIES.filter((e) => e.league === leagueFilter)
+    : SCOOP_ENTRIES;
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between border-b border-surface-300 pb-4">
         <div className="flex items-center gap-2">
           <Zap size={20} className="text-red-600 fill-red-600" />
-          <h1 className="text-2xl font-black italic uppercase tracking-tighter text-surface-text">The Scoop</h1>
+          <h1 className="text-2xl font-black italic uppercase tracking-tighter text-surface-text">
+            {leagueFilter ? `${leagueFilter} — The Scoop` : "The Scoop"}
+          </h1>
         </div>
         <span className="text-[10px] font-bold text-surface-muted uppercase tracking-widest">Live Updates</span>
       </div>
 
       <div className="space-y-4">
-        {SCOOP_ENTRIES.map((entry) => (
+        {entries.length > 0 ? entries.map((entry) => (
           <div key={entry.id} className="rounded-xl border border-surface-300 bg-surface-200 p-4 transition-all hover:shadow-md group">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -59,7 +65,9 @@ export default function TheScoop() {
               </button>
             </div>
           </div>
-        ))}
+        )) : (
+          <p className="py-16 text-center text-sm text-surface-muted">No scoops yet for {leagueFilter}.</p>
+        )}
       </div>
     </div>
   );
