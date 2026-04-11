@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import StatLeaderCard from "@/components/cards/StatLeaderCard";
+import CollegeStatsHub from "@/components/editorial/CollegeStatsHub";
 import { leagues } from "@/data/leagues";
 
 interface Props {
@@ -111,6 +112,8 @@ export default async function LeagueStatsPage({ params }: Props) {
   const { slug } = await params;
   const league = leagues.find((l) => l.slug === slug);
   if (!league) notFound();
+
+  if (slug === "college") return <CollegeStatsHub />;
 
   const boards = STAT_BOARDS[slug] ?? FALLBACK_BOARD;
 
