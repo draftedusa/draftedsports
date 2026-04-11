@@ -24,8 +24,12 @@ const SCOOP_ENTRIES = [
   }
 ];
 
-export default function TheScoop({ leagueFilter }: { leagueFilter?: string }) {
-  const entries = leagueFilter
+interface ScoopProps {
+  leagueFilter?: string;
+}
+
+export default function TheScoop({ leagueFilter }: ScoopProps) {
+  const filteredData = leagueFilter
     ? SCOOP_ENTRIES.filter((e) => e.league === leagueFilter)
     : SCOOP_ENTRIES;
 
@@ -35,14 +39,14 @@ export default function TheScoop({ leagueFilter }: { leagueFilter?: string }) {
         <div className="flex items-center gap-2">
           <Zap size={20} className="text-red-600 fill-red-600" />
           <h1 className="text-2xl font-black italic uppercase tracking-tighter text-surface-text">
-            {leagueFilter ? `${leagueFilter} — The Scoop` : "The Scoop"}
+            {leagueFilter ? `${leagueFilter} THE SCOOP` : "THE SCOOP"}
           </h1>
         </div>
         <span className="text-[10px] font-bold text-surface-muted uppercase tracking-widest">Live Updates</span>
       </div>
 
       <div className="space-y-4">
-        {entries.length > 0 ? entries.map((entry) => (
+        {filteredData.length > 0 ? filteredData.map((entry) => (
           <div key={entry.id} className="rounded-xl border border-surface-300 bg-surface-200 p-4 transition-all hover:shadow-md group">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -66,7 +70,11 @@ export default function TheScoop({ leagueFilter }: { leagueFilter?: string }) {
             </div>
           </div>
         )) : (
-          <p className="py-16 text-center text-sm text-surface-muted">No scoops yet for {leagueFilter}.</p>
+          <div className="p-12 text-center border border-dashed border-surface-300 rounded-xl">
+            <p className="text-surface-muted italic text-sm">
+              No recent {leagueFilter} scoops found. Check back later.
+            </p>
+          </div>
         )}
       </div>
     </div>
