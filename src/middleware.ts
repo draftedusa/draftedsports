@@ -1,5 +1,9 @@
-import { auth } from "@/lib/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 import { NextResponse } from "next/server";
+
+// Edge-safe auth — uses JWT-only config with no Prisma/pg imports.
+const { auth } = NextAuth(authConfig);
 
 /**
  * Security headers applied to every response.
