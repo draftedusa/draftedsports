@@ -11,6 +11,7 @@ import { polls } from "@/data/polls";
 import { odds } from "@/data/odds";
 import { transactions } from "@/data/transactions";
 import PlayByPlay from "@/components/live/PlayByPlay";
+import GameInsightWidget from "@/components/live/GameInsightWidget";
 import { GameStatusBadge } from "@/components/ui/Badge";
 import Panel from "@/components/ui/Panel";
 import { formatCount } from "@/lib/utils";
@@ -263,6 +264,13 @@ export default function GamePage({ params }: Props) {
               </div>
             </Panel>
           )}
+
+          {/* Stat leaders for these teams */}
+          <GameInsightWidget
+            homeTeam={homeTeam}
+            awayTeam={awayTeam}
+            leagueId={game.leagueId}
+          />
 
           {/* Injury / transaction news for these teams */}
           {gameTransactions.length > 0 && (
