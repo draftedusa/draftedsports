@@ -25,9 +25,12 @@ export const authConfig = {
     jwt({ token, user }) {
       if (user) {
         token.id         = user.id;
-        token.role       = (user as Record<string, unknown>).role       ?? "user";
-        token.scoutXp    = (user as Record<string, unknown>).scoutXp    ?? 0;
-        token.reputation = (user as Record<string, unknown>).reputation ?? "";
+        // Double-cast needed because AdapterUser doesn't overlap Record<string, unknown>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const u = user as unknown as any;
+        token.role       = u.role       ?? "user";
+        token.scoutXp    = u.scoutXp    ?? 0;
+        token.reputation = u.reputation ?? "";
       }
       return token;
     },
