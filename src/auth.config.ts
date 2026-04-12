@@ -40,7 +40,8 @@ export const authConfig = {
         session.user.id         = (token.sub ?? token.id) as string;
         session.user.scoutXp    = (token.scoutXp    as number) ?? 0;
         session.user.reputation = (token.reputation as string) ?? "";
-        (session.user as Record<string, unknown>).role = token.role ?? "user";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).role = token.role ?? "user";
       }
       return session;
     },
