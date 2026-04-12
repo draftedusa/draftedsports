@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import StatLeaderCard from "@/components/cards/StatLeaderCard";
 import StatsFilter from "@/components/stats/StatsFilter";
 
@@ -140,6 +142,16 @@ const STAT_DATA: Record<Sport, { category: string; leaders: Leader[] }[]> = {
   ],
 };
 
+// ─────────────────────────────────────────────────────────
+// Pro league destinations keyed by college sport
+// ─────────────────────────────────────────────────────────
+const PRO_LINKS: Record<Sport, { label: string; href: string; league: string; blurb: string }> = {
+  Football:   { label: "NFL Stats",     href: "/league/nfl/stats", league: "NFL 🏈", blurb: "Compare passing yards, rushing totals, and receiving numbers to the top pros." },
+  Basketball: { label: "NBA Stats",     href: "/league/nba/stats", league: "NBA 🏀", blurb: "See how college scoring and assist averages stack up against NBA leaders."    },
+  Baseball:   { label: "MLB Stats",     href: "/league/mlb/stats", league: "MLB ⚾", blurb: "Track how college batting averages and K-rates translate at the major-league level." },
+  Soccer:     { label: "Futbol Tables", href: "/league/mls/stats", league: "MLS ⚽", blurb: "Benchmark college goals and assists against MLS professional tables."         },
+};
+
 export default function CollegeStatsHub() {
   const [activeSport, setActiveSport] = useState<Sport>("Football");
   const boards = STAT_DATA[activeSport];
@@ -175,6 +187,25 @@ export default function CollegeStatsHub() {
             </p>
           </button>
         ))}
+      </div>
+
+      {/* ProspectDiscovery — bridges college stats to the matching pro league */}
+      <div className="mb-10 border border-dashed border-surface-300 rounded-xl p-5">
+        <h2 className="text-sm font-black italic uppercase tracking-tighter text-surface-text mb-1">
+          Pro Prospect Comparison
+        </h2>
+        <p className="text-[10px] text-surface-muted font-bold uppercase tracking-widest mb-3">
+          {PRO_LINKS[activeSport].league} · Active Season
+        </p>
+        <p className="text-xs text-surface-muted leading-relaxed mb-4">
+          {PRO_LINKS[activeSport].blurb}
+        </p>
+        <Link
+          href={PRO_LINKS[activeSport].href}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-200 border border-surface-300 hover:border-brand hover:text-brand text-[10px] font-black uppercase tracking-widest text-surface-text transition-colors"
+        >
+          {PRO_LINKS[activeSport].label} <ArrowRight size={12} />
+        </Link>
       </div>
 
       {/* Stat boards for selected sport */}
