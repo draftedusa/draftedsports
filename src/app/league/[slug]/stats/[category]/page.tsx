@@ -3,6 +3,7 @@ import Link from "next/link";
 import { leagues } from "@/data/leagues";
 import FullStatsTable, { type ColumnDef, type StatRow } from "@/components/stats/FullStatsTable";
 import Kicker from "@/components/ui/Kicker";
+import HistoricalMirror from "@/components/stats/HistoricalMirror";
 
 interface Props {
   params: Promise<{ slug: string; category: string }>;
@@ -315,13 +316,18 @@ export default async function LeagueStatsCategoryPage({ params }: Props) {
 
       {/* Header */}
       <div className="pb-4 border-b border-surface-300">
-        <Kicker label={league.name} />
-        <h1 className="text-2xl font-black tracking-tighter text-surface-text mt-0.5">
-          {config.title} <span className="text-brand">Leaders</span>
-        </h1>
-        <p className="text-[10px] text-surface-muted font-bold uppercase tracking-widest mt-1">
-          Season: 2025–2026 · Regular Season
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <Kicker label={league.name} />
+            <h1 className="text-2xl font-black tracking-tighter text-surface-text mt-0.5">
+              {config.title} <span className="text-brand">Leaders</span>
+            </h1>
+            <p className="text-[10px] text-surface-muted font-bold uppercase tracking-widest mt-1">
+              Season: 2025–2026 · Regular Season
+            </p>
+          </div>
+          <HistoricalMirror slug={slug} category={category} categoryTitle={config.title} />
+        </div>
       </div>
 
       {/* Table */}

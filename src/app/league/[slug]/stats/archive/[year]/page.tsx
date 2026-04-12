@@ -150,12 +150,17 @@ export default async function HistoricalStatsPage({ params }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {boards.map((board) => (
-          <StatChart
+          <div
             key={board.category}
-            title={board.category}
-            data={board.data}
-            fullStatsUrl={`/league/${slug}/stats`}
-          />
+            id={board.category.toLowerCase().replace(/\s+/g, "-")}
+            className="scroll-mt-8"
+          >
+            <StatChart
+              title={board.category}
+              data={board.data}
+              fullStatsUrl={`/league/${slug}/stats`}
+            />
+          </div>
         ))}
       </div>
     </main>
