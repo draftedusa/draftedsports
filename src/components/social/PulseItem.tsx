@@ -144,7 +144,7 @@ export default function PulseItem({
 
   return (
     // Flat post — no shadow, no rounded corners on the container itself
-    <div className="flex w-full flex-col border-b border-surface-300 bg-transparent px-4 py-3 hover:bg-surface-200/30 transition-colors">
+    <div className="flex w-full flex-col !border-b !border-surface-300 bg-transparent px-4 py-3 hover:bg-surface-200/30 transition-colors">
 
       {/* League context header */}
       {leagueId && (
