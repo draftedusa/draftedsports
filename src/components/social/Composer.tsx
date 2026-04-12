@@ -188,7 +188,7 @@ export default function Composer({
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="p-1.5 rounded-lg text-brand hover:bg-brand/10 transition-colors"
+              className="p-1.5 rounded-none text-brand hover:bg-brand/10 transition-colors"
               aria-label="Attach media"
               title="Photo / Video"
             >
@@ -201,7 +201,7 @@ export default function Composer({
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="px-2 py-1 rounded-lg text-[10px] font-black text-brand border border-brand/30 hover:bg-brand/10 transition-colors leading-none"
+              className="px-2 py-1 rounded-none text-[10px] font-black text-brand border border-brand/30 hover:bg-brand/10 transition-colors leading-none"
               aria-label="Add GIF"
             >
               GIF
