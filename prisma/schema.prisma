@@ -28,6 +28,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Authenticator Authenticator[]
+  pulses        Pulse[]
+  likes         Like[]
 }
 
 model Account {
@@ -82,4 +84,32 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+// ── Social / Pulse models ──────────────────────────────────────────────────
+
+model Pulse {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  leagueTag String?  // e.g., "NBA", "NFL", "MLB"
+  parentId  String?  // null = root post; set = reply
+  createdAt DateTime @default(now())
+
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes   Like[]
+  replies Pulse[] @relation("Thread")
+  parent  Pulse?  @relation("Thread", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  pulseId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  pulse Pulse @relation(fields: [pulseId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pulseId, userId]) // one like per user per pulse
 }
