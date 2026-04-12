@@ -30,7 +30,7 @@ function teamsFor(leagueId: string): Team[] {
 function buildSubPages(league: League) {
   return [
     { label: "Home",                                href: `/league/${league.slug}` },
-    { label: "News",                                href: `/league/${league.slug}/news` },
+    { label: "The Scoop",                           href: `/league/${league.slug}/scoop` },
     { label: "Scores",                              href: `/league/${league.slug}/scores` },
     { label: "Schedule",                            href: `/league/${league.slug}/schedule` },
     { label: league.standingsLabel ?? "Standings",  href: `/league/${league.slug}/standings` },

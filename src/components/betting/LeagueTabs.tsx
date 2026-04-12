@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { label: "Home",    href: (slug: string) => `/league/${slug}` },
   { label: "Pulse",   href: (slug: string) => `/league/${slug}/pulse` },
-  { label: "Betting", href: (slug: string) => `/league/${slug}/odds` },
+  { label: "Odds", href: (slug: string) => `/league/${slug}/odds` },
 ] as const;
 
 export default function LeagueTabs({
@@ -42,7 +42,7 @@ export default function LeagueTabs({
             }`}
           >
             {tab.label}
-            {tab.label === "Betting" && (
+            {tab.label === "Odds" && (
               <span className="ml-1.5 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-brand/20 text-brand text-[8px] font-black leading-none">
                 $
               </span>

@@ -35,7 +35,7 @@ function teamsFor(leagueId: string): Team[] {
 function subPages(league: League) {
   return [
     { label: "Home",                                 suffix: "" },
-    { label: "News",                                 suffix: "/news" },
+    { label: "The Scoop",                            suffix: "/scoop" },
     { label: "Scores",                               suffix: "/scores" },
     { label: "Schedule",                             suffix: "/schedule" },
     { label: league.standingsLabel ?? "Standings",   suffix: "/standings" },

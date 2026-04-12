@@ -317,7 +317,7 @@ export default async function LeagueStatsCategoryPage({ params }: Props) {
       {/* Header */}
       <div className="pb-4 border-b border-surface-300">
         <div className="flex items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <Kicker label={league.name} />
             <h1 className="text-2xl font-black tracking-tighter text-surface-text mt-0.5">
               {config.title} <span className="text-brand">Leaders</span>
