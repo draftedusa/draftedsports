@@ -27,6 +27,18 @@
   "overrides": {
     "@auth/core": "0.41.1"
   },
+  "pnpm": {
+    "overrides": {
+      "@auth/core": "0.41.1"
+    },
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "esbuild",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
