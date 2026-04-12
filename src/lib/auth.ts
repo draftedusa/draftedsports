@@ -1,36 +1,48 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import NextAuth, { type DefaultSession } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
+import Google from "next-auth/providers/google";
+import Twitter from "next-auth/providers/twitter";
 
-const USERS = [
-  { id: "1", username: "SportsCentralAdmin", email: "admin@undrafted.com", password: "admin123", role: "admin", name: "Admin" },
-  { id: "2", username: "testuser", email: "user@test.com", password: "user123", role: "user", name: "Test User" },
-];
+// ── NextAuth type augmentation ────────────────────────────────────────────
+// Extends the built-in Session and User types with custom Prisma fields so
+// session.user.scoutXp / .reputation are fully typed without @ts-ignore.
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      scoutXp: number;
+      reputation: number;
+    } & DefaultSession["user"];
+  }
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
+  interface User {
+    scoutXp?: number;
+    reputation?: number;
+  }
+}
+
+// ── Auth config ───────────────────────────────────────────────────────────
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
   providers: [
-    Credentials({
-      credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const user = USERS.find(
-          (u) =>
-            (u.username === credentials?.username || u.email === credentials?.username) &&
-            u.password === credentials?.password
-        );
-        return user ?? null;
-      },
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
+    Twitter({
+      clientId: process.env.AUTH_TWITTER_ID!,
+      clientSecret: process.env.AUTH_TWITTER_SECRET!,
     }),
   ],
-  pages: { signIn: "/auth/login" },
+  session: { strategy: "database" },
   callbacks: {
-    jwt({ token, user }) {
-      if (user) (token as Record<string, unknown>).role = (user as Record<string, unknown>).role;
-      return token;
-    },
-    session({ session, token }) {
-      (session.user as unknown as Record<string, unknown>).role = token.role;
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id         = user.id;
+        session.user.scoutXp    = user.scoutXp    ?? 0;
+        session.user.reputation = user.reputation ?? 0;
+      }
       return session;
     },
   },
