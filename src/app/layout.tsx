@@ -5,7 +5,7 @@ import SiteShell from "@/components/layout/SiteShell";
 import TutorialModal from "@/components/ui/TutorialModal";
 
 export const metadata: Metadata = {
-  title: "UNDRAFTED — Mock Sports Media",
+  title: "UNDRAFTED | The Scoop",
   description: "A mock sports media platform inspired by ESPN, Bleacher Report, and The Athletic. Live game control, analytics dashboard, and community features.",
 };
 
