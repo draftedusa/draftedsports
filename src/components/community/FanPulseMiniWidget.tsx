@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 const MINI_POSTS = [
   { id: "1", user: "RocketsNation",  handle: "@rocketsnation",  avatar: "🚀", time: "2m",   body: "Sengun is absolutely COOKED tonight. MVP watch activated 👀", fire: 42, league: "NBA" },
@@ -16,6 +17,9 @@ interface FanPulseMiniWidgetProps {
 }
 
 export default function FanPulseMiniWidget({ limit = 3 }: FanPulseMiniWidgetProps) {
+  const { user } = useUser();
+  const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
+
   const [input, setInput] = useState("");
   const [posts, setPosts] = useState(MINI_POSTS.slice(0, limit));
   const [fired, setFired] = useState<Set<string>>(new Set());
@@ -25,8 +29,8 @@ export default function FanPulseMiniWidget({ limit = 3 }: FanPulseMiniWidgetProp
     if (!input.trim()) return;
     const newPost = {
       id: `local-${Date.now()}`,
-      user: "You",
-      handle: "@you",
+      user: clerkUsername ?? "You",
+      handle: clerkUsername ? `@${clerkUsername}` : "@you",
       avatar: "👤",
       time: "now",
       body: input.trim(),

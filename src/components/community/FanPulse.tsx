@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 interface Post {
   id: string;
@@ -32,30 +33,69 @@ const MEDIA_OPTIONS = [
 ];
 
 export default function FanPulse({ compact = false }: { compact?: boolean }) {
+  const { user } = useUser();
+  const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
+
   const [posts, setPosts]         = useState<Post[]>(MOCK_POSTS);
   const [input, setInput]         = useState("");
   const [reacted, setReacted]     = useState<Set<string>>(new Set());
   const [reposted, setReposted]   = useState<Set<string>>(new Set());
   const [pendingMedia, setPendingMedia] = useState<Post["media"] | null>(null);
+  const [posting, setPosting]     = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  function handlePost(e: React.FormEvent) {
+  useEffect(() => {
+    fetch("/api/fan-pulse")
+      .then((r) => r.json())
+      .then((data: Post[]) => { if (Array.isArray(data) && data.length > 0) setPosts(data); })
+      .catch(() => {});
+  }, []);
+
+  async function handlePost(e: React.FormEvent) {
     e.preventDefault();
     if (!input.trim() && !pendingMedia) return;
-    setPosts((prev) => [{
-      id: `local-${Date.now()}`,
-      user: "You",
-      handle: "@you",
-      avatar: "👤",
-      time: "just now",
-      body: input.trim(),
-      media: pendingMedia ?? undefined,
-      reactions: { fire: 0, wow: 0, repost: 0 },
-      comments: 0,
-      league: "ALL",
-    }, ...prev]);
+    const body = input.trim();
+    setPosting(true);
+    try {
+      const res = await fetch("/api/fan-pulse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: body, media: pendingMedia }),
+      });
+      if (res.ok) {
+        const newPost: Post = await res.json();
+        setPosts((prev) => [newPost, ...prev]);
+      } else {
+        setPosts((prev) => [{
+          id: `local-${Date.now()}`,
+          user: clerkUsername ?? "You",
+          handle: clerkUsername ? `@${clerkUsername}` : "@you",
+          avatar: "👤",
+          time: "just now",
+          body,
+          media: pendingMedia ?? undefined,
+          reactions: { fire: 0, wow: 0, repost: 0 },
+          comments: 0,
+          league: "ALL",
+        }, ...prev]);
+      }
+    } catch {
+      setPosts((prev) => [{
+        id: `local-${Date.now()}`,
+        user: clerkUsername ?? "You",
+        handle: clerkUsername ? `@${clerkUsername}` : "@you",
+        avatar: "👤",
+        time: "just now",
+        body,
+        media: pendingMedia ?? undefined,
+        reactions: { fire: 0, wow: 0, repost: 0 },
+        comments: 0,
+        league: "ALL",
+      }, ...prev]);
+    }
     setInput("");
     setPendingMedia(null);
+    setPosting(false);
   }
 
   function handleReact(postId: string, type: "fire" | "wow") {
@@ -151,10 +191,10 @@ export default function FanPulse({ compact = false }: { compact?: boolean }) {
             </div>
             <button
               type="submit"
-              disabled={!input.trim() && !pendingMedia}
+              disabled={posting || (!input.trim() && !pendingMedia)}
               className="px-4 py-1.5 bg-brand hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg transition-colors"
             >
-              Post
+              {posting ? "…" : "Post"}
             </button>
           </div>
         </form>

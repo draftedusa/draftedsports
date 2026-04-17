@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FooterAccountLinks from "./FooterAccountLinks";
 
 const YT = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -79,19 +80,7 @@ export default function Footer() {
         {/* Col 3 — Account */}
         <div>
           <h4 className="text-surface-text font-bold mb-4 text-xs uppercase tracking-widest">Account</h4>
-          <ul className="space-y-1.5">
-            {[
-              { href: "/profile",           label: "My Profile" },
-              { href: "/profile",           label: "Saved Articles" },
-              { href: "/",                   label: "Sign In / Register" },
-              { href: "/profile",           label: "Notification Settings" },
-              { href: "/feed",              label: "Fan Pulse Feed" },
-            ].map(({ href, label }) => (
-              <li key={label}>
-                <Link href={href} className="hover:text-brand transition-colors text-xs">{label}</Link>
-              </li>
-            ))}
-          </ul>
+          <FooterAccountLinks />
         </div>
 
         {/* Col 4 — Social */}
