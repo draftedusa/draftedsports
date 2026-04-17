@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import {
-  Search, Bell, ChevronDown, PlayCircle, Activity,
+  Search, ChevronDown, PlayCircle, Activity,
   Star, Zap, Newspaper, BarChart2, Tv,
 } from "lucide-react";
 import { games } from "@/data/games";
@@ -14,6 +14,7 @@ import { transactions } from "@/data/transactions";
 import ThemeToggle from "./ThemeToggle";
 import SearchModal from "./SearchModal";
 import PointsCounter from "@/components/ui/PointsCounter";
+import NotificationBell from "./NotificationBell";
 
 // ─────────────────────────────────────────────────────────
 // League strip config
@@ -175,11 +176,8 @@ export default function Header() {
               <Search size={18} />
             </button>
 
-            <div className="relative hidden lg:block">
-              <button aria-label="Notifications" className="p-2 text-white/60 hover:text-white transition-colors">
-                <Bell size={18} />
-              </button>
-              <span aria-hidden className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 ring-1 ring-black" />
+            <div className="hidden lg:block">
+              <NotificationBell />
             </div>
 
             <PointsCounter />

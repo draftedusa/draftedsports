@@ -3,51 +3,59 @@ import { supabaseService } from "@/lib/supabase";
 import { runMigrations } from "@/lib/migrations";
 import { NextResponse } from "next/server";
 
-// Run migrations lazily on first API hit
 let migrated = false;
 async function ensureMigrated() {
   if (!migrated) { await runMigrations(); migrated = true; }
 }
 
-// ── Relative time helper ──────────────────────────────────
 function relativeTime(iso: string): string {
   const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (secs < 60)   return `${secs}s ago`;
-  if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
-  if (secs < 86400)return `${Math.floor(secs / 3600)}h ago`;
+  if (secs < 60)    return `${secs}s ago`;
+  if (secs < 3600)  return `${Math.floor(secs / 60)}m ago`;
+  if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
   return `${Math.floor(secs / 86400)}d ago`;
 }
 
-// ── GET /api/fan-pulse ────────────────────────────────────
-export async function GET() {
+function rowToPost(row: Record<string, unknown>) {
+  return {
+    id:        row.id as string,
+    user:      (row.author_display_name as string | null) ?? (row.author_username as string),
+    handle:    `@${row.author_username as string}`,
+    avatar:    (row.author_avatar_url as string | null) ?? "👤",
+    time:      relativeTime(row.created_at as string),
+    body:      row.content as string,
+    reactions: (row.reactions as Record<string, number>) ?? { fire: 0, wow: 0, repost: 0 },
+    comments:  (row.reply_count as number) ?? 0,
+    league:    (row.league_tag as string) ?? "ALL",
+  };
+}
+
+// GET /api/fan-pulse[?league=nfl]
+export async function GET(req: Request) {
   await ensureMigrated();
-  const { data, error } = await supabaseService
+
+  const leagueFilter = new URL(req.url).searchParams.get("league");
+
+  let query = supabaseService
     .from("fan_pulse_posts")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(60);
 
+  if (leagueFilter && leagueFilter !== "ALL") {
+    query = (query as typeof query).eq("league_tag", leagueFilter.toUpperCase());
+  }
+
+  const { data, error } = await query;
   if (error) {
     console.error("[fan-pulse GET]", error);
     return NextResponse.json({ posts: [] });
   }
 
-  const posts = (data ?? []).map((row) => ({
-    id:        row.id,
-    user:      row.author_display_name ?? row.author_username,
-    handle:    `@${row.author_username}`,
-    avatar:    row.author_avatar_url ?? "👤",
-    time:      relativeTime(row.created_at),
-    body:      row.content,
-    reactions: row.reactions ?? { fire: 0, wow: 0, repost: 0 },
-    comments:  row.reply_count ?? 0,
-    league:    row.league_tag ?? "ALL",
-  }));
-
-  return NextResponse.json({ posts });
+  return NextResponse.json({ posts: (data ?? []).map(rowToPost) });
 }
 
-// ── POST /api/fan-pulse ───────────────────────────────────
+// POST /api/fan-pulse
 export async function POST(req: Request) {
   await ensureMigrated();
 
@@ -57,6 +65,9 @@ export async function POST(req: Request) {
   const body = await req.json();
   const content: string = (body.content ?? "").trim();
   if (!content) return NextResponse.json({ error: "Content required" }, { status: 400 });
+
+  // Raw league tag from client (e.g. "nfl" or "ALL")
+  const leagueTag = ((body.league ?? "ALL") as string).toUpperCase();
 
   // Look up author profile
   const { data: profile } = await supabaseService
@@ -75,7 +86,7 @@ export async function POST(req: Request) {
       author_display_name: profile?.display_name ?? null,
       author_avatar_url:   profile?.avatar_url ?? null,
       content,
-      league_tag: body.league ?? "ALL",
+      league_tag: leagueTag,
     })
     .select()
     .single();
@@ -85,23 +96,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Award "Early Bird" achievement if first post (fire-and-forget)
+  // Award "Early Bird" achievement (fire-and-forget)
   supabaseService
     .from("achievements")
     .upsert({ clerk_id: userId, achievement_type: "early_bird" }, { onConflict: "clerk_id,achievement_type" })
     .then(() => {});
 
-  return NextResponse.json({
-    post: {
-      id:        inserted.id,
-      user:      inserted.author_display_name ?? inserted.author_username,
-      handle:    `@${inserted.author_username}`,
-      avatar:    inserted.author_avatar_url ?? "👤",
-      time:      "just now",
-      body:      inserted.content,
-      reactions: { fire: 0, wow: 0, repost: 0 },
-      comments:  0,
-      league:    inserted.league_tag ?? "ALL",
-    },
-  });
+  // Insert activity row (fire-and-forget)
+  supabaseService
+    .from("user_activity")
+    .insert({ clerk_id: userId, type: "comment_posted", description: `Posted: "${content.slice(0, 60)}${content.length > 60 ? "…" : ""}"` })
+    .then(() => {});
+
+  return NextResponse.json({ post: rowToPost(inserted as Record<string, unknown>) });
 }

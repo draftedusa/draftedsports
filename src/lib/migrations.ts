@@ -71,6 +71,36 @@ export async function runMigrations() {
     await sql`CREATE INDEX IF NOT EXISTS fan_pulse_created_idx ON public.fan_pulse_posts(created_at DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS fan_pulse_author_idx  ON public.fan_pulse_posts(author_clerk_id)`;
 
+    // ── notifications ───────────────────────────────────────
+    await sql`
+      CREATE TABLE IF NOT EXISTS public.notifications (
+        id                  uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        recipient_clerk_id  text NOT NULL,
+        type                text NOT NULL,
+        title               text NOT NULL,
+        body                text,
+        read                boolean DEFAULT false,
+        action_url          text,
+        metadata            jsonb DEFAULT '{}'::jsonb,
+        created_at          timestamptz DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS notifs_recipient_idx ON public.notifications(recipient_clerk_id, created_at DESC)`;
+    await sql`CREATE INDEX IF NOT EXISTS notifs_unread_idx    ON public.notifications(recipient_clerk_id, read) WHERE read = false`;
+
+    // ── user_activity ───────────────────────────────────────
+    await sql`
+      CREATE TABLE IF NOT EXISTS public.user_activity (
+        id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+        clerk_id    text NOT NULL,
+        type        text NOT NULL,
+        description text NOT NULL,
+        metadata    jsonb DEFAULT '{}'::jsonb,
+        created_at  timestamptz DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS activity_clerk_idx ON public.user_activity(clerk_id, created_at DESC)`;
+
     ran = true;
   } catch (err) {
     console.error("[migrations] error:", err);

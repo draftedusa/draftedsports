@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import type { WebhookEvent } from "@clerk/nextjs/server";
 import { supabaseService } from "@/lib/supabase";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -66,10 +67,16 @@ export async function POST(req: Request) {
     const email = email_addresses[0]?.email_address ?? null;
     const display_name = [first_name, last_name].filter(Boolean).join(" ") || null;
 
-    await supabaseService
+    const { data: updated } = await supabaseService
       .from("users")
       .update({ email, display_name, avatar_url: image_url })
-      .eq("clerk_id", id);
+      .eq("clerk_id", id)
+      .select("username")
+      .maybeSingle();
+
+    if (updated?.username) {
+      revalidatePath(`/profile/${updated.username}`);
+    }
   }
 
   if (eventType === "user.deleted") {

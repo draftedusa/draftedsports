@@ -62,9 +62,32 @@ export async function completeOnboarding(formData: {
   }
 
   // Award "Early Bird" achievement (first signup)
+  const { data: existingEarlyBird } = await supabaseService
+    .from("achievements")
+    .select("id")
+    .eq("clerk_id", user.id)
+    .eq("achievement_type", "early_bird")
+    .maybeSingle();
+
   await supabaseService
     .from("achievements")
     .upsert({ clerk_id: user.id, achievement_type: "early_bird" }, { onConflict: "clerk_id,achievement_type" });
+
+  // Create notification for Early Bird if first time
+  if (!existingEarlyBird) {
+    await supabaseService.from("notifications").insert({
+      recipient_clerk_id: user.id,
+      type:       "achievement_earned",
+      title:      "You earned the Early Bird achievement 🐦",
+      body:       "Welcome to UNDRAFTED! You joined early.",
+      action_url: formData.username ? `/profile/${formData.username}` : null,
+    });
+    await supabaseService.from("user_activity").insert({
+      clerk_id:    user.id,
+      type:        "achievement_earned",
+      description: "Earned the Early Bird achievement 🐦",
+    });
+  }
 
   // Award "Super Fan" if they picked at least 1 team
   if (formData.favorite_team_ids.length > 0) {

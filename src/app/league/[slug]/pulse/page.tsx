@@ -7,7 +7,7 @@ import { articles } from "@/data/articles";
 import { bettingLineMap } from "@/data/betting";
 import LayoutGamma from "@/components/layout/LayoutGamma";
 import ContentCard from "@/components/cards/ContentCard";
-import DynamicFeed from "@/components/social/DynamicFeed";
+import FanPulse from "@/components/community/FanPulse";
 import Kicker from "@/components/ui/Kicker";
 import OddsCard from "@/components/betting/OddsCard";
 import HypeMeter from "@/components/live/HypeMeter";
@@ -192,8 +192,8 @@ export default async function LeaguePulsePage({ params }: Props) {
           </div>
         }
         right={
-          <div className="border border-surface-300 dark:border-white/5 rounded-xl overflow-hidden">
-            <DynamicFeed leagueId={league.id} compact />
+          <div className="bg-surface-200 border border-surface-300 dark:border-white/5 rounded-xl p-4">
+            <FanPulse lockedLeague={league.id} compact />
           </div>
         }
       />

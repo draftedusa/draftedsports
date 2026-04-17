@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import AuthGate from "@/components/auth/AuthGate";
 
 const MINI_POSTS = [
   { id: "1", user: "RocketsNation",  handle: "@rocketsnation",  avatar: "🚀", time: "2m",   body: "Sengun is absolutely COOKED tonight. MVP watch activated 👀", fire: 42, league: "NBA" },
@@ -19,6 +20,8 @@ interface FanPulseMiniWidgetProps {
 export default function FanPulseMiniWidget({ limit = 3 }: FanPulseMiniWidgetProps) {
   const { user } = useUser();
   const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
+
+  const avatarUrl = user?.imageUrl ?? null;
 
   const [input, setInput] = useState("");
   const [posts, setPosts] = useState(MINI_POSTS.slice(0, limit));
@@ -62,19 +65,26 @@ export default function FanPulseMiniWidget({ limit = 3 }: FanPulseMiniWidgetProp
 
       {/* Quick compose */}
       <form onSubmit={handleSubmit} className="flex gap-2 px-4 py-2.5 border-b border-surface-300">
-        <div className="w-6 h-6 rounded-full bg-brand/20 flex items-center justify-center text-xs shrink-0 mt-0.5">👤</div>
+        <div className="w-6 h-6 rounded-full bg-brand/20 flex items-center justify-center text-xs shrink-0 mt-0.5 overflow-hidden">
+          {avatarUrl
+            ? <img src={avatarUrl} alt="You" className="w-full h-full object-cover" />
+            : <span>{clerkUsername ? clerkUsername[0].toUpperCase() : "👤"}</span>
+          }
+        </div>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="What's your take?"
           className="flex-1 bg-surface-300/50 border border-surface-300 rounded-lg px-3 py-1.5 text-xs text-surface-text placeholder-surface-muted focus:outline-none focus:border-brand transition-colors min-w-0"
         />
-        <button
-          type="submit"
-          className="px-2.5 py-1.5 bg-brand hover:bg-brand/90 text-white text-[10px] font-bold rounded-lg transition-colors shrink-0"
-        >
-          Post
-        </button>
+        <AuthGate tooltip="Sign in to post">
+          <button
+            type="submit"
+            className="px-2.5 py-1.5 bg-brand hover:bg-brand/90 text-white text-[10px] font-bold rounded-lg transition-colors shrink-0"
+          >
+            Post
+          </button>
+        </AuthGate>
       </form>
 
       {/* Posts */}

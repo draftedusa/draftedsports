@@ -28,7 +28,7 @@ export default function FooterAccountLinks() {
       {username && (
         <li><Link href={`/profile/${username}`} className="hover:text-brand transition-colors text-xs">Saved Articles</Link></li>
       )}
-      <li><Link href="/profile/edit" className="hover:text-brand transition-colors text-xs">Notification Settings</Link></li>
+      <li><Link href="/notifications/settings" className="hover:text-brand transition-colors text-xs">Notification Settings</Link></li>
       <li><Link href="/feed" className="hover:text-brand transition-colors text-xs">Fan Pulse Feed</Link></li>
     </ul>
   );

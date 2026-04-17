@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useUser } from "@clerk/nextjs";
 import type { SocialPost } from "@/types/social";
+import AuthGate from "@/components/auth/AuthGate";
 
 const MAX_CHARS = 280;
 
@@ -100,6 +102,10 @@ export default function Composer({
   onPost,
   placeholder = "What's happening in sports?",
 }: ComposerProps) {
+  const { user } = useUser();
+  const avatarUrl = user?.imageUrl ?? null;
+  const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
+
   const [body,   setBody]   = useState("");
   const [media,  setMedia]  = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -153,9 +159,12 @@ export default function Composer({
       className="px-4 py-3.5 border-b border-surface-300 dark:border-white/5"
     >
       <div className="flex gap-3">
-        {/* Avatar placeholder */}
-        <div className="shrink-0 w-9 h-9 rounded-full bg-brand/20 flex items-center justify-center text-base">
-          👤
+        {/* Avatar */}
+        <div className="shrink-0 w-9 h-9 rounded-full overflow-hidden bg-brand/20 flex items-center justify-center text-base">
+          {avatarUrl
+            ? <img src={avatarUrl} alt={clerkUsername ?? "You"} className="w-full h-full object-cover" />
+            : <span>{clerkUsername ? clerkUsername[0].toUpperCase() : "👤"}</span>
+          }
         </div>
 
         <div className="flex-1 min-w-0">
@@ -215,13 +224,15 @@ export default function Composer({
               <CharRing used={charCount} max={MAX_CHARS} />
             )}
 
-            <button
-              type="submit"
-              disabled={!canPost}
-              className="px-4 py-1.5 bg-brand hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-black rounded-full transition-colors"
-            >
-              Post
-            </button>
+            <AuthGate tooltip="Sign in to post">
+              <button
+                type="submit"
+                disabled={!canPost}
+                className="px-4 py-1.5 bg-brand hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-black rounded-full transition-colors"
+              >
+                Post
+              </button>
+            </AuthGate>
           </div>
         </div>
       </div>

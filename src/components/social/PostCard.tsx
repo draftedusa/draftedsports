@@ -7,6 +7,7 @@ import type { SocialPost, PostMedia } from "@/types/social";
 import { profiles } from "@/data/profiles";
 import { socialPosts } from "@/data/social-posts";
 import { timeAgo, formatCount } from "@/lib/utils";
+import AuthGate from "@/components/auth/AuthGate";
 
 // ─────────────────────────────────────────────────────────
 // Profile lookup map (module-level, computed once)
@@ -242,56 +243,64 @@ export default function PostCard({ post, hideLeagueTag = false, compact = false 
           {/* ── Interaction bar ────────────────────────── */}
           <div className="flex items-center gap-5 mt-3 text-surface-muted">
 
-            {/* Reply — blue */}
-            <button
-              className="flex items-center gap-1.5 group hover:text-blue-500 transition-colors"
-              aria-label={`${post.repliesCount} replies`}
-            >
-              <span className="rounded-full p-1.5 group-hover:bg-blue-500/10 transition-colors">
-                <MessageCircle size={18} />
-              </span>
-              <span className="text-xs tabular-nums">{formatCount(post.repliesCount)}</span>
-            </button>
+            {/* Reply — auth-gated */}
+            <AuthGate tooltip="Sign in to reply">
+              <button
+                className="flex items-center gap-1.5 group hover:text-blue-500 transition-colors"
+                aria-label={`${post.repliesCount} replies`}
+              >
+                <span className="rounded-full p-1.5 group-hover:bg-blue-500/10 transition-colors">
+                  <MessageCircle size={18} />
+                </span>
+                <span className="text-xs tabular-nums">{formatCount(post.repliesCount)}</span>
+              </button>
+            </AuthGate>
 
-            {/* Repost — green */}
-            <button
-              onClick={toggleRepost}
-              className={`flex items-center gap-1.5 group transition-colors ${
-                reposted ? "text-green-500" : "hover:text-green-500"
-              }`}
-              aria-label={`${reposts} reposts`}
-              aria-pressed={reposted}
-            >
-              <span className="rounded-full p-1.5 group-hover:bg-green-500/10 transition-colors">
-                <Repeat2 size={18} />
-              </span>
-              <span className="text-xs tabular-nums">{formatCount(reposts)}</span>
-            </button>
+            {/* Repost — auth-gated */}
+            <AuthGate tooltip="Sign in to repost">
+              <button
+                onClick={toggleRepost}
+                className={`flex items-center gap-1.5 group transition-colors ${
+                  reposted ? "text-green-500" : "hover:text-green-500"
+                }`}
+                aria-label={`${reposts} reposts`}
+                aria-pressed={reposted}
+              >
+                <span className="rounded-full p-1.5 group-hover:bg-green-500/10 transition-colors">
+                  <Repeat2 size={18} />
+                </span>
+                <span className="text-xs tabular-nums">{formatCount(reposts)}</span>
+              </button>
+            </AuthGate>
 
-            {/* Hype — orange */}
-            <button
-              onClick={toggleHype}
-              className={`flex items-center gap-1.5 group transition-colors ${
-                hyped ? "text-orange-500" : "hover:text-orange-500"
-              }`}
-              aria-label={`${hypes} hypes`}
-              aria-pressed={hyped}
-            >
-              <span className="rounded-full p-1.5 group-hover:bg-orange-500/10 transition-colors">
-                <Flame size={18} />
-              </span>
-              <span className="text-xs tabular-nums">{formatCount(hypes)}</span>
-            </button>
+            {/* Hype — auth-gated */}
+            <AuthGate tooltip="Sign in to react">
+              <button
+                onClick={toggleHype}
+                className={`flex items-center gap-1.5 group transition-colors ${
+                  hyped ? "text-orange-500" : "hover:text-orange-500"
+                }`}
+                aria-label={`${hypes} hypes`}
+                aria-pressed={hyped}
+              >
+                <span className="rounded-full p-1.5 group-hover:bg-orange-500/10 transition-colors">
+                  <Flame size={18} />
+                </span>
+                <span className="text-xs tabular-nums">{formatCount(hypes)}</span>
+              </button>
+            </AuthGate>
 
-            {/* Share — blue */}
-            <button
-              className="flex items-center group hover:text-blue-500 transition-colors ml-auto"
-              aria-label="Share"
-            >
-              <span className="rounded-full p-1.5 group-hover:bg-blue-500/10 transition-colors">
-                <Share size={18} />
-              </span>
-            </button>
+            {/* Share — auth-gated */}
+            <AuthGate tooltip="Sign in to share" className="ml-auto">
+              <button
+                className="flex items-center group hover:text-blue-500 transition-colors"
+                aria-label="Share"
+              >
+                <span className="rounded-full p-1.5 group-hover:bg-blue-500/10 transition-colors">
+                  <Share size={18} />
+                </span>
+              </button>
+            </AuthGate>
 
           </div>
         </div>
