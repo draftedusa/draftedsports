@@ -3,12 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSession, signOut } from "next-auth/react";
+import { useUser, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import {
   Search, Bell, ChevronDown, PlayCircle, Activity,
-  Star, User, Zap, Newspaper, BarChart2, Tv,
+  Star, Zap, Newspaper, BarChart2, Tv,
 } from "lucide-react";
-import { leagues as leaguesData } from "@/data/leagues";
 import { games } from "@/data/games";
 import { teams } from "@/data/teams";
 import { transactions } from "@/data/transactions";
@@ -92,28 +91,16 @@ export default function Header() {
   const [searchOpen,      setSearchOpen]      = useState(false);
   const [hoveredLeague,   setHoveredLeague]   = useState<string | null>(null);
   const [hoveredTickerId, setHoveredTickerId] = useState<string | null>(null);
-  const [userMenuOpen,    setUserMenuOpen]    = useState(false);
 
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const leaveTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { data: session } = useSession();
-  const isAdmin = (session?.user as Record<string, unknown> | undefined)?.role === "admin";
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { isSignedIn } = useUser();
 
   // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = isDirOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isDirOpen]);
-
-  // Outside click closes user menu
-  useEffect(() => {
-    const fn = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
-        setUserMenuOpen(false);
-    };
-    document.addEventListener("mousedown", fn);
-    return () => document.removeEventListener("mousedown", fn);
-  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -126,9 +113,9 @@ export default function Header() {
   }, []);
 
   // League dropdown hover with grace period
-  const openLeague  = (name: string) => { if (leaveTimer.current) clearTimeout(leaveTimer.current); setHoveredLeague(name); };
-  const closeLeague = ()              => { leaveTimer.current = setTimeout(() => setHoveredLeague(null), 120); };
-  const keepLeague  = ()              => { if (leaveTimer.current) clearTimeout(leaveTimer.current); };
+  const openLeague  = (name: string) => { if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current); setHoveredLeague(name); };
+  const closeLeague = ()              => { leaveTimerRef.current = setTimeout(() => setHoveredLeague(null), 120); };
+  const keepLeague  = ()              => { if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current); };
 
   return (
     <>
@@ -197,59 +184,23 @@ export default function Header() {
             <PointsCounter />
             <ThemeToggle />
 
-            {/* Profile avatar */}
-            <Link href="/profile" aria-label="Profile"
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 border border-white/10 text-white/60 hover:border-white/40 hover:text-white ml-1 transition-colors">
-              <User size={16} />
-            </Link>
-
-            {/* Auth dropdown (session-aware) */}
-            {session && (
-              <div ref={userMenuRef} className="relative hidden lg:block ml-1">
-                <button
-                  onClick={() => setUserMenuOpen((o) => !o)}
-                  aria-expanded={userMenuOpen}
-                  className="flex items-center gap-1.5 px-1.5 py-1 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <span className="w-6 h-6 rounded-full bg-brand flex items-center justify-center text-white text-[10px] font-black">
-                    {session.user?.name?.[0]?.toUpperCase() ?? "U"}
-                  </span>
-                  <motion.div animate={{ rotate: userMenuOpen ? 180 : 0 }} transition={{ duration: 0.2 }} className="text-white/60">
-                    <ChevronDown size={11} />
-                  </motion.div>
-                </button>
-
-                {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-52 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[60]">
-                    <div className="px-3 py-2.5 border-b border-white/10">
-                      <p className="text-xs font-semibold text-white truncate">{session.user?.name}</p>
-                      <p className="text-[10px] text-white/50 truncate">{session.user?.email}</p>
-                    </div>
-                    <DropItem href="/profile" onClick={() => setUserMenuOpen(false)}>👤 My Profile</DropItem>
-                    <DropItem href="/premium" onClick={() => setUserMenuOpen(false)}>⭐ Premium</DropItem>
-                    {isAdmin && (
-                      <>
-                        <div className="border-t border-white/10" />
-                        <DropItem href="/admin/live-control" onClick={() => setUserMenuOpen(false)} accent="text-yellow-500">⚡ Live Control</DropItem>
-                        <DropItem href="/admin/analytics" onClick={() => setUserMenuOpen(false)} accent="text-blue-400">📊 Analytics</DropItem>
-                      </>
-                    )}
-                    <div className="border-t border-white/10" />
-                    <button
-                      onClick={() => { signOut(); setUserMenuOpen(false); }}
-                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-white/50 hover:bg-white/5 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
+            {/* Clerk: UserButton when signed in, Sign In / Sign Up when signed out */}
+            {isSignedIn ? (
+              <div className="ml-1">
+                <UserButton afterSignOutUrl="/" />
               </div>
-            )}
-
-            {!session && (
+            ) : (
               <div className="ml-2 hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
-                <Link href="/auth/login" className="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors">Log In</Link>
-                <Link href="/auth/signup" className="rounded bg-white px-3 py-1.5 text-[10px] font-black uppercase text-black hover:bg-zinc-200 transition-colors">Sign Up</Link>
+                <SignInButton mode="modal">
+                  <button className="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors">
+                    Log In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="rounded bg-white px-3 py-1.5 text-[10px] font-black uppercase text-black hover:bg-zinc-200 transition-colors">
+                    Sign Up
+                  </button>
+                </SignUpButton>
               </div>
             )}
           </div>
@@ -437,21 +388,5 @@ export default function Header() {
 
       </header>
     </>
-  );
-}
-
-// ─────────────────────────────────────────────────────────
-// DropItem helper
-// ─────────────────────────────────────────────────────────
-function DropItem({
-  href, onClick, accent, children,
-}: {
-  href: string; onClick: () => void; accent?: string; children: React.ReactNode;
-}) {
-  return (
-    <Link href={href} onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/5 transition-colors ${accent ?? "text-white/80"}`}>
-      {children}
-    </Link>
   );
 }

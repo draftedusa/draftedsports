@@ -83,7 +83,7 @@ export default function Footer() {
             {[
               { href: "/profile",           label: "My Profile" },
               { href: "/profile",           label: "Saved Articles" },
-              { href: "/auth/login",        label: "Sign In / Register" },
+              { href: "/",                   label: "Sign In / Register" },
               { href: "/profile",           label: "Notification Settings" },
               { href: "/feed",              label: "Fan Pulse Feed" },
             ].map(({ href, label }) => (

@@ -18,7 +18,7 @@ export const authConfig = {
     }),
   ],
   session: { strategy: "jwt" as const },
-  pages: { signIn: "/auth/login" },
+
   callbacks: {
     // Populate JWT token on first sign-in so the middleware can read
     // user id, role, scoutXp, and reputation without a DB round-trip.

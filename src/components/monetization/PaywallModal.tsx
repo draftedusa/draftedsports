@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 interface PaywallModalProps {
   onClose: () => void;
@@ -14,7 +14,6 @@ export default function PaywallModal({ onClose, articlesViewed = 0 }: PaywallMod
       if (e.key === "Escape") onClose();
     }
     document.addEventListener("keydown", handleKeyDown);
-    // Lock scroll
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -75,20 +74,18 @@ export default function PaywallModal({ onClose, articlesViewed = 0 }: PaywallMod
         </ul>
 
         {/* Primary CTA */}
-        <Link
-          href="/auth/onboarding"
-          className="block w-full text-center px-6 py-3 bg-brand hover:bg-brand/90 text-white font-bold rounded-xl text-sm transition-colors mb-3"
-        >
-          Unlock UNDRAFTED+
-        </Link>
+        <SignUpButton mode="modal">
+          <button className="block w-full text-center px-6 py-3 bg-brand hover:bg-brand/90 text-white font-bold rounded-xl text-sm transition-colors mb-3">
+            Unlock UNDRAFTED+
+          </button>
+        </SignUpButton>
 
         {/* Secondary CTA */}
-        <Link
-          href="/auth/login"
-          className="block w-full text-center px-6 py-3 bg-surface-200 hover:bg-surface-300 border border-surface-300 text-surface-text font-bold rounded-xl text-sm transition-colors mb-4"
-        >
-          Already a member? Sign In
-        </Link>
+        <SignInButton mode="modal">
+          <button className="block w-full text-center px-6 py-3 bg-surface-200 hover:bg-surface-300 border border-surface-300 text-surface-text font-bold rounded-xl text-sm transition-colors mb-4">
+            Already a member? Sign In
+          </button>
+        </SignInButton>
 
         {/* No thanks */}
         <button

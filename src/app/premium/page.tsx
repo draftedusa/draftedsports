@@ -26,7 +26,7 @@ const PLANS = [
     price: "$6.99",
     period: "per month",
     cta: "Start Free Trial",
-    ctaHref: "/auth/onboarding",
+    ctaHref: "/",
     ctaVariant: "brand" as const,
     badge: "Most Popular",
     features: [
@@ -46,7 +46,7 @@ const PLANS = [
     period: "per year",
     subtext: "Save 28%",
     cta: "Go Annual",
-    ctaHref: "/auth/onboarding",
+    ctaHref: "/",
     ctaVariant: "brand" as const,
     features: [
       "Everything in UNDRAFTED+",
