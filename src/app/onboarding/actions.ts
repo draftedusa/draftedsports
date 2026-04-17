@@ -4,8 +4,31 @@ import { currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { supabaseService } from "@/lib/supabase";
 import { redirect } from "next/navigation";
+import postgres from "postgres";
 
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+
+// ── Ensure favorite_team_ids column exists ───────────────
+// The users table was originally created with only the webhook columns
+// (clerk_id, email, display_name, avatar_url). Run a one-time migration
+// to add favorite_team_ids if it's missing.
+async function ensureFavoriteTeamIdsColumn() {
+  if (!process.env.DATABASE_URL) {
+    console.warn("[onboarding] DATABASE_URL not set — skipping column migration");
+    return;
+  }
+  try {
+    const sql = postgres(process.env.DATABASE_URL, { max: 1 });
+    await sql`
+      ALTER TABLE public.users
+      ADD COLUMN IF NOT EXISTS favorite_team_ids jsonb DEFAULT '[]'::jsonb
+    `;
+    await sql.end();
+  } catch (err) {
+    // Non-fatal: the column may already exist or the DB may not be reachable
+    console.error("[onboarding] ensureFavoriteTeamIdsColumn failed:", err);
+  }
+}
 
 export async function checkUsernameAvailable(
   username: string
@@ -16,11 +39,12 @@ export async function checkUsernameAvailable(
       error: "3–20 characters: lowercase letters, numbers, underscores only.",
     };
   }
-  const { data } = await supabaseService
+  const { data, error } = await supabaseService
     .from("users")
     .select("username")
     .eq("username", username)
     .maybeSingle();
+  if (error) console.error("[onboarding] checkUsernameAvailable error:", error);
   return { available: !data };
 }
 
@@ -32,7 +56,7 @@ export async function completeOnboarding(formData: {
   const user = await currentUser();
   if (!user) return { error: "Not signed in." };
 
-  // Final uniqueness check before writing
+  // Final uniqueness check
   const { data: existing } = await supabaseService
     .from("users")
     .select("username")
@@ -40,7 +64,10 @@ export async function completeOnboarding(formData: {
     .maybeSingle();
   if (existing) return { error: "Username was just taken. Please choose another." };
 
-  // Upsert into Supabase (handles webhook-not-yet-fired edge case)
+  // Ensure the column exists before writing
+  await ensureFavoriteTeamIdsColumn();
+
+  // Upsert the full row
   const { error: dbError } = await supabaseService.from("users").upsert(
     {
       clerk_id: user.id,
@@ -52,15 +79,19 @@ export async function completeOnboarding(formData: {
     },
     { onConflict: "clerk_id" }
   );
-  if (dbError) return { error: "Failed to save profile. Please try again." };
 
-  // Mark onboarding complete in Clerk publicMetadata so middleware
-  // can skip the Supabase check on subsequent requests
+  if (dbError) {
+    console.error("[onboarding] Supabase upsert error:", JSON.stringify(dbError, null, 2));
+    return { error: `Failed to save profile: ${dbError.message}` };
+  }
+
+  // Persist to Clerk publicMetadata so middleware can skip future DB checks
   const client = await clerkClient();
   await client.users.updateUserMetadata(user.id, {
     publicMetadata: {
       username: formData.username,
       onboarding_complete: true,
+      favorite_team_ids: formData.favorite_team_ids,
     },
   });
 

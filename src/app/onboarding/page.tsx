@@ -168,8 +168,7 @@ export default function OnboardingPage() {
   })).filter((g) => g.teams.length > 0);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-surface-100">
-      <div className="w-full max-w-lg">
+    <div className="w-full max-w-lg">
 
         {/* Logo */}
         <div className="text-center mb-8">
@@ -314,7 +313,6 @@ export default function OnboardingPage() {
             </div>
           </form>
         )}
-      </div>
     </div>
   );
 }

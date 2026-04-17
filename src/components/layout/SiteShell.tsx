@@ -6,7 +6,7 @@ import Footer from "./Footer";
 import PageWrapper from "./PageWrapper";
 
 // Routes that bypass the global chrome entirely
-const CHROMELESS_PATHS = ["/auth"];
+const CHROMELESS_PATHS = ["/auth", "/onboarding"];
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
