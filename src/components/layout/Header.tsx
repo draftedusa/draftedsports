@@ -94,7 +94,8 @@ export default function Header() {
 
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
+  const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
 
   // Body scroll lock
   useEffect(() => {
@@ -184,9 +185,24 @@ export default function Header() {
             <PointsCounter />
             <ThemeToggle />
 
-            {/* Clerk: UserButton when signed in, Sign In / Sign Up when signed out */}
+            {/* Auth section */}
             {isSignedIn ? (
-              <div className="ml-1">
+              <div className="ml-1 hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
+                {clerkUsername ? (
+                  <Link
+                    href={`/profile/${clerkUsername}`}
+                    className="text-[10px] font-black uppercase text-white/40 hover:text-white transition-colors"
+                  >
+                    My Profile
+                  </Link>
+                ) : (
+                  <Link
+                    href="/onboarding"
+                    className="text-[10px] font-black uppercase text-yellow-500/80 hover:text-yellow-400 transition-colors"
+                  >
+                    Complete Profile
+                  </Link>
+                )}
                 <UserButton />
               </div>
             ) : (
