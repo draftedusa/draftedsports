@@ -187,7 +187,7 @@ export default function Header() {
             {/* Clerk: UserButton when signed in, Sign In / Sign Up when signed out */}
             {isSignedIn ? (
               <div className="ml-1">
-                <UserButton afterSignOutUrl="/" />
+                <UserButton />
               </div>
             ) : (
               <div className="ml-2 hidden lg:flex items-center gap-3 border-l border-white/10 pl-4">
