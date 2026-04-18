@@ -185,7 +185,46 @@ export interface Highlight {
   status: HighlightStatus;
 }
 
-// ── Polls ────────────────────────────────────────────
+// ── Fan Pulse ─────────────────────────────────────────
+
+export interface FanPulseReply {
+  id: string
+  post_id: string
+  parent_reply_id: string | null
+  user_id: string
+  content: string
+  fire_count: number
+  depth: number
+  created_at: string
+  updated_at: string
+  user?: {
+    name: string
+    handle: string
+    avatar_url: string
+  }
+  children?: FanPulseReply[]
+}
+
+export interface FanPulsePost {
+  id: string
+  user_id: string
+  content: string
+  league_tag: string
+  fire_count: number
+  comment_count: number
+  repost_count: number
+  hot_score?: number
+  created_at: string
+  updated_at: string
+  user?: {
+    name: string
+    handle: string
+    avatar_url: string
+  }
+  replies?: FanPulseReply[]
+}
+
+// ── Polls ─────────────────────────────────────────────
 
 export interface PollOption {
   id: string;

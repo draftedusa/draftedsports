@@ -101,6 +101,40 @@ export async function runMigrations() {
     `;
     await sql`CREATE INDEX IF NOT EXISTS activity_clerk_idx ON public.user_activity(clerk_id, created_at DESC)`;
 
+    // ── fan_pulse_replies ───────────────────────────────────
+    await sql`
+      CREATE TABLE IF NOT EXISTS public.fan_pulse_replies (
+        id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        post_id          uuid REFERENCES public.fan_pulse_posts(id) ON DELETE CASCADE,
+        parent_reply_id  uuid REFERENCES public.fan_pulse_replies(id) ON DELETE CASCADE,
+        user_id          text NOT NULL,
+        author_username  text,
+        author_display_name text,
+        author_avatar_url   text,
+        content          text NOT NULL CHECK (char_length(content) <= 500),
+        fire_count       int DEFAULT 0,
+        depth            int DEFAULT 0 CHECK (depth <= 1),
+        created_at       timestamptz DEFAULT now(),
+        updated_at       timestamptz DEFAULT now()
+      )
+    `;
+    await sql`CREATE INDEX IF NOT EXISTS idx_replies_post_id ON public.fan_pulse_replies(post_id)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_replies_parent  ON public.fan_pulse_replies(parent_reply_id)`;
+
+    // ── fan_pulse_posts_ranked view ─────────────────────────
+    await sql`
+      CREATE OR REPLACE VIEW public.fan_pulse_posts_ranked AS
+      SELECT *,
+        (
+          (COALESCE((reactions->>'fire')::float, 0) * 1.0
+           + COALESCE(reply_count, 0) * 2.0
+           + COALESCE((reactions->>'repost')::float, 0) * 1.5)
+          * EXP(-EXTRACT(EPOCH FROM (NOW() - created_at)) / 43200)
+        ) AS hot_score
+      FROM public.fan_pulse_posts
+      ORDER BY hot_score DESC
+    `;
+
     ran = true;
   } catch (err) {
     console.error("[migrations] error:", err);

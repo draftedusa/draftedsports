@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import AuthGate from "@/components/auth/AuthGate";
+import { ReplyThread } from "./ReplyThread";
 
 // ── Types ──────────────────────────────────────────────────
 interface Post {
@@ -64,7 +65,20 @@ export default function FanPulse({ compact = false, lockedLeague }: FanPulseProp
   const [reposted, setReposted]         = useState<Set<string>>(new Set());
   const [pendingMedia, setPendingMedia] = useState<Post["media"] | null>(null);
   const [posting, setPosting]           = useState(false);
+  const [sortMode, setSortMode]         = useState<"hot" | "new">("hot");
+  const [openReplies, setOpenReplies]   = useState<Set<string>>(new Set());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const sortedPosts = useMemo(() => {
+    if (sortMode === "hot") {
+      return [...posts].sort((a, b) => {
+        const scoreA = a.reactions.fire * 1.0 + a.reactions.wow * 1.5 + a.reactions.repost * 1.2 + a.comments * 2.0;
+        const scoreB = b.reactions.fire * 1.0 + b.reactions.wow * 1.5 + b.reactions.repost * 1.2 + b.comments * 2.0;
+        return scoreB - scoreA;
+      });
+    }
+    return posts; // "new" = API order (already newest-first)
+  }, [posts, sortMode]);
 
   // ── Fetch posts from API ─────────────────────────────────
   useEffect(() => {
@@ -166,7 +180,7 @@ export default function FanPulse({ compact = false, lockedLeague }: FanPulseProp
     );
   }
 
-  const displayPosts = compact ? posts.slice(0, 3) : posts;
+  const displayPosts = compact ? sortedPosts.slice(0, 3) : sortedPosts;
 
   // Avatar to show in composer
   const composerAvatar = avatarUrl
@@ -209,6 +223,32 @@ export default function FanPulse({ compact = false, lockedLeague }: FanPulseProp
               {lg}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* ── Sort toggle ─────────────────────────────────── */}
+      {!compact && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSortMode("hot")}
+            className={`text-xs px-3 py-1 rounded-full transition-colors ${
+              sortMode === "hot"
+                ? "bg-brand text-white"
+                : "text-surface-muted hover:text-surface-text"
+            }`}
+          >
+            🔥 Hot
+          </button>
+          <button
+            onClick={() => setSortMode("new")}
+            className={`text-xs px-3 py-1 rounded-full transition-colors ${
+              sortMode === "new"
+                ? "bg-brand text-white"
+                : "text-surface-muted hover:text-surface-text"
+            }`}
+          >
+            ✨ New
+          </button>
         </div>
       )}
 
@@ -332,14 +372,23 @@ export default function FanPulse({ compact = false, lockedLeague }: FanPulseProp
                     </button>
                   </AuthGate>
 
-                  <AuthGate tooltip="Sign in to comment">
-                    <button className="flex items-center gap-1 text-xs text-surface-muted hover:text-surface-text transition-colors font-semibold">
-                      <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
-                        <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
-                      </svg>
-                      <span>{post.comments}</span>
-                    </button>
-                  </AuthGate>
+                  <button
+                    onClick={() =>
+                      setOpenReplies((prev) => {
+                        const next = new Set(prev);
+                        next.has(post.id) ? next.delete(post.id) : next.add(post.id);
+                        return next;
+                      })
+                    }
+                    className={`flex items-center gap-1 text-xs font-semibold transition-colors ${
+                      openReplies.has(post.id) ? "text-brand" : "text-surface-muted hover:text-brand"
+                    }`}
+                  >
+                    <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                      <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+                    </svg>
+                    <span>{post.comments}</span>
+                  </button>
 
                   <AuthGate tooltip="Sign in to repost">
                     <button
@@ -355,6 +404,8 @@ export default function FanPulse({ compact = false, lockedLeague }: FanPulseProp
                     </button>
                   </AuthGate>
                 </div>
+
+                <ReplyThread postId={post.id} isOpen={openReplies.has(post.id)} />
               </div>
             </div>
           </div>
