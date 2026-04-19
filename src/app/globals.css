@@ -67,6 +67,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── X/Twitter design tokens (Fan Pulse) ──────────────── */
+:root {
+  --x-bg:          #000000;
+  --x-surface:     #16181c;
+  --x-border:      #2f3336;
+  --x-text:        #e7e9ea;
+  --x-muted:       #71767b;
+  --x-blue:        #1d9bf0;
+  --x-blue-hover:  #1a8cd8;
+}
+
 /* ── Base reset & globals ──────────────────────────────── */
 html { scroll-behavior: smooth; }
 
