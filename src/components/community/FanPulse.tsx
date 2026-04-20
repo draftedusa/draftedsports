@@ -10,6 +10,7 @@ import { ReplyModal } from "@/components/fan-pulse/ReplyModal";
 import { MediaGrid } from "@/components/fan-pulse/MediaGrid";
 import { ReplyIcon, FireIcon, RepostIcon, ViewsIcon, ActionBtn } from "@/components/icons/PulseIcons";
 import { useCreateReply } from "@/lib/hooks/useFanPulse";
+import { uploadMediaFiles } from "@/lib/uploadMedia";
 
 // ── Types ──────────────────────────────────────────────────
 interface Post {
@@ -19,7 +20,7 @@ interface Post {
   avatar: string;
   time: string;
   body: string;
-  media?: { type: "image" | "gif" | "video"; label: string };
+  media_urls?: string[];
   reactions: { fire: number; wow: number; repost: number };
   comments: number;
   league: string;
@@ -222,16 +223,25 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
     if (!postContent.trim() || !isSignedIn) return;
     setIsPosting(true);
     const body = postContent.trim();
+    const filesToUpload = [...mediaFiles];
     setPostContent("");
     setMediaFiles([]);
     setMediaUrls([]);
     setComposerOpen(false);
 
     try {
+      let uploadedUrls: string[] = [];
+      if (filesToUpload.length > 0) {
+        try {
+          uploadedUrls = await uploadMediaFiles(filesToUpload);
+        } catch {
+          // Upload failed — post without media rather than blocking
+        }
+      }
       const res = await fetch("/api/fan-pulse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: body, league: lockedLeague ?? selectedLeague }),
+        body: JSON.stringify({ content: body, league: lockedLeague ?? selectedLeague, media_urls: uploadedUrls }),
       });
       if (res.ok) {
         const { post: newPost } = await res.json();
@@ -415,10 +425,14 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
               </span>
             </div>
 
-            <p className="text-[15px] leading-5 text-gray-900 dark:text-[#e7e9ea] mb-3">{post.body}</p>
+            <p className="text-[15px] leading-5 text-gray-900 dark:text-[#e7e9ea]">{post.body}</p>
+
+            {post.media_urls && post.media_urls.length > 0 && (
+              <MediaGrid files={post.media_urls} />
+            )}
 
             {/* Action bar */}
-            <div className="flex items-center justify-between max-w-[425px] -ml-2">
+            <div className="flex items-center justify-between max-w-[425px] -ml-2 mt-3">
               {/* Area 5 — reply icon opens modal */}
               <ActionBtn
                 icon={<ReplyIcon />}
@@ -502,14 +516,14 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
           style={{ background: "rgba(91,112,131,0.4)" }}
           onClick={(e) => e.target === e.currentTarget && setComposerOpen(false)}
         >
-          <div className="bg-white dark:bg-black w-full max-w-[600px] rounded-2xl overflow-hidden shadow-2xl mx-4">
+          <div className="bg-[#000000] w-full max-w-[600px] rounded-2xl overflow-hidden shadow-2xl mx-4">
             {/* Modal header */}
             <div className="flex items-center justify-between px-4 py-3">
               <button
                 onClick={() => setComposerOpen(false)}
-                className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
               >
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-900 dark:fill-[#e7e9ea]">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#e7e9ea]">
                   <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z" />
                 </svg>
               </button>
@@ -523,7 +537,7 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
               {avatarUrl ? (
                 <img src={avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#333639] flex items-center justify-center text-gray-500 dark:text-[#71767b] flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#333639] flex items-center justify-center text-[#71767b] flex-shrink-0">
                   {clerkUsername?.[0]?.toUpperCase() ?? "?"}
                 </div>
               )}
@@ -535,7 +549,7 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
                     <select
                       value={selectedLeague}
                       onChange={(e) => setSelectedLeague(e.target.value)}
-                      className="text-[13px] text-[#1d9bf0] bg-transparent border border-[#1d9bf0]/40 rounded-full px-3 py-1 outline-none cursor-pointer"
+                      className="text-[13px] text-[#1d9bf0] bg-[#000000] border border-[#1d9bf0]/40 rounded-full px-3 py-1 outline-none cursor-pointer"
                     >
                       {LEAGUES.map((l) => (
                         <option key={l} value={l}>{l}</option>
@@ -560,7 +574,7 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
                   }
                   maxLength={280}
                   rows={3}
-                  className="w-full bg-transparent text-[20px] text-gray-900 dark:text-[#e7e9ea] placeholder:text-gray-400 dark:placeholder:text-[#71767b] resize-none outline-none leading-7 min-h-[80px]"
+                  className="w-full bg-transparent text-[20px] text-[#e7e9ea] placeholder:text-[#71767b] resize-none outline-none leading-7 min-h-[80px]"
                 />
 
                 {/* Area 7: Media preview grid */}
@@ -579,19 +593,19 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
                   </button>
 
                   {showReplySelector && (
-                    <div className="absolute z-10 top-full mt-1 bg-white dark:bg-black border border-gray-200 dark:border-[#2f3336] rounded-2xl shadow-xl overflow-hidden w-[280px]">
-                      <p className="px-4 pt-3 pb-1 text-[17px] font-bold text-gray-900 dark:text-[#e7e9ea]">
+                    <div className="absolute z-10 top-full mt-1 bg-[#000000] border border-[#2f3336] rounded-2xl shadow-xl overflow-hidden w-[280px]">
+                      <p className="px-4 pt-3 pb-1 text-[17px] font-bold text-[#e7e9ea]">
                         Who can reply?
                       </p>
                       {REPLY_OPTIONS.map((opt) => (
                         <button
                           key={opt.value}
                           onClick={() => { setReplyPermission(opt.value); setShowReplySelector(false); }}
-                          className="flex items-center justify-between w-full px-4 py-3 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-colors"
+                          className="flex items-center justify-between w-full px-4 py-3 hover:bg-white/[0.03] transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             <span className="text-[#1d9bf0] text-lg">{opt.icon}</span>
-                            <span className="text-[15px] text-gray-900 dark:text-[#e7e9ea]">{opt.label}</span>
+                            <span className="text-[15px] text-[#e7e9ea]">{opt.label}</span>
                           </div>
                           {replyPermission === opt.value && (
                             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#1d9bf0]">
@@ -605,7 +619,7 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
                 </div>
 
                 {/* Bottom toolbar */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-[#2f3336]">
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#2f3336]">
                   <div className="flex items-center gap-0.5 text-[#1d9bf0]">
                     <label className="p-2 hover:bg-[#1d9bf0]/10 rounded-full cursor-pointer transition-colors">
                       <input

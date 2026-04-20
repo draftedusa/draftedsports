@@ -47,12 +47,12 @@ export function ReplyThread({ postId, isOpen }: ReplyThreadProps) {
               onKeyDown={(e) => e.key === 'Enter' && handleSubmitReply()}
               placeholder="Add a reply..."
               maxLength={500}
-              className="flex-1 bg-surface-200 border border-surface-300 rounded-full px-4 py-1.5 text-xs focus:outline-none focus:border-brand/60 placeholder:text-surface-muted"
+              className="flex-1 bg-transparent border border-[#2f3336] rounded-full px-4 py-2 text-[14px] text-[#e7e9ea] dark:text-[#e7e9ea] placeholder:text-[#71767b] focus:outline-none focus:border-[#1d9bf0] transition-colors"
             />
             <button
               onClick={() => handleSubmitReply()}
               disabled={!replyContent.trim() || createReply.isPending}
-              className="px-3 py-1.5 bg-brand text-white text-xs rounded-full disabled:opacity-40 hover:bg-brand/90 transition-colors"
+              className="px-4 py-2 bg-[#007CB0] text-white text-[14px] font-bold rounded-full disabled:opacity-40 hover:bg-[#007CB0]/90 transition-colors"
             >
               Reply
             </button>
@@ -168,12 +168,12 @@ function ReplyItem({
                 placeholder={`Replying to @${reply.user?.handle}…`}
                 maxLength={500}
                 autoFocus
-                className="flex-1 bg-surface-200 border border-surface-300 rounded-full px-3 py-1 text-xs focus:outline-none focus:border-brand/60"
+                className="flex-1 bg-transparent border border-[#2f3336] rounded-full px-3 py-1.5 text-[13px] text-[#e7e9ea] placeholder:text-[#71767b] focus:outline-none focus:border-[#1d9bf0] transition-colors"
               />
               <button
                 onClick={() => onSubmitNested(reply.id)}
                 disabled={!replyContent.trim() || isPending}
-                className="px-3 py-1 bg-brand text-white text-[10px] rounded-full disabled:opacity-40"
+                className="px-3 py-1.5 bg-[#007CB0] text-white text-[13px] font-bold rounded-full disabled:opacity-40 hover:bg-[#007CB0]/90 transition-colors"
               >
                 Reply
               </button>

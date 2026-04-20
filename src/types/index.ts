@@ -221,6 +221,7 @@ export interface FanPulsePost {
     handle: string
     avatar_url: string
   }
+  media_urls?: string[]
   replies?: FanPulseReply[]
 }
 

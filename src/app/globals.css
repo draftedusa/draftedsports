@@ -7,6 +7,8 @@
 
 /* ── Color tokens ──────────────────────────────────────── */
 :root {
+  --background:    #ffffff;
+  --foreground:    #000000;
   --brand:         #8b5cf6;
   --brand-light:   #d946ef;
   --brand-dim:     rgba(139, 92, 246, 0.12);
@@ -41,6 +43,8 @@
 }
 
 .dark {
+  --background:    #000000;
+  --foreground:    #e7e9ea;
   --surface-100:      #0f0f14;
   --surface-200:      #18181f;
   --surface-300:      #27272f;
@@ -82,7 +86,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--surface-100);
+  background-color: var(--background);
   color: var(--surface-text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.6;

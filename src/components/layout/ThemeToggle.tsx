@@ -20,10 +20,10 @@ export default function ThemeToggle() {
       aria-checked={isDark}
     >
       {/* Labels */}
-      <span className={`absolute left-6 text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-0" : "opacity-60"} text-surface-text`}>
+      <span className={`absolute left-6 min-w-[52px] text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-0" : "opacity-60"} text-surface-text`}>
         Light
       </span>
-      <span className={`absolute right-1.5 text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-60" : "opacity-0"} text-surface-text`}>
+      <span className={`absolute right-1.5 min-w-[52px] text-[9px] font-bold uppercase tracking-wide transition-opacity select-none ${isDark ? "opacity-60" : "opacity-0"} text-surface-text`}>
         Dark
       </span>
       {/* Thumb */}

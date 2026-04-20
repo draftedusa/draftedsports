@@ -40,14 +40,14 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
       style={{ background: 'rgba(91,112,131,0.4)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white dark:bg-black w-full max-w-[600px] rounded-2xl overflow-hidden shadow-2xl mx-4">
+      <div className="bg-[#000000] w-full max-w-[600px] rounded-2xl overflow-hidden shadow-2xl mx-4">
         {/* Header */}
         <div className="flex items-center px-4 py-3">
           <button
             onClick={onClose}
-            className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
+            className="p-2 hover:bg-white/10 rounded-full transition-colors"
           >
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-900 dark:fill-[#e7e9ea]">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#e7e9ea]">
               <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z" />
             </svg>
           </button>
@@ -56,7 +56,7 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
         {/* Parent post preview (read-only) */}
         <div className="flex gap-3 px-4 pb-2 opacity-70">
           <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#333639] overflow-hidden flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#333639] overflow-hidden flex-shrink-0">
               {post.authorAvatar.startsWith('http') ? (
                 <img src={post.authorAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -65,19 +65,19 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
                 </div>
               )}
             </div>
-            <div className="w-0.5 bg-gray-200 dark:bg-[#2f3336] flex-1 mt-2 min-h-[20px]" />
+            <div className="w-0.5 bg-[#2f3336] flex-1 mt-2 min-h-[20px]" />
           </div>
           <div className="pb-3 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[15px] font-bold text-gray-900 dark:text-[#e7e9ea]">
+              <span className="text-[15px] font-bold text-[#e7e9ea]">
                 {post.authorName}
               </span>
-              <span className="text-[15px] text-gray-500 dark:text-[#71767b]">
+              <span className="text-[15px] text-[#71767b]">
                 @{post.authorHandle}
               </span>
             </div>
-            <p className="text-[15px] text-gray-900 dark:text-[#e7e9ea] mt-1">{post.content}</p>
-            <p className="text-[15px] text-gray-500 dark:text-[#71767b] mt-2">
+            <p className="text-[15px] text-[#e7e9ea] mt-1">{post.content}</p>
+            <p className="text-[15px] text-[#71767b] mt-2">
               Replying to{' '}
               <span className="text-[#1d9bf0]">@{post.authorHandle}</span>
             </p>
@@ -93,7 +93,7 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
               className="w-10 h-10 rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-[#333639] flex items-center justify-center text-gray-500 dark:text-[#71767b] flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#333639] flex items-center justify-center text-[#71767b] flex-shrink-0">
               ?
             </div>
           )}
@@ -109,10 +109,10 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
               placeholder="Post your reply"
               maxLength={280}
               rows={3}
-              className="w-full bg-transparent text-[20px] text-gray-900 dark:text-[#e7e9ea] placeholder:text-gray-400 dark:placeholder:text-[#71767b] resize-none outline-none leading-7 min-h-[80px]"
+              className="w-full bg-transparent text-[20px] text-[#e7e9ea] placeholder:text-[#71767b] resize-none outline-none leading-7 min-h-[80px]"
             />
 
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-[#2f3336]">
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#2f3336]">
               <div className="flex items-center gap-1 text-[#1d9bf0]">
                 <button className="p-2 hover:bg-[#1d9bf0]/10 rounded-full transition-colors">
                   <ImageIcon className="w-[18px] h-[18px]" />

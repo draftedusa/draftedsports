@@ -70,6 +70,7 @@ export async function runMigrations() {
     `;
     await sql`CREATE INDEX IF NOT EXISTS fan_pulse_created_idx ON public.fan_pulse_posts(created_at DESC)`;
     await sql`CREATE INDEX IF NOT EXISTS fan_pulse_author_idx  ON public.fan_pulse_posts(author_clerk_id)`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS media_urls TEXT[] DEFAULT '{}'`;
 
     // ── notifications ───────────────────────────────────────
     await sql`
