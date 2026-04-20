@@ -19,6 +19,7 @@ export async function POST(req: Request) {
   if (!content) return NextResponse.json({ error: 'Content required' }, { status: 400 })
 
   const { postId, parentReplyId, depth } = body
+  if (!postId) return NextResponse.json({ error: 'postId required' }, { status: 400 })
 
   const { data: profile } = await supabaseService
     .from('users')

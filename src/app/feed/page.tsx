@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function FeedPage() {
   return (
-    <div className="flex justify-center min-h-screen bg-black">
+    <div className="flex justify-center min-h-screen bg-white dark:bg-black">
       {/* Center feed — 600px, bordered */}
       <main className="w-full max-w-[600px] border-x border-[#2f3336] min-h-screen">
         <FanPulse />
