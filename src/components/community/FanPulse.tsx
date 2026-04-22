@@ -213,25 +213,38 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
     setMediaPreviewUrls(nextFiles.map(f => URL.createObjectURL(f)));
   }
 
+  const [isPosting, setIsPosting] = useState(false);
+
   async function handlePost() {
-    if (!postContent.trim() || !isSignedIn) return;
-    const body = postContent.trim();
-    const filesToUpload = [...mediaFiles];
-    setPostContent("");
-    setMediaFiles([]);
-    setMediaPreviewUrls([]);
-    setComposerOpen(false);
+    if ((!postContent.trim() && mediaFiles.length === 0) || !isSignedIn) return;
+    setIsPosting(true);
+    try {
+      // Step 1: upload media first and get permanent URLs
+      let uploadedUrls: string[] = [];
+      if (mediaFiles.length > 0) {
+        uploadedUrls = await uploadMediaFiles(mediaFiles);
+        if (uploadedUrls.length === 0 && mediaFiles.length > 0) {
+          console.error('[handlePost] media upload failed — posting without media');
+        }
+      }
 
-    let uploadedUrls: string[] = [];
-    if (filesToUpload.length > 0) {
-      try { uploadedUrls = await uploadMediaFiles(filesToUpload); } catch { /* post without media */ }
+      // Step 2: create post with permanent URLs (await for error handling)
+      await createPost.mutateAsync({
+        content: postContent,
+        leagueTag: composerLeague,
+        mediaUrls: uploadedUrls,
+      });
+
+      // Step 3: reset state only after success
+      setPostContent("");
+      setMediaFiles([]);
+      setMediaPreviewUrls([]);
+      setComposerOpen(false);
+    } catch (err) {
+      console.error('[handlePost] failed:', err);
+    } finally {
+      setIsPosting(false);
     }
-
-    createPost.mutate({
-      content: body,
-      leagueTag: composerLeague,
-      mediaUrls: uploadedUrls,
-    });
   }
 
   function handleFire(postId: string) {
@@ -605,10 +618,10 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
                     <CharCounter length={postContent.length} max={280} />
                     <button
                       onClick={handlePost}
-                      disabled={!postContent.trim() || createPost.isPending}
+                      disabled={!postContent.trim() || isPosting || createPost.isPending}
                       className="px-5 py-2 bg-[#1d9bf0] text-white text-[15px] font-bold rounded-full disabled:opacity-50 hover:bg-[#1a8cd8] transition-colors"
                     >
-                      {createPost.isPending ? "Posting…" : "Post"}
+                      {isPosting || createPost.isPending ? "Posting…" : "Post"}
                     </button>
                   </div>
                 </div>

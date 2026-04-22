@@ -47,10 +47,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  console.log('[GET /api/fan-pulse/posts] rows:', data?.length ?? 0, '| league:', leagueTag ?? 'ALL')
+
   return NextResponse.json((data || []).map(mapRow))
 }
 
 export async function POST(req: NextRequest) {
+  console.log('[POST /api/fan-pulse/posts] SUPABASE_URL set:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log('[POST /api/fan-pulse/posts] SERVICE_KEY set:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+
   const { userId } = await auth()
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

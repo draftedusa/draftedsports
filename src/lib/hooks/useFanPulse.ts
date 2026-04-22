@@ -74,7 +74,9 @@ export function useFanPulsePosts(leagueTag?: string) {
       return res.json()
     },
     refetchInterval: 30000,
-    staleTime: 10000,
+    staleTime: 20000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   })
 }
 
@@ -127,6 +129,17 @@ export function useCreatePost() {
       }
       return { previousAll, previousLeague, leagueTag }
     },
+    onSuccess: (data, variables) => {
+      // Replace the temp optimistic entry with the real DB row
+      const replace = (old: FeedPost[] | undefined) => {
+        if (!old) return [data]
+        return old.map(p => p.id?.startsWith('temp-') ? data : p)
+      }
+      queryClient.setQueryData<FeedPost[]>(['fan-pulse-posts', 'ALL'], replace)
+      if (variables.leagueTag !== 'ALL') {
+        queryClient.setQueryData<FeedPost[]>(['fan-pulse-posts', variables.leagueTag], replace)
+      }
+    },
     onError: (_err, _vars, context) => {
       if (context?.previousAll !== undefined) {
         queryClient.setQueryData(['fan-pulse-posts', 'ALL'], context.previousAll)
@@ -136,10 +149,13 @@ export function useCreatePost() {
       }
     },
     onSettled: (_data, _err, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', 'ALL'] })
-      if (variables?.leagueTag && variables.leagueTag !== 'ALL') {
-        queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', variables.leagueTag] })
-      }
+      // Delay refetch so Supabase row is fully committed before we read it back
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', 'ALL'] })
+        if (variables?.leagueTag && variables.leagueTag !== 'ALL') {
+          queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', variables.leagueTag] })
+        }
+      }, 1500)
     },
   })
 }
