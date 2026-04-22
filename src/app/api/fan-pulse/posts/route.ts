@@ -99,22 +99,31 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase
     .from('fan_pulse_posts')
     .insert({
-      author_clerk_id: userId,
+      user_id: userId,
+      content: content?.trim() || '',
+      league_tag: leagueTag || 'ALL',
+      media_urls: mediaUrls || [],
+      reactions: {},
+      reply_count: 0,
       author_username: authorUsername,
       author_display_name: authorDisplayName,
       author_avatar_url: authorAvatarUrl,
-      content: content?.trim() || '',
-      league_tag: leagueTag,
-      media_urls: mediaUrls,
-      reactions: { fire: 0, wow: 0, repost: 0 },
-      reply_count: 0,
     })
     .select()
     .single()
 
   if (error) {
-    console.error('[POST /api/fan-pulse/posts] error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('[POST /api/fan-pulse/posts] Supabase insert error:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    })
+    return NextResponse.json({
+      error: error.message,
+      details: error.details,
+      hint: error.hint,
+    }, { status: 500 })
   }
 
   return NextResponse.json(mapRow(data), { status: 201 })

@@ -69,8 +69,13 @@ export async function runMigrations() {
       )
     `;
     await sql`CREATE INDEX IF NOT EXISTS fan_pulse_created_idx ON public.fan_pulse_posts(created_at DESC)`;
-    await sql`CREATE INDEX IF NOT EXISTS fan_pulse_author_idx  ON public.fan_pulse_posts(author_clerk_id)`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS user_id TEXT DEFAULT ''`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS author_username TEXT DEFAULT ''`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS author_display_name TEXT DEFAULT ''`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS author_avatar_url TEXT DEFAULT ''`;
     await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS media_urls TEXT[] DEFAULT '{}'`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS reactions JSONB DEFAULT '{}'`;
+    await sql`ALTER TABLE public.fan_pulse_posts ADD COLUMN IF NOT EXISTS reply_count INT DEFAULT 0`;
 
     // ── notifications ───────────────────────────────────────
     await sql`
