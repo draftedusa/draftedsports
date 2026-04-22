@@ -5,6 +5,21 @@ import { supabase } from '@/lib/supabase'
 import { useUser } from '@clerk/nextjs'
 import type { FanPulsePost, FanPulseReply } from '@/types'
 
+// ── Types ──────────────────────────────────────────────────
+export interface FeedPost {
+  id: string
+  content: string
+  league_tag: string
+  author_clerk_id?: string
+  fire_count: number
+  comment_count: number
+  repost_count: number
+  created_at: string
+  media_urls: string[]
+  user: { name: string; handle: string; avatar_url: string }
+  reactions?: { fire: number; wow: number; repost: number }
+}
+
 function mapPost(row: Record<string, unknown>): FanPulsePost {
   const reactions = (row.reactions as Record<string, number>) ?? {}
   return {
@@ -46,23 +61,86 @@ function mapReply(row: Record<string, unknown>): FanPulseReply {
 }
 
 export function useFanPulsePosts(leagueTag?: string) {
-  return useQuery({
-    queryKey: ['fan-pulse-posts', leagueTag],
+  return useQuery<FeedPost[]>({
+    queryKey: ['fan-pulse-posts', leagueTag ?? 'ALL'],
     queryFn: async () => {
-      let query = supabase
-        .from('fan_pulse_posts_ranked')
-        .select('*')
-        .limit(50)
-
+      const params = new URLSearchParams()
       if (leagueTag && leagueTag !== 'ALL') {
-        query = query.eq('league_tag', leagueTag)
+        params.set('league', leagueTag)
       }
-
-      const { data, error } = await query
-      if (error) throw error
-      return (data as Record<string, unknown>[]).map(mapPost)
+      const url = `/api/fan-pulse/posts${params.toString() ? '?' + params.toString() : ''}`
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Failed to fetch posts')
+      return res.json()
     },
     refetchInterval: 30000,
+    staleTime: 10000,
+  })
+}
+
+export function useCreatePost() {
+  const queryClient = useQueryClient()
+  const { user } = useUser()
+
+  return useMutation({
+    mutationFn: async ({
+      content,
+      leagueTag = 'ALL',
+      mediaUrls = [],
+    }: {
+      content: string
+      leagueTag: string
+      mediaUrls?: string[]
+    }) => {
+      const res = await fetch('/api/fan-pulse/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, leagueTag, mediaUrls }),
+      })
+      if (!res.ok) throw new Error(`Failed to create post: ${res.status}`)
+      return res.json() as Promise<FeedPost>
+    },
+    onMutate: async ({ content, leagueTag = 'ALL', mediaUrls = [] }) => {
+      await queryClient.cancelQueries({ queryKey: ['fan-pulse-posts'] })
+      const previousAll = queryClient.getQueryData<FeedPost[]>(['fan-pulse-posts', 'ALL'])
+      const previousLeague = queryClient.getQueryData<FeedPost[]>(['fan-pulse-posts', leagueTag])
+
+      const optimistic: FeedPost = {
+        id: 'temp-' + Date.now(),
+        content,
+        league_tag: leagueTag,
+        fire_count: 0,
+        comment_count: 0,
+        repost_count: 0,
+        media_urls: mediaUrls,
+        created_at: new Date().toISOString(),
+        user: {
+          name: user?.fullName || 'You',
+          handle: user?.username || 'you',
+          avatar_url: user?.imageUrl || '',
+        },
+      }
+
+      queryClient.setQueryData<FeedPost[]>(['fan-pulse-posts', 'ALL'], (old) => [optimistic, ...(old ?? [])])
+      if (leagueTag !== 'ALL') {
+        queryClient.setQueryData<FeedPost[]>(['fan-pulse-posts', leagueTag], (old) => [optimistic, ...(old ?? [])])
+      }
+      return { previousAll, previousLeague, leagueTag }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousAll !== undefined) {
+        queryClient.setQueryData(['fan-pulse-posts', 'ALL'], context.previousAll)
+      }
+      if (context?.previousLeague !== undefined && context?.leagueTag) {
+        queryClient.setQueryData(['fan-pulse-posts', context.leagueTag], context.previousLeague)
+      }
+    },
+    onSettled: (_data, _err, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', 'ALL'] })
+      if (variables?.leagueTag && variables.leagueTag !== 'ALL') {
+        queryClient.invalidateQueries({ queryKey: ['fan-pulse-posts', variables.leagueTag] })
+      }
+    },
   })
 }
 
