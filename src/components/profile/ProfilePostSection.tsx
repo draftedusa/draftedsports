@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useQueryClient } from "@tanstack/react-query";
 import AuthGate from "@/components/auth/AuthGate";
-
-interface Post { id: string; content: string; created_at: string }
+import { useUserPosts, useCreatePost } from "@/lib/hooks/useFanPulse";
 
 interface Props {
   username: string;
-  initialPosts: Post[];
+  clerkId: string;
   avatarUrl: string | null;
   displayName: string;
 }
@@ -17,32 +17,32 @@ function relativeDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export default function ProfilePostSection({ username, initialPosts, avatarUrl, displayName }: Props) {
+export default function ProfilePostSection({ username, clerkId, avatarUrl, displayName }: Props) {
   const { isSignedIn, user } = useUser();
-  const clerkUsername = (user?.publicMetadata as { username?: string } | undefined)?.username;
-  const isOwner = clerkUsername === username;
+  const queryClient = useQueryClient();
+  const clerkUsername = user?.username || (user?.publicMetadata as { username?: string } | undefined)?.username;
+  const isOwner = clerkUsername === username || user?.id === clerkId;
 
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [input, setInput]   = useState("");
-  const [posting, setPosting] = useState(false);
+  const { data: posts, isLoading } = useUserPosts(clerkId);
+  const createPost = useCreatePost();
+
+  const [input, setInput] = useState("");
 
   async function handlePost(e: React.FormEvent) {
     e.preventDefault();
-    if (!input.trim() || !isSignedIn || posting) return;
-    const body = input.trim();
-    setPosting(true);
+    if (!input.trim() || !isSignedIn || createPost.isPending) return;
     try {
-      const res = await fetch("/api/fan-pulse", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: body }),
+      await createPost.mutateAsync({
+        content: input.trim(),
+        leagueTag: "ALL",
+        mediaUrls: [],
       });
-      if (res.ok) {
-        setPosts((prev) => [{ id: `local-${Date.now()}`, content: body, created_at: new Date().toISOString() }, ...prev]);
-        setInput("");
-      }
-    } finally {
-      setPosting(false);
+      setInput("");
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["user-posts", clerkId] });
+      }, 1500);
+    } catch (err) {
+      console.error("[ProfilePostSection] post failed:", err);
     }
   }
 
@@ -56,7 +56,7 @@ export default function ProfilePostSection({ username, initialPosts, avatarUrl, 
         <h2 className="text-sm font-black uppercase tracking-wider text-surface-text">My Feed</h2>
       </div>
 
-      {/* Composer */}
+      {/* Composer — owner only */}
       {isOwner && (
         <form onSubmit={handlePost} className="px-5 pb-4 border-b border-surface-300">
           <div className="flex gap-3">
@@ -73,10 +73,10 @@ export default function ProfilePostSection({ username, initialPosts, avatarUrl, 
                 <AuthGate tooltip="Sign in to post">
                   <button
                     type="submit"
-                    disabled={posting || !input.trim()}
+                    disabled={createPost.isPending || !input.trim()}
                     className="px-4 py-1.5 bg-brand hover:bg-brand/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-bold rounded-full transition-colors"
                   >
-                    {posting ? "…" : "Post"}
+                    {createPost.isPending ? "…" : "Post"}
                   </button>
                 </AuthGate>
               </div>
@@ -87,7 +87,11 @@ export default function ProfilePostSection({ username, initialPosts, avatarUrl, 
 
       {/* Posts */}
       <div className="divide-y divide-surface-300">
-        {posts.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-6">
+            <p className="text-xs text-surface-muted">Loading…</p>
+          </div>
+        ) : posts && posts.length > 0 ? (
           posts.map((p) => (
             <div key={p.id} className="flex items-start gap-2.5 px-5 py-3">
               <span className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-brand" />

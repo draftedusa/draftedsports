@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const leagueTag = searchParams.get('league')
 
+  const filterUserId = searchParams.get('userId')
+
   let query = supabase
     .from('fan_pulse_posts')
     .select('*')
@@ -38,6 +40,10 @@ export async function GET(req: NextRequest) {
 
   if (leagueTag && leagueTag !== 'ALL') {
     query = query.eq('league_tag', leagueTag)
+  }
+
+  if (filterUserId) {
+    query = query.eq('user_id', filterUserId)
   }
 
   const { data, error } = await query
@@ -85,12 +91,12 @@ export async function POST(req: NextRequest) {
     const { clerkClient } = await import('@clerk/nextjs/server')
     const client = await clerkClient()
     const clerkUser = await client.users.getUser(userId)
-    authorUsername =
-      clerkUser.username ||
-      clerkUser.emailAddresses[0]?.emailAddress?.split('@')[0] ||
-      'user'
+    // Never use email prefix — fall back to short user ID suffix
+    authorUsername = clerkUser.username || `user_${userId.slice(-6)}`
     authorDisplayName =
-      `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'User'
+      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') ||
+      clerkUser.username ||
+      'User'
     authorAvatarUrl = clerkUser.imageUrl || ''
   } catch (err) {
     console.error('[POST /api/fan-pulse/posts] Clerk fetch failed:', err)
@@ -125,6 +131,15 @@ export async function POST(req: NextRequest) {
       hint: error.hint,
     }, { status: 500 })
   }
+
+  // Log activity (fire-and-forget)
+  supabase.from('user_activity').insert({
+    clerk_id: userId,
+    type: 'comment_posted',
+    description: `Posted: "${(content?.trim() ?? '').slice(0, 80)}${(content?.trim() ?? '').length > 80 ? '…' : ''}"`,
+  }).then(({ error: actErr }) => {
+    if (actErr) console.error('[activity log] failed:', actErr)
+  })
 
   return NextResponse.json(mapRow(data), { status: 201 })
 }

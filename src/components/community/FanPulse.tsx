@@ -399,8 +399,20 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
           {/* Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-1.5 flex-wrap mb-0.5">
-              <span className="font-bold text-[15px] text-gray-900 dark:text-[#e7e9ea]">{post.user.name}</span>
-              <span className="text-[15px] text-gray-500 dark:text-[#71767b]">@{post.user.handle}</span>
+              <Link
+                href={`/profile/${post.user.handle}`}
+                onClick={(e) => e.stopPropagation()}
+                className="font-bold text-[15px] text-gray-900 dark:text-[#e7e9ea] hover:underline"
+              >
+                {post.user.name}
+              </Link>
+              <Link
+                href={`/profile/${post.user.handle}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-[15px] text-gray-500 dark:text-[#71767b] hover:underline"
+              >
+                @{post.user.handle}
+              </Link>
               <span className="text-gray-400 dark:text-[#71767b]">·</span>
               <span className="text-[13px] text-gray-500 dark:text-[#71767b]">{relTime(post.created_at)}</span>
               <span className="ml-auto">
@@ -485,8 +497,8 @@ function FanPulseFeed({ lockedLeague }: { lockedLeague?: string }) {
             authorAvatar: replyModalPost.user.avatar_url,
           }}
           onClose={() => setReplyModalPost(null)}
-          onSubmit={async (content) => {
-            await createReply.mutateAsync({ postId: replyModalPost.id, content, depth: 0 });
+          onSubmit={async (content, mediaUrls) => {
+            await createReply.mutateAsync({ postId: replyModalPost.id, content, mediaUrls, depth: 0 });
             queryClient.setQueriesData<Post[]>({ queryKey: ['fan-pulse-posts'] }, old =>
               old?.map(p => p.id === replyModalPost.id ? { ...p, comment_count: p.comment_count + 1 } : p)
             );

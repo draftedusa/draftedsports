@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { ImageIcon, Film, BarChart2 } from 'lucide-react'
+import { ImageIcon, X } from 'lucide-react'
+import { uploadMediaFiles } from '@/lib/uploadMedia'
 
 interface PostPreview {
   id: string
@@ -15,19 +16,41 @@ interface PostPreview {
 interface ReplyModalProps {
   post: PostPreview
   onClose: () => void
-  onSubmit: (content: string) => Promise<void>
+  onSubmit: (content: string, mediaUrls?: string[]) => Promise<void>
 }
 
 export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
   const { user } = useUser()
   const [content, setContent] = useState('')
+  const [mediaFiles, setMediaFiles] = useState<File[]>([])
+  const [mediaPreviewUrls, setMediaPreviewUrls] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function handleMediaSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || [])
+    const next = [...mediaFiles, ...files].slice(0, 4)
+    setMediaFiles(next)
+    setMediaPreviewUrls(next.map(f => URL.createObjectURL(f)))
+    e.target.value = ''
+  }
+
+  function removeMedia(index: number) {
+    URL.revokeObjectURL(mediaPreviewUrls[index])
+    const nextFiles = mediaFiles.filter((_, i) => i !== index)
+    setMediaFiles(nextFiles)
+    setMediaPreviewUrls(nextFiles.map(f => URL.createObjectURL(f)))
+  }
 
   const handleSubmit = async () => {
     if (!content.trim() || isSubmitting) return
     setIsSubmitting(true)
     try {
-      await onSubmit(content)
+      let uploadedUrls: string[] = []
+      if (mediaFiles.length > 0) {
+        uploadedUrls = await uploadMediaFiles(mediaFiles)
+      }
+      await onSubmit(content, uploadedUrls)
       onClose()
     } finally {
       setIsSubmitting(false)
@@ -107,34 +130,57 @@ export function ReplyModal({ post, onClose, onSubmit }: ReplyModalProps) {
                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit()
               }}
               placeholder="Post your reply"
-              maxLength={280}
+              maxLength={500}
               rows={3}
               className="w-full bg-transparent text-[20px] text-[#e7e9ea] placeholder:text-[#71767b] resize-none outline-none leading-7 min-h-[80px]"
             />
 
+            {/* Media preview grid */}
+            {mediaPreviewUrls.length > 0 && (
+              <div className={`grid gap-1 mt-2 rounded-2xl overflow-hidden ${mediaPreviewUrls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                {mediaPreviewUrls.map((url, i) => (
+                  <div key={i} className="relative aspect-video bg-[#1c1c1c]">
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => removeMedia(i)}
+                      className="absolute top-1 right-1 w-6 h-6 bg-black/70 rounded-full flex items-center justify-center hover:bg-black transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-white" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#2f3336]">
               <div className="flex items-center gap-1 text-[#1d9bf0]">
-                <button className="p-2 hover:bg-[#1d9bf0]/10 rounded-full transition-colors">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleMediaSelect}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={mediaFiles.length >= 4}
+                  className="p-2 hover:bg-[#1d9bf0]/10 rounded-full transition-colors disabled:opacity-40"
+                >
                   <ImageIcon className="w-[18px] h-[18px]" />
-                </button>
-                <button className="p-2 hover:bg-[#1d9bf0]/10 rounded-full transition-colors">
-                  <Film className="w-[18px] h-[18px]" />
-                </button>
-                <button className="p-2 hover:bg-[#1d9bf0]/10 rounded-full transition-colors">
-                  <BarChart2 className="w-[18px] h-[18px]" />
                 </button>
               </div>
 
               <div className="flex items-center gap-3">
-                {content.length > 240 && (
-                  <span className={`text-[13px] ${content.length > 270 ? 'text-red-500' : 'text-gray-400 dark:text-[#71767b]'}`}>
-                    {280 - content.length}
+                {content.length > 460 && (
+                  <span className={`text-[13px] ${content.length > 490 ? 'text-red-500' : 'text-[#71767b]'}`}>
+                    {500 - content.length}
                   </span>
                 )}
                 <button
                   onClick={handleSubmit}
                   disabled={!content.trim() || isSubmitting}
-                  className="px-5 py-2 bg-[#1d9bf0] text-white text-[15px] font-bold rounded-full disabled:opacity-50 hover:bg-[#1a8cd8] transition-colors"
+                  className="px-5 py-2 bg-[#007CB0] text-white text-[15px] font-bold rounded-full disabled:opacity-50 hover:bg-[#006a99] transition-colors"
                 >
                   {isSubmitting ? 'Posting…' : 'Reply'}
                 </button>

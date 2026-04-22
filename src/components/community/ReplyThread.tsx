@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { formatDistanceToNow } from 'date-fns'
 import { useReplies, useCreateReply } from '@/lib/hooks/useFanPulse'
+import { MediaGrid } from '@/components/fan-pulse/MediaGrid'
 import type { FanPulseReply } from '@/types'
 
 interface ReplyThreadProps {
@@ -144,6 +145,9 @@ function ReplyItem({
             <span className="text-[10px] text-surface-muted">{timeAgo}</span>
           </div>
           <p className="text-xs text-surface-text/90 mt-0.5 leading-relaxed">{reply.content}</p>
+          {reply.media_urls && reply.media_urls.length > 0 && (
+            <MediaGrid files={reply.media_urls} />
+          )}
           <div className="flex items-center gap-3 mt-1">
             <button className="text-[10px] text-surface-muted hover:text-orange-400 flex items-center gap-1 transition-colors">
               🔥 {reply.fire_count}

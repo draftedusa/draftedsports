@@ -1,16 +1,14 @@
 import { auth } from '@clerk/nextjs/server'
-import { supabaseService } from '@/lib/supabase'
-import { runMigrations } from '@/lib/migrations'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-let migrated = false
-async function ensureMigrated() {
-  if (!migrated) { await runMigrations(); migrated = true }
-}
+const getSupabase = () =>
+  createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
 export async function POST(req: Request) {
-  await ensureMigrated()
-
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -18,28 +16,41 @@ export async function POST(req: Request) {
   const content: string = (body.content ?? '').trim()
   if (!content) return NextResponse.json({ error: 'Content required' }, { status: 400 })
 
-  const { postId, parentReplyId, depth } = body
+  const { postId, parentReplyId, depth, mediaUrls = [] } = body
   if (!postId) return NextResponse.json({ error: 'postId required' }, { status: 400 })
 
-  const { data: profile } = await supabaseService
-    .from('users')
-    .select('username, display_name, avatar_url')
-    .eq('clerk_id', userId)
-    .maybeSingle()
+  let authorUsername = `user_${userId.slice(-6)}`
+  let authorDisplayName: string | null = null
+  let authorAvatarUrl: string | null = null
 
-  const username = profile?.username ?? userId.slice(0, 8)
+  try {
+    const { clerkClient } = await import('@clerk/nextjs/server')
+    const client = await clerkClient()
+    const clerkUser = await client.users.getUser(userId)
+    authorUsername = clerkUser.username || `user_${userId.slice(-6)}`
+    authorDisplayName =
+      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') ||
+      clerkUser.username ||
+      null
+    authorAvatarUrl = clerkUser.imageUrl || null
+  } catch (err) {
+    console.error('[fan-pulse/replies POST] Clerk fetch failed:', err)
+  }
 
-  const { data, error } = await supabaseService
+  const supabase = getSupabase()
+
+  const { data, error } = await supabase
     .from('fan_pulse_replies')
     .insert({
       post_id: postId,
       parent_reply_id: parentReplyId || null,
       user_id: userId,
-      author_username: username,
-      author_display_name: profile?.display_name ?? null,
-      author_avatar_url: profile?.avatar_url ?? null,
+      author_username: authorUsername,
+      author_display_name: authorDisplayName,
+      author_avatar_url: authorAvatarUrl,
       content,
       depth: depth ?? 0,
+      media_urls: mediaUrls,
     })
     .select()
     .single()
@@ -50,14 +61,14 @@ export async function POST(req: Request) {
   }
 
   // Increment reply_count on parent post (fire-and-forget)
-  supabaseService
+  supabase
     .from('fan_pulse_posts')
     .select('reply_count')
     .eq('id', postId)
     .single()
     .then(({ data: p }) => {
       if (p) {
-        supabaseService
+        supabase
           .from('fan_pulse_posts')
           .update({ reply_count: (p.reply_count ?? 0) + 1 })
           .eq('id', postId)

@@ -50,6 +50,7 @@ function mapReply(row: Record<string, unknown>): FanPulseReply {
     content: row.content as string,
     fire_count: (row.fire_count as number) ?? 0,
     depth: (row.depth as number) ?? 0,
+    media_urls: (row.media_urls as string[]) ?? [],
     created_at: row.created_at as string,
     updated_at: (row.updated_at ?? row.created_at) as string,
     user: {
@@ -77,6 +78,20 @@ export function useFanPulsePosts(leagueTag?: string) {
     staleTime: 20000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+  })
+}
+
+export function useUserPosts(userId: string | null) {
+  return useQuery<FeedPost[]>({
+    queryKey: ['user-posts', userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/fan-pulse/posts?userId=${userId}`)
+      if (!res.ok) throw new Error('Failed to fetch user posts')
+      return res.json()
+    },
+    enabled: !!userId,
+    staleTime: 15000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -235,11 +250,13 @@ export function useCreateReply() {
       content,
       parentReplyId,
       depth,
+      mediaUrls = [],
     }: {
       postId: string
       content: string
       parentReplyId?: string
       depth: number
+      mediaUrls?: string[]
     }) => {
       const res = await fetch('/api/fan-pulse/replies', {
         method: 'POST',
@@ -249,6 +266,7 @@ export function useCreateReply() {
           content,
           parentReplyId: parentReplyId || null,
           depth,
+          mediaUrls,
           userId: user?.id,
         }),
       })

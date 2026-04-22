@@ -197,6 +197,7 @@ export interface FanPulseReply {
   depth: number
   created_at: string
   updated_at: string
+  media_urls?: string[]
   user?: {
     name: string
     handle: string

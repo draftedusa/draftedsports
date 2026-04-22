@@ -98,10 +98,10 @@ export default async function ProfilePage({ params }: Props) {
   ] = await Promise.all([
     supabaseService.from("followers").select("*", { count: "exact", head: true }).eq("following_clerk_id", profile.clerk_id),
     supabaseService.from("followers").select("*", { count: "exact", head: true }).eq("follower_clerk_id",  profile.clerk_id),
-    supabaseService.from("fan_pulse_posts").select("*", { count: "exact", head: true }).eq("author_clerk_id", profile.clerk_id),
+    supabaseService.from("fan_pulse_posts").select("*", { count: "exact", head: true }).eq("user_id", profile.clerk_id),
     supabaseService.from("saved_articles").select("*",  { count: "exact", head: true }).eq("clerk_id", profile.clerk_id),
     supabaseService.from("achievements").select("achievement_type, awarded_at").eq("clerk_id", profile.clerk_id),
-    supabaseService.from("fan_pulse_posts").select("id, content, created_at").eq("author_clerk_id", profile.clerk_id).order("created_at", { ascending: false }).limit(12),
+    supabaseService.from("fan_pulse_posts").select("id, content, created_at").eq("user_id", profile.clerk_id).order("created_at", { ascending: false }).limit(12),
     supabaseService.from("saved_articles").select("article_slug").eq("clerk_id", profile.clerk_id).order("saved_at", { ascending: false }).limit(6),
     supabaseService.from("user_activity").select("*").eq("clerk_id", profile.clerk_id).order("created_at", { ascending: false }).limit(6),
   ]);
@@ -243,11 +243,7 @@ export default async function ProfilePage({ params }: Props) {
           {isOwner && (
             <ProfilePostSection
               username={username}
-              initialPosts={(recentPosts ?? []).map((p: { id: string; content: string; created_at: string }) => ({
-                id: p.id,
-                content: p.content,
-                created_at: p.created_at,
-              }))}
+              clerkId={profile.clerk_id}
               avatarUrl={profile.avatar_url}
               displayName={profile.display_name ?? profile.username}
             />
